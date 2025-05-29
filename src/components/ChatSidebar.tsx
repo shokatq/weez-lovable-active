@@ -30,9 +30,9 @@ const ChatSidebar = ({
   const generateSmartTitle = (firstMessage: string) => {
     if (!firstMessage) return "New conversation";
     
-    // Take first 50 characters and add ellipsis if longer
-    const title = firstMessage.length > 50 
-      ? firstMessage.substring(0, 50) + "..." 
+    // Take first 30-40 characters for a cleaner look
+    const title = firstMessage.length > 35 
+      ? firstMessage.substring(0, 35) + "..." 
       : firstMessage;
     
     return title;
@@ -53,9 +53,9 @@ const ChatSidebar = ({
       <SidebarHeader className="p-3 border-b border-weezy-dark-tertiary">
         <Button
           onClick={onNewConversation}
-          className="w-full bg-transparent hover:bg-weezy-dark-secondary text-white border border-weezy-dark-tertiary font-normal rounded-lg h-10 justify-start"
+          className="w-full bg-transparent hover:bg-weezy-dark-secondary text-white/80 hover:text-white border border-weezy-dark-tertiary font-normal rounded-lg h-10 justify-start text-sm"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 mr-3" />
           New chat
         </Button>
       </SidebarHeader>
@@ -80,11 +80,11 @@ const ChatSidebar = ({
                         className={`w-full p-2 rounded-lg transition-colors text-left ${
                           currentConversationId === conversation.id
                             ? "bg-weezy-dark-secondary text-white"
-                            : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
+                            : "hover:bg-weezy-dark-secondary text-white/70 hover:text-white"
                         }`}
                       >
                         <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-white/60 flex-shrink-0" />
+                          <MessageSquare className="w-4 h-4 text-white/50 flex-shrink-0" />
                           <span className="text-sm truncate font-normal">
                             {smartTitle}
                           </span>
@@ -117,11 +117,11 @@ const ChatSidebar = ({
                         className={`w-full p-2 rounded-lg transition-colors text-left ${
                           currentConversationId === conversation.id
                             ? "bg-weezy-dark-secondary text-white"
-                            : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
+                            : "hover:bg-weezy-dark-secondary text-white/70 hover:text-white"
                         }`}
                       >
                         <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-white/60 flex-shrink-0" />
+                          <MessageSquare className="w-4 h-4 text-white/50 flex-shrink-0" />
                           <span className="text-sm truncate font-normal">
                             {smartTitle}
                           </span>

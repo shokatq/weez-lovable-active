@@ -46,7 +46,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   return (
     <div className="p-6 bg-weezy-dark">
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-end gap-3 p-4 bg-weezy-dark-secondary rounded-3xl border border-weezy-dark-tertiary shadow-sm">
+        <div className="relative flex items-center gap-3 p-4 bg-weezy-dark-secondary rounded-3xl shadow-sm">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -76,15 +76,17 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             </Button>
           </div>
 
-          <Textarea
-            ref={textareaRef}
-            value={message}
-            onChange={handleTextareaChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask anything"
-            className="flex-1 min-h-[24px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-white/50 focus:ring-0 focus:ring-offset-0 text-sm p-0 leading-relaxed"
-            style={{ height: 'auto' }}
-          />
+          <div className="flex-1 relative">
+            <Textarea
+              ref={textareaRef}
+              value={message}
+              onChange={handleTextareaChange}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask anything"
+              className="w-full min-h-[24px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-white/50 focus:ring-0 focus:ring-offset-0 text-base p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0"
+              style={{ height: 'auto' }}
+            />
+          </div>
 
           <div className="flex items-center gap-2">
             <Button
