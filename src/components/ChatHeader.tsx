@@ -5,7 +5,7 @@ import { Menu } from "lucide-react";
 
 const ChatHeader = () => {
   return (
-    <header className="flex items-center justify-between p-4 border-b border-weezy-dark-tertiary bg-weezy-dark/80 backdrop-blur-xl">
+    <header className="flex items-center justify-between p-4 border-b border-weezy-dark-tertiary bg-weezy-dark">
       <div className="flex items-center gap-4">
         <SidebarTrigger>
           <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-weezy-dark-secondary">
@@ -14,7 +14,7 @@ const ChatHeader = () => {
         </SidebarTrigger>
         
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-weezy-accent to-weezy-accent-light flex items-center justify-center animate-pulse-glow">
+          <div className="w-8 h-8 rounded-lg bg-weezy-accent flex items-center justify-center">
             <span className="text-white font-bold text-sm">W</span>
           </div>
           <div>
@@ -25,7 +25,7 @@ const ChatHeader = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
         <span className="text-xs text-white/60">Online</span>
       </div>
     </header>

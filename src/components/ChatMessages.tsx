@@ -22,8 +22,8 @@ const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
       {messages.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-weezy-accent to-weezy-accent-light flex items-center justify-center mb-6 animate-float">
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <div className="w-20 h-20 rounded-2xl bg-weezy-accent flex items-center justify-center mb-6">
             <span className="text-white font-bold text-2xl">W</span>
           </div>
           <h2 className="text-2xl font-semibold text-white mb-2">Welcome to Weezy</h2>
@@ -33,16 +33,15 @@ const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
         </div>
       )}
 
-      {messages.map((message, index) => (
+      {messages.map((message) => (
         <div
           key={message.id}
-          className={`flex gap-4 animate-fade-in ${
+          className={`flex gap-4 ${
             message.isUser ? "justify-end" : "justify-start"
           }`}
-          style={{ animationDelay: `${index * 0.1}s` }}
         >
           {!message.isUser && (
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-weezy-accent to-weezy-accent-light flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-weezy-accent flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">W</span>
             </div>
           )}
@@ -72,8 +71,8 @@ const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
       ))}
 
       {isThinking && (
-        <div className="flex gap-4 justify-start animate-slide-up">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-weezy-accent to-weezy-accent-light flex items-center justify-center flex-shrink-0">
+        <div className="flex gap-4 justify-start">
+          <div className="w-8 h-8 rounded-lg bg-weezy-accent flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">W</span>
           </div>
           

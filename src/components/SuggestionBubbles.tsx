@@ -8,31 +8,20 @@ const suggestions = [
   "Analyze this data",
   "Create a presentation",
   "Schedule my tasks",
-  "Research latest trends",
-  "Generate creative ideas",
-  "Review my notes",
-  "Plan my day",
 ];
 
 const SuggestionBubbles = () => {
   const [visibleSuggestions, setVisibleSuggestions] = useState(
-    suggestions.slice(0, 4)
+    suggestions.slice(0, 3)
   );
-  const [shuffleIndex, setShuffleIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setShuffleIndex((prev) => (prev + 1) % suggestions.length);
       setVisibleSuggestions((prev) => {
-        const newSuggestions = [...prev];
-        const randomIndex = Math.floor(Math.random() * newSuggestions.length);
-        const nextSuggestionIndex =
-          (suggestions.indexOf(newSuggestions[randomIndex]) + 1) %
-          suggestions.length;
-        newSuggestions[randomIndex] = suggestions[nextSuggestionIndex];
-        return newSuggestions;
+        const newSuggestions = [...suggestions];
+        return newSuggestions.slice(0, 3);
       });
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -42,9 +31,8 @@ const SuggestionBubbles = () => {
       <div className="flex flex-wrap justify-center gap-3 px-4">
         {visibleSuggestions.map((suggestion, index) => (
           <div
-            key={`${suggestion}-${shuffleIndex}`}
-            className="suggestion-bubble animate-shuffle"
-            style={{ animationDelay: `${index * 0.2}s` }}
+            key={suggestion}
+            className="bg-weezy-dark-secondary border border-weezy-dark-tertiary rounded-full px-4 py-2 text-sm text-white/90 cursor-pointer hover:bg-weezy-dark-tertiary transition-colors"
           >
             {suggestion}
           </div>

@@ -56,21 +56,21 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   ];
 
   return (
-    <div className="p-4 border-t border-weezy-dark-tertiary bg-weezy-dark/80 backdrop-blur-xl">
+    <div className="p-4 border-t border-weezy-dark-tertiary bg-weezy-dark">
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-end gap-3 p-3 bg-weezy-dark-secondary rounded-2xl border border-weezy-dark-tertiary glow-effect">
+        <div className="relative flex items-end gap-3 p-3 bg-weezy-dark-secondary rounded-2xl border border-weezy-dark-tertiary">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white/80 hover:text-white hover:bg-weezy-dark-tertiary rounded-xl p-2 transition-all duration-200 hover:scale-110"
+                className="text-white/80 hover:text-white hover:bg-weezy-dark-tertiary rounded-xl p-2"
               >
                 <Plus className="w-5 h-5" />
               </Button>
             </PopoverTrigger>
             <PopoverContent 
-              className="w-80 p-4 bg-weezy-dark-secondary border border-weezy-dark-tertiary rounded-xl glass-effect" 
+              className="w-80 p-4 bg-weezy-dark-secondary border border-weezy-dark-tertiary rounded-xl" 
               sideOffset={10}
             >
               <div className="space-y-2">
@@ -79,7 +79,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
                   <Button
                     key={option.label}
                     variant="ghost"
-                    className="w-full justify-start text-left p-3 h-auto hover:bg-weezy-dark-tertiary transition-all duration-200"
+                    className="w-full justify-start text-left p-3 h-auto hover:bg-weezy-dark-tertiary"
                     onClick={() => {
                       // Implement file upload functionality
                       console.log(`Upload ${option.label}`);
@@ -109,18 +109,18 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className={`text-white/80 hover:text-white rounded-xl p-2 transition-all duration-200 hover:scale-110 ${
+              className={`text-white/80 hover:text-white rounded-xl p-2 ${
                 isRecording ? "bg-red-500/20 text-red-400" : "hover:bg-weezy-dark-tertiary"
               }`}
               onClick={toggleRecording}
             >
-              <Mic className={`w-5 h-5 ${isRecording ? "animate-pulse" : ""}`} />
+              <Mic className="w-5 h-5" />
             </Button>
 
             <Button
               onClick={handleSend}
               disabled={!message.trim()}
-              className="bg-weezy-accent hover:bg-weezy-accent-light text-white rounded-xl p-2 transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="bg-weezy-accent hover:bg-weezy-accent-light text-white rounded-xl p-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-5 h-5" />
             </Button>
