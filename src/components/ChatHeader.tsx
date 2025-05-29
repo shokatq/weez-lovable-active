@@ -7,7 +7,7 @@ const ChatHeader = () => {
   return (
     <header className="flex items-center justify-between p-4 border-b border-weezy-dark-tertiary bg-weezy-dark/80 backdrop-blur-xl">
       <div className="flex items-center gap-4">
-        <SidebarTrigger asChild>
+        <SidebarTrigger>
           <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-weezy-dark-secondary">
             <Menu className="w-4 h-4" />
           </Button>

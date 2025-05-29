@@ -103,7 +103,6 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             onKeyPress={handleKeyPress}
             placeholder="Message Weezy..."
             className="flex-1 min-h-[50px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-white/50 focus:ring-0 focus:ring-offset-0 text-sm leading-relaxed p-2"
-            style={{ fieldSizing: "content" }}
           />
 
           <div className="flex items-center gap-2">
