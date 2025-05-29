@@ -46,7 +46,6 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
 
   const toggleRecording = () => {
     setIsRecording(!isRecording);
-    // Here you would implement actual voice recording functionality
   };
 
   const fileUploadOptions = [
@@ -56,39 +55,39 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   ];
 
   return (
-    <div className="p-4 border-t border-weezy-dark-tertiary bg-weezy-dark">
+    <div className="p-6 bg-weezy-dark border-t border-weezy-dark-tertiary">
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-end gap-3 p-3 bg-weezy-dark-secondary rounded-2xl border border-weezy-dark-tertiary">
+        <div className="relative flex items-end gap-3 p-4 bg-weezy-dark-secondary rounded-2xl border border-weezy-dark-tertiary shadow-lg">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white/80 hover:text-white hover:bg-weezy-dark-tertiary rounded-xl p-2"
+                className="text-white/70 hover:text-white hover:bg-weezy-dark-tertiary rounded-xl p-2 h-8 w-8"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
               </Button>
             </PopoverTrigger>
             <PopoverContent 
-              className="w-80 p-4 bg-weezy-dark-secondary border border-weezy-dark-tertiary rounded-xl" 
+              className="w-72 p-3 bg-weezy-dark-secondary border border-weezy-dark-tertiary rounded-xl shadow-xl" 
               sideOffset={10}
+              align="start"
             >
-              <div className="space-y-2">
-                <h3 className="font-medium text-white mb-3">Upload Files</h3>
+              <div className="space-y-1">
+                <h3 className="font-medium text-white text-sm mb-2 px-2">Upload Files</h3>
                 {fileUploadOptions.map((option) => (
                   <Button
                     key={option.label}
                     variant="ghost"
-                    className="w-full justify-start text-left p-3 h-auto hover:bg-weezy-dark-tertiary"
+                    className="w-full justify-start text-left p-3 h-auto hover:bg-weezy-dark-tertiary rounded-lg"
                     onClick={() => {
-                      // Implement file upload functionality
                       console.log(`Upload ${option.label}`);
                     }}
                   >
-                    <option.icon className="w-5 h-5 mr-3 text-weezy-accent" />
-                    <div>
-                      <div className="font-medium text-white">{option.label}</div>
-                      <div className="text-sm text-white/60">{option.description}</div>
+                    <option.icon className="w-4 h-4 mr-3 text-weezy-accent" />
+                    <div className="text-left">
+                      <div className="font-medium text-white text-sm">{option.label}</div>
+                      <div className="text-xs text-white/60">{option.description}</div>
                     </div>
                   </Button>
                 ))}
@@ -102,32 +101,34 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             onChange={handleTextareaChange}
             onKeyPress={handleKeyPress}
             placeholder="Message Weezy..."
-            className="flex-1 min-h-[50px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-white/50 focus:ring-0 focus:ring-offset-0 text-sm leading-relaxed p-2"
+            className="flex-1 min-h-[24px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-white/50 focus:ring-0 focus:ring-offset-0 text-sm p-0 leading-relaxed"
+            style={{ height: 'auto' }}
           />
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className={`text-white/80 hover:text-white rounded-xl p-2 ${
-                isRecording ? "bg-red-500/20 text-red-400" : "hover:bg-weezy-dark-tertiary"
+              className={`text-white/70 hover:text-white rounded-xl p-2 h-8 w-8 ${
+                isRecording ? "text-red-400 hover:text-red-300" : ""
               }`}
               onClick={toggleRecording}
             >
-              <Mic className="w-5 h-5" />
+              <Mic className="w-4 h-4" />
             </Button>
 
             <Button
               onClick={handleSend}
               disabled={!message.trim()}
-              className="bg-weezy-accent hover:bg-weezy-accent-light text-white rounded-xl p-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              size="sm"
+              className="bg-weezy-accent hover:bg-weezy-accent-light text-white rounded-xl p-2 h-8 w-8 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-weezy-accent"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
             </Button>
           </div>
         </div>
 
-        <p className="text-center text-xs text-white/40 mt-2">
+        <p className="text-center text-xs text-white/40 mt-3">
           Weezy can make mistakes. Consider checking important information.
         </p>
       </div>

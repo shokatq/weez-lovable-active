@@ -1,5 +1,5 @@
 
-import { Calendar, MessageSquare, Trash2 } from "lucide-react";
+import { MessageSquare, Plus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -50,57 +50,54 @@ const ChatSidebar = ({
   });
 
   return (
-    <Sidebar className="border-r border-weezy-dark-tertiary">
+    <Sidebar className="border-r border-weezy-dark-tertiary bg-weezy-dark">
       <SidebarHeader className="p-4 border-b border-weezy-dark-tertiary">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-weezy-accent to-weezy-accent-light flex items-center justify-center">
-            <span className="text-white font-bold text-sm">W</span>
+          <div className="w-8 h-8 rounded-lg bg-weezy-accent flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">W</span>
           </div>
           <div>
-            <h1 className="font-semibold text-lg text-white">Weezy AI</h1>
+            <h1 className="font-semibold text-white">Weezy AI</h1>
             <p className="text-xs text-white/60">Your intelligent assistant</p>
           </div>
         </div>
         
         <Button
           onClick={onNewConversation}
-          className="w-full bg-weezy-accent hover:bg-weezy-accent-light text-white font-medium rounded-lg transition-all duration-200 hover:scale-105"
+          className="w-full bg-weezy-accent hover:bg-weezy-accent-light text-white font-medium rounded-lg h-10"
         >
-          <MessageSquare className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           New Chat
         </Button>
       </SidebarHeader>
 
-      <SidebarContent className="p-2">
+      <SidebarContent className="p-3">
         {recentConversations.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-white/60 font-medium mb-2">
+            <SidebarGroupLabel className="text-white/70 font-medium text-xs mb-2 px-2">
               Recent
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="space-y-1">
                 {recentConversations.map((conversation) => (
                   <SidebarMenuItem key={conversation.id}>
                     <SidebarMenuButton
                       onClick={() => onConversationSelect(conversation.id)}
-                      className={`w-full p-3 rounded-lg transition-all duration-200 hover:bg-weezy-dark-secondary group ${
+                      className={`w-full p-3 rounded-lg transition-colors group ${
                         currentConversationId === conversation.id
-                          ? "bg-weezy-accent/20 border border-weezy-accent/30"
-                          : "hover:bg-weezy-dark-secondary"
+                          ? "bg-weezy-dark-secondary text-white"
+                          : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
                       }`}
                     >
-                      <div className="flex items-start gap-3 w-full">
-                        <MessageSquare className="w-4 h-4 mt-1 text-weezy-accent flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-sm text-white truncate">
+                      <div className="flex items-start gap-3 w-full min-w-0">
+                        <MessageSquare className="w-4 h-4 mt-0.5 text-weezy-accent flex-shrink-0" />
+                        <div className="flex-1 min-w-0 text-left">
+                          <h3 className="font-medium text-sm truncate">
                             {conversation.title}
                           </h3>
-                          <p className="text-xs text-white/60 truncate mt-1">
+                          <p className="text-xs text-white/50 truncate mt-0.5">
                             {conversation.lastMessage}
                           </p>
-                          <span className="text-xs text-white/40 mt-1 block">
-                            {formatTime(conversation.timestamp)}
-                          </span>
                         </div>
                       </div>
                     </SidebarMenuButton>
@@ -112,35 +109,31 @@ const ChatSidebar = ({
         )}
 
         {olderConversations.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-white/60 font-medium mb-2 flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Previous
+          <SidebarGroup className="mt-6">
+            <SidebarGroupLabel className="text-white/70 font-medium text-xs mb-2 px-2">
+              Previous 7 days
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="space-y-1">
                 {olderConversations.map((conversation) => (
                   <SidebarMenuItem key={conversation.id}>
                     <SidebarMenuButton
                       onClick={() => onConversationSelect(conversation.id)}
-                      className={`w-full p-3 rounded-lg transition-all duration-200 hover:bg-weezy-dark-secondary group ${
+                      className={`w-full p-3 rounded-lg transition-colors group ${
                         currentConversationId === conversation.id
-                          ? "bg-weezy-accent/20 border border-weezy-accent/30"
-                          : "hover:bg-weezy-dark-secondary"
+                          ? "bg-weezy-dark-secondary text-white"
+                          : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
                       }`}
                     >
-                      <div className="flex items-start gap-3 w-full">
-                        <MessageSquare className="w-4 h-4 mt-1 text-weezy-accent flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-sm text-white truncate">
+                      <div className="flex items-start gap-3 w-full min-w-0">
+                        <MessageSquare className="w-4 h-4 mt-0.5 text-weezy-accent flex-shrink-0" />
+                        <div className="flex-1 min-w-0 text-left">
+                          <h3 className="font-medium text-sm truncate">
                             {conversation.title}
                           </h3>
-                          <p className="text-xs text-white/60 truncate mt-1">
+                          <p className="text-xs text-white/50 truncate mt-0.5">
                             {conversation.lastMessage}
                           </p>
-                          <span className="text-xs text-white/40 mt-1 block">
-                            {formatTime(conversation.timestamp)}
-                          </span>
                         </div>
                       </div>
                     </SidebarMenuButton>
