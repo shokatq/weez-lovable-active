@@ -27,16 +27,15 @@ const ChatSidebar = ({
   onConversationSelect,
   onNewConversation,
 }: ChatSidebarProps) => {
-  const formatTime = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffHours < 1) return "Just now";
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
+  const generateSmartTitle = (firstMessage: string) => {
+    if (!firstMessage) return "New conversation";
+    
+    // Take first 50 characters and add ellipsis if longer
+    const title = firstMessage.length > 50 
+      ? firstMessage.substring(0, 50) + "..." 
+      : firstMessage;
+    
+    return title;
   };
 
   const recentConversations = conversations.filter(conv => {
@@ -51,94 +50,86 @@ const ChatSidebar = ({
 
   return (
     <Sidebar className="border-r border-weezy-dark-tertiary bg-weezy-dark">
-      <SidebarHeader className="p-4 border-b border-weezy-dark-tertiary">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-weezy-accent flex items-center justify-center">
-            <span className="text-white font-semibold text-sm">W</span>
-          </div>
-          <div>
-            <h1 className="font-semibold text-white">Weezy AI</h1>
-            <p className="text-xs text-white/60">Your intelligent assistant</p>
-          </div>
-        </div>
-        
+      <SidebarHeader className="p-3 border-b border-weezy-dark-tertiary">
         <Button
           onClick={onNewConversation}
-          className="w-full bg-weezy-accent hover:bg-weezy-accent-light text-white font-medium rounded-lg h-10"
+          className="w-full bg-transparent hover:bg-weezy-dark-secondary text-white border border-weezy-dark-tertiary font-normal rounded-lg h-10 justify-start"
         >
           <Plus className="w-4 h-4 mr-2" />
-          New Chat
+          New chat
         </Button>
       </SidebarHeader>
 
-      <SidebarContent className="p-3">
+      <SidebarContent className="p-2">
         {recentConversations.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-white/70 font-medium text-xs mb-2 px-2">
+            <SidebarGroupLabel className="text-white/50 font-normal text-xs mb-2 px-2">
               Recent
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1">
-                {recentConversations.map((conversation) => (
-                  <SidebarMenuItem key={conversation.id}>
-                    <SidebarMenuButton
-                      onClick={() => onConversationSelect(conversation.id)}
-                      className={`w-full p-3 rounded-lg transition-colors group ${
-                        currentConversationId === conversation.id
-                          ? "bg-weezy-dark-secondary text-white"
-                          : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3 w-full min-w-0">
-                        <MessageSquare className="w-4 h-4 mt-0.5 text-weezy-accent flex-shrink-0" />
-                        <div className="flex-1 min-w-0 text-left">
-                          <h3 className="font-medium text-sm truncate">
-                            {conversation.title}
-                          </h3>
-                          <p className="text-xs text-white/50 truncate mt-0.5">
-                            {conversation.lastMessage}
-                          </p>
+                {recentConversations.map((conversation) => {
+                  const userMessages = conversation.messages.filter(msg => msg.isUser);
+                  const firstUserMessage = userMessages.length > 0 ? userMessages[0].content : "";
+                  const smartTitle = generateSmartTitle(firstUserMessage);
+                  
+                  return (
+                    <SidebarMenuItem key={conversation.id}>
+                      <SidebarMenuButton
+                        onClick={() => onConversationSelect(conversation.id)}
+                        className={`w-full p-2 rounded-lg transition-colors text-left ${
+                          currentConversationId === conversation.id
+                            ? "bg-weezy-dark-secondary text-white"
+                            : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 w-full min-w-0">
+                          <MessageSquare className="w-4 h-4 text-white/60 flex-shrink-0" />
+                          <span className="text-sm truncate font-normal">
+                            {smartTitle}
+                          </span>
                         </div>
-                      </div>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         )}
 
         {olderConversations.length > 0 && (
-          <SidebarGroup className="mt-6">
-            <SidebarGroupLabel className="text-white/70 font-medium text-xs mb-2 px-2">
+          <SidebarGroup className="mt-4">
+            <SidebarGroupLabel className="text-white/50 font-normal text-xs mb-2 px-2">
               Previous 7 days
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1">
-                {olderConversations.map((conversation) => (
-                  <SidebarMenuItem key={conversation.id}>
-                    <SidebarMenuButton
-                      onClick={() => onConversationSelect(conversation.id)}
-                      className={`w-full p-3 rounded-lg transition-colors group ${
-                        currentConversationId === conversation.id
-                          ? "bg-weezy-dark-secondary text-white"
-                          : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3 w-full min-w-0">
-                        <MessageSquare className="w-4 h-4 mt-0.5 text-weezy-accent flex-shrink-0" />
-                        <div className="flex-1 min-w-0 text-left">
-                          <h3 className="font-medium text-sm truncate">
-                            {conversation.title}
-                          </h3>
-                          <p className="text-xs text-white/50 truncate mt-0.5">
-                            {conversation.lastMessage}
-                          </p>
+                {olderConversations.map((conversation) => {
+                  const userMessages = conversation.messages.filter(msg => msg.isUser);
+                  const firstUserMessage = userMessages.length > 0 ? userMessages[0].content : "";
+                  const smartTitle = generateSmartTitle(firstUserMessage);
+                  
+                  return (
+                    <SidebarMenuItem key={conversation.id}>
+                      <SidebarMenuButton
+                        onClick={() => onConversationSelect(conversation.id)}
+                        className={`w-full p-2 rounded-lg transition-colors text-left ${
+                          currentConversationId === conversation.id
+                            ? "bg-weezy-dark-secondary text-white"
+                            : "hover:bg-weezy-dark-secondary text-white/80 hover:text-white"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 w-full min-w-0">
+                          <MessageSquare className="w-4 h-4 text-white/60 flex-shrink-0" />
+                          <span className="text-sm truncate font-normal">
+                            {smartTitle}
+                          </span>
                         </div>
-                      </div>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
