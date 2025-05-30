@@ -1,5 +1,5 @@
 
-import { MessageSquare, Plus } from "lucide-react";
+import { MessageSquare, Plus, User } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Conversation } from "./ChatInterface";
@@ -49,11 +50,11 @@ const ChatSidebar = ({
   });
 
   return (
-    <Sidebar className="border-r border-gray-200 bg-gray-50">
-      <SidebarHeader className="p-3 border-b border-gray-200">
+    <Sidebar className="border-r border-gray-800 bg-black/80 backdrop-blur-xl">
+      <SidebarHeader className="p-3 border-b border-gray-800">
         <Button
           onClick={onNewConversation}
-          className="w-full bg-white hover:bg-gray-100 text-gray-700 hover:text-gray-900 border border-gray-300 font-normal rounded-lg h-10 justify-start text-sm shadow-sm"
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 font-normal rounded-lg h-10 justify-start text-sm"
         >
           <Plus className="w-4 h-4 mr-3" />
           New chat
@@ -63,8 +64,8 @@ const ChatSidebar = ({
       <SidebarContent className="p-2">
         {recentConversations.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-gray-600 font-medium text-xs mb-2 px-2">
-              Recent
+            <SidebarGroupLabel className="text-gray-400 font-medium text-xs mb-2 px-2">
+              Today
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1">
@@ -79,12 +80,12 @@ const ChatSidebar = ({
                         onClick={() => onConversationSelect(conversation.id)}
                         className={`w-full p-2 rounded-lg transition-colors text-left ${
                           currentConversationId === conversation.id
-                            ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                            : "hover:bg-white text-gray-600 hover:text-gray-900"
+                            ? "bg-gray-800 text-white"
+                            : "hover:bg-gray-900 text-gray-300 hover:text-white"
                         }`}
                       >
                         <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <MessageSquare className="w-4 h-4 text-gray-500 flex-shrink-0" />
                           <span className="text-sm truncate font-normal">
                             {smartTitle}
                           </span>
@@ -100,8 +101,8 @@ const ChatSidebar = ({
 
         {olderConversations.length > 0 && (
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="text-gray-600 font-medium text-xs mb-2 px-2">
-              Previous 7 days
+            <SidebarGroupLabel className="text-gray-400 font-medium text-xs mb-2 px-2">
+              Yesterday
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1">
@@ -116,12 +117,12 @@ const ChatSidebar = ({
                         onClick={() => onConversationSelect(conversation.id)}
                         className={`w-full p-2 rounded-lg transition-colors text-left ${
                           currentConversationId === conversation.id
-                            ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-                            : "hover:bg-white text-gray-600 hover:text-gray-900"
+                            ? "bg-gray-800 text-white"
+                            : "hover:bg-gray-900 text-gray-300 hover:text-white"
                         }`}
                       >
                         <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <MessageSquare className="w-4 h-4 text-gray-500 flex-shrink-0" />
                           <span className="text-sm truncate font-normal">
                             {smartTitle}
                           </span>
@@ -135,6 +136,18 @@ const ChatSidebar = ({
           </SidebarGroup>
         )}
       </SidebarContent>
+
+      <SidebarFooter className="p-3 border-t border-gray-800">
+        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer">
+          <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+            <User className="w-4 h-4 text-gray-300" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">User Account</p>
+            <p className="text-xs text-gray-400 truncate">user@example.com</p>
+          </div>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };
