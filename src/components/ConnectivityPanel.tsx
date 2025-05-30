@@ -19,33 +19,33 @@ const ConnectivityPanel = () => {
       id: "google-drive",
       name: "Google Drive",
       description: "Access your documents and files",
-      icon: "📁",
+      icon: "/lovable-uploads/ae039732-12c4-43f6-9bb0-7637273d577c.png",
       connected: false,
-      color: "bg-gray-700"
-    },
-    {
-      id: "notion",
-      name: "Notion", 
-      description: "Connect your workspace and databases",
-      icon: "📝",
-      connected: false,
-      color: "bg-gray-700"
+      color: "bg-white"
     },
     {
       id: "slack",
       name: "Slack",
       description: "Integrate with your team communications", 
-      icon: "💬",
+      icon: "/lovable-uploads/2b21fecb-5fe6-44fb-8e1a-ac8d0a358617.png",
       connected: false,
-      color: "bg-gray-700"
+      color: "bg-white"
     },
     {
       id: "onedrive",
       name: "OneDrive",
       description: "Access Microsoft cloud storage",
-      icon: "☁️", 
+      icon: "/lovable-uploads/a25695ba-ae63-4adf-8026-526c4e08e395.png", 
       connected: false,
-      color: "bg-gray-700"
+      color: "bg-white"
+    },
+    {
+      id: "notion",
+      name: "Notion", 
+      description: "Connect your workspace and databases",
+      icon: "/lovable-uploads/ff191e8c-d8df-45af-a5da-a8f49ee636ee.png",
+      connected: false,
+      color: "bg-white"
     }
   ]);
 
@@ -71,8 +71,12 @@ const ConnectivityPanel = () => {
         {integrations.map((integration) => (
           <div key={integration.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-900 hover:bg-gray-800 transition-colors">
             <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-lg ${integration.color} flex items-center justify-center text-white text-sm`}>
-                {integration.icon}
+              <div className={`w-8 h-8 rounded-lg ${integration.color} p-1 flex items-center justify-center`}>
+                <img 
+                  src={integration.icon} 
+                  alt={integration.name}
+                  className="w-6 h-6 object-contain"
+                />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
