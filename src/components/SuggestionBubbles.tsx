@@ -27,12 +27,12 @@ const SuggestionBubbles = () => {
   }, []);
 
   return (
-    <div className="absolute bottom-full mb-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl">
+    <div className="absolute bottom-full mb-4 left-1/2 transform -translate-x-1/2 w-full max-w-3xl">
       <div className="flex flex-wrap justify-center gap-3 px-4">
         {visibleSuggestions.map((suggestion, index) => (
           <div
             key={suggestion}
-            className="bg-weezy-dark-secondary border border-weezy-dark-tertiary rounded-full px-4 py-2 text-sm text-white/90 cursor-pointer hover:bg-weezy-dark-tertiary transition-colors"
+            className="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
           >
             {suggestion}
           </div>

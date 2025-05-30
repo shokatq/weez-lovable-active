@@ -44,14 +44,14 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   };
 
   return (
-    <div className="p-6 bg-weezy-dark">
-      <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-center gap-3 p-4 bg-weezy-dark-secondary rounded-3xl shadow-sm">
-          <div className="flex items-center gap-2">
+    <div className="p-4 bg-gray-50">
+      <div className="max-w-3xl mx-auto">
+        <div className="relative flex items-center gap-3 px-4 py-3 bg-white rounded-full shadow-sm border border-gray-200">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className="text-white/60 hover:text-white hover:bg-weezy-dark-tertiary rounded-full p-2 h-9 w-9"
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 h-8 w-8"
               onClick={() => console.log('Attach file')}
             >
               <Paperclip className="w-4 h-4" />
@@ -60,7 +60,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-white/60 hover:text-white hover:bg-weezy-dark-tertiary rounded-full p-2 h-9 w-9"
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 h-8 w-8"
               onClick={() => console.log('Search')}
             >
               <Globe className="w-4 h-4" />
@@ -69,31 +69,31 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-white/60 hover:text-white hover:bg-weezy-dark-tertiary rounded-full p-2 h-9 w-9"
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 h-8 w-8"
               onClick={() => console.log('Reason')}
             >
               <Lightbulb className="w-4 h-4" />
             </Button>
           </div>
 
-          <div className="flex-1 relative">
+          <div className="flex-1 relative min-h-[20px]">
             <Textarea
               ref={textareaRef}
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
               placeholder="Ask anything"
-              className="w-full min-h-[24px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-white/50 focus:ring-0 focus:ring-offset-0 text-base p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0"
-              style={{ height: 'auto' }}
+              className="w-full min-h-[20px] max-h-[120px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-sm p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0 overflow-hidden"
+              style={{ height: '20px' }}
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className={`text-white/60 hover:text-white rounded-full p-2 h-9 w-9 ${
-                isRecording ? "text-red-400 hover:text-red-300" : ""
+              className={`text-gray-500 hover:text-gray-700 rounded-full p-2 h-8 w-8 ${
+                isRecording ? "text-red-500 hover:text-red-600" : ""
               }`}
               onClick={toggleRecording}
             >
@@ -104,7 +104,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
               <Button
                 onClick={handleSend}
                 size="sm"
-                className="bg-white text-black hover:bg-gray-200 rounded-full p-2 h-9 w-9"
+                className="bg-gray-900 text-white hover:bg-gray-800 rounded-full p-2 h-8 w-8"
               >
                 <Send className="w-4 h-4" />
               </Button>
@@ -112,7 +112,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
           </div>
         </div>
 
-        <p className="text-center text-xs text-white/40 mt-3">
+        <p className="text-center text-xs text-gray-500 mt-3">
           Weezy can make mistakes. Consider checking important information.
         </p>
       </div>

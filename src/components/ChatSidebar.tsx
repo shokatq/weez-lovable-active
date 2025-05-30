@@ -49,11 +49,11 @@ const ChatSidebar = ({
   });
 
   return (
-    <Sidebar className="border-r border-weezy-dark-tertiary bg-weezy-dark">
-      <SidebarHeader className="p-3 border-b border-weezy-dark-tertiary">
+    <Sidebar className="border-r border-gray-200 bg-gray-50">
+      <SidebarHeader className="p-3 border-b border-gray-200">
         <Button
           onClick={onNewConversation}
-          className="w-full bg-transparent hover:bg-weezy-dark-secondary text-white/80 hover:text-white border border-weezy-dark-tertiary font-normal rounded-lg h-10 justify-start text-sm"
+          className="w-full bg-white hover:bg-gray-100 text-gray-700 hover:text-gray-900 border border-gray-300 font-normal rounded-lg h-10 justify-start text-sm shadow-sm"
         >
           <Plus className="w-4 h-4 mr-3" />
           New chat
@@ -63,7 +63,7 @@ const ChatSidebar = ({
       <SidebarContent className="p-2">
         {recentConversations.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-white/50 font-normal text-xs mb-2 px-2">
+            <SidebarGroupLabel className="text-gray-600 font-medium text-xs mb-2 px-2">
               Recent
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -79,12 +79,12 @@ const ChatSidebar = ({
                         onClick={() => onConversationSelect(conversation.id)}
                         className={`w-full p-2 rounded-lg transition-colors text-left ${
                           currentConversationId === conversation.id
-                            ? "bg-weezy-dark-secondary text-white"
-                            : "hover:bg-weezy-dark-secondary text-white/70 hover:text-white"
+                            ? "bg-white text-gray-900 shadow-sm border border-gray-200"
+                            : "hover:bg-white text-gray-600 hover:text-gray-900"
                         }`}
                       >
                         <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-white/50 flex-shrink-0" />
+                          <MessageSquare className="w-4 h-4 text-gray-400 flex-shrink-0" />
                           <span className="text-sm truncate font-normal">
                             {smartTitle}
                           </span>
@@ -100,7 +100,7 @@ const ChatSidebar = ({
 
         {olderConversations.length > 0 && (
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="text-white/50 font-normal text-xs mb-2 px-2">
+            <SidebarGroupLabel className="text-gray-600 font-medium text-xs mb-2 px-2">
               Previous 7 days
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -116,12 +116,12 @@ const ChatSidebar = ({
                         onClick={() => onConversationSelect(conversation.id)}
                         className={`w-full p-2 rounded-lg transition-colors text-left ${
                           currentConversationId === conversation.id
-                            ? "bg-weezy-dark-secondary text-white"
-                            : "hover:bg-weezy-dark-secondary text-white/70 hover:text-white"
+                            ? "bg-white text-gray-900 shadow-sm border border-gray-200"
+                            : "hover:bg-white text-gray-600 hover:text-gray-900"
                         }`}
                       >
                         <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-white/50 flex-shrink-0" />
+                          <MessageSquare className="w-4 h-4 text-gray-400 flex-shrink-0" />
                           <span className="text-sm truncate font-normal">
                             {smartTitle}
                           </span>
