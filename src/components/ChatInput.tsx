@@ -2,7 +2,8 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Paperclip, Mic, Send, Globe, Lightbulb } from "lucide-react";
+import { Mic, Send, Globe, Lightbulb } from "lucide-react";
+import FileUpload from "./FileUpload";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -43,24 +44,22 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
     setIsRecording(!isRecording);
   };
 
+  const handleFileSelect = (files: FileList) => {
+    console.log('Files selected:', Array.from(files).map(f => f.name));
+    // Handle file upload logic here
+  };
+
   return (
-    <div className="p-4 bg-gray-50">
+    <div className="p-4 bg-background">
       <div className="max-w-3xl mx-auto">
-        <div className="relative flex items-center gap-3 px-4 py-3 bg-white rounded-full shadow-sm border border-gray-200">
+        <div className="relative flex items-end gap-3 px-4 py-3 bg-secondary rounded-2xl">
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 h-8 w-8"
-              onClick={() => console.log('Attach file')}
-            >
-              <Paperclip className="w-4 h-4" />
-            </Button>
+            <FileUpload onFileSelect={handleFileSelect} />
             
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 h-8 w-8"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-full p-2 h-8 w-8"
               onClick={() => console.log('Search')}
             >
               <Globe className="w-4 h-4" />
@@ -69,22 +68,22 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 h-8 w-8"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-full p-2 h-8 w-8"
               onClick={() => console.log('Reason')}
             >
               <Lightbulb className="w-4 h-4" />
             </Button>
           </div>
 
-          <div className="flex-1 relative min-h-[20px]">
+          <div className="flex-1 relative">
             <Textarea
               ref={textareaRef}
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
               placeholder="Ask anything"
-              className="w-full min-h-[20px] max-h-[120px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-sm p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0 overflow-hidden"
-              style={{ height: '20px' }}
+              className="w-full min-h-[24px] max-h-[120px] bg-transparent border-none resize-none text-foreground placeholder:text-muted-foreground focus:ring-0 focus:ring-offset-0 text-sm p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0 overflow-hidden"
+              style={{ height: '24px' }}
             />
           </div>
 
@@ -92,8 +91,8 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className={`text-gray-500 hover:text-gray-700 rounded-full p-2 h-8 w-8 ${
-                isRecording ? "text-red-500 hover:text-red-600" : ""
+              className={`text-muted-foreground hover:text-foreground rounded-full p-2 h-8 w-8 ${
+                isRecording ? "text-red-500 hover:text-red-400" : ""
               }`}
               onClick={toggleRecording}
             >
@@ -104,7 +103,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
               <Button
                 onClick={handleSend}
                 size="sm"
-                className="bg-gray-900 text-white hover:bg-gray-800 rounded-full p-2 h-8 w-8"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-2 h-8 w-8"
               >
                 <Send className="w-4 h-4" />
               </Button>
@@ -112,7 +111,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-500 mt-3">
+        <p className="text-center text-xs text-muted-foreground mt-3">
           Weezy can make mistakes. Consider checking important information.
         </p>
       </div>

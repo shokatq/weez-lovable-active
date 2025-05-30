@@ -32,7 +32,7 @@ const SuggestionBubbles = () => {
         {visibleSuggestions.map((suggestion, index) => (
           <div
             key={suggestion}
-            className="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
+            className="bg-secondary border border-border rounded-full px-4 py-2 text-sm text-foreground cursor-pointer hover:bg-accent hover:border-accent transition-colors shadow-sm"
           >
             {suggestion}
           </div>

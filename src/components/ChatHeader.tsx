@@ -14,9 +14,9 @@ const ChatHeader = () => {
   const [showConnectivity, setShowConnectivity] = useState(false);
 
   return (
-    <header className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+    <header className="flex items-center justify-between p-4 border-b border-border bg-background">
       <div className="flex items-center gap-4">
-        <SidebarTrigger className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 h-8 w-8 p-0 rounded-lg">
+        <SidebarTrigger className="text-muted-foreground hover:text-foreground hover:bg-accent h-8 w-8 p-0 rounded-lg">
           <Menu className="w-4 h-4" />
         </SidebarTrigger>
         
@@ -25,7 +25,7 @@ const ChatHeader = () => {
             <span className="text-white font-bold text-sm">W</span>
           </div>
           <div>
-            <h1 className="font-semibold text-gray-900">Weezy</h1>
+            <h1 className="font-semibold text-foreground">Weezy</h1>
           </div>
         </div>
       </div>
@@ -36,7 +36,7 @@ const ChatHeader = () => {
             <Button
               variant="outline"
               size="sm"
-              className="text-gray-600 border-gray-300 hover:bg-gray-50 hover:text-gray-900"
+              className="text-muted-foreground border-border hover:bg-accent hover:text-foreground"
             >
               <Settings className="w-4 h-4 mr-2" />
               Connect Services
