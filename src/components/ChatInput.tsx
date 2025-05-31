@@ -34,7 +34,6 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
     
-    // Auto-resize textarea
     const textarea = e.target;
     textarea.style.height = "auto";
     textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
@@ -46,7 +45,6 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
 
   const handleFileSelect = (files: FileList) => {
     console.log('Files selected:', Array.from(files).map(f => f.name));
-    // Handle file upload logic here
   };
 
   return (
@@ -54,7 +52,9 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
       <div className="max-w-3xl mx-auto">
         <div className="relative flex items-center gap-3 px-4 py-3 bg-gray-900 rounded-2xl border border-gray-800">
           <div className="flex items-center gap-1">
-            <FileUpload onFileSelect={handleFileSelect} />
+            <div className="text-white">
+              <FileUpload onFileSelect={handleFileSelect} />
+            </div>
             
             <Button
               variant="ghost"

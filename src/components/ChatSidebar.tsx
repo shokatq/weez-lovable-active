@@ -1,5 +1,5 @@
 
-import { MessageSquare, Plus, User, Settings, LogOut, Search } from "lucide-react";
+import { MessageSquare, Plus, User, Settings, LogOut, Search, ChevronDown, ChevronUp } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Conversation } from "./ChatInterface";
+import { useState } from "react";
 
 interface ChatSidebarProps {
   conversations: Conversation[];
@@ -34,10 +35,11 @@ const ChatSidebar = ({
   onConversationSelect,
   onNewConversation,
 }: ChatSidebarProps) => {
+  const [isHistoryCollapsed, setIsHistoryCollapsed] = useState(false);
+
   const generateSmartTitle = (firstMessage: string) => {
     if (!firstMessage) return "New conversation";
     
-    // Take first 30-40 characters for a cleaner look
     const title = firstMessage.length > 35 
       ? firstMessage.substring(0, 35) + "..." 
       : firstMessage;
@@ -58,13 +60,24 @@ const ChatSidebar = ({
   return (
     <Sidebar className="bg-black/80 backdrop-blur-xl">
       <SidebarHeader className="p-3 space-y-3">
-        <Button
-          onClick={onNewConversation}
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 font-normal rounded-lg h-10 justify-start text-sm"
-        >
-          <Plus className="w-4 h-4 mr-3" />
-          New chat
-        </Button>
+        <div className="flex items-center justify-between">
+          <Button
+            onClick={onNewConversation}
+            className="flex-1 bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 font-normal rounded-lg h-10 justify-start text-sm"
+          >
+            <Plus className="w-4 h-4 mr-3" />
+            New chat
+          </Button>
+          
+          <Button
+            onClick={() => setIsHistoryCollapsed(!isHistoryCollapsed)}
+            variant="ghost"
+            size="sm"
+            className="ml-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg p-2 h-10 w-10"
+          >
+            {isHistoryCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+          </Button>
+        </div>
         
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -76,78 +89,82 @@ const ChatSidebar = ({
       </SidebarHeader>
 
       <SidebarContent className="p-2">
-        {recentConversations.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-gray-400 font-medium text-xs mb-2 px-2">
-              Today
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
-                {recentConversations.map((conversation) => {
-                  const userMessages = conversation.messages.filter(msg => msg.isUser);
-                  const firstUserMessage = userMessages.length > 0 ? userMessages[0].content : "";
-                  const smartTitle = generateSmartTitle(firstUserMessage);
-                  
-                  return (
-                    <SidebarMenuItem key={conversation.id}>
-                      <SidebarMenuButton
-                        onClick={() => onConversationSelect(conversation.id)}
-                        className={`w-full p-2 rounded-lg transition-colors text-left ${
-                          currentConversationId === conversation.id
-                            ? "bg-gray-800 text-white"
-                            : "hover:bg-gray-900 text-gray-300 hover:text-white"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                          <span className="text-sm truncate font-normal">
-                            {smartTitle}
-                          </span>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {!isHistoryCollapsed && (
+          <>
+            {recentConversations.length > 0 && (
+              <SidebarGroup>
+                <SidebarGroupLabel className="text-gray-400 font-medium text-xs mb-2 px-2">
+                  Today
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu className="space-y-1">
+                    {recentConversations.map((conversation) => {
+                      const userMessages = conversation.messages.filter(msg => msg.isUser);
+                      const firstUserMessage = userMessages.length > 0 ? userMessages[0].content : "";
+                      const smartTitle = generateSmartTitle(firstUserMessage);
+                      
+                      return (
+                        <SidebarMenuItem key={conversation.id}>
+                          <SidebarMenuButton
+                            onClick={() => onConversationSelect(conversation.id)}
+                            className={`w-full p-2 rounded-lg transition-colors text-left ${
+                              currentConversationId === conversation.id
+                                ? "bg-gray-800 text-white"
+                                : "hover:bg-gray-900 text-gray-300 hover:text-white"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 w-full min-w-0">
+                              <MessageSquare className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                              <span className="text-sm truncate font-normal">
+                                {smartTitle}
+                              </span>
+                            </div>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )}
 
-        {olderConversations.length > 0 && (
-          <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="text-gray-400 font-medium text-xs mb-2 px-2">
-              Yesterday
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
-                {olderConversations.map((conversation) => {
-                  const userMessages = conversation.messages.filter(msg => msg.isUser);
-                  const firstUserMessage = userMessages.length > 0 ? userMessages[0].content : "";
-                  const smartTitle = generateSmartTitle(firstUserMessage);
-                  
-                  return (
-                    <SidebarMenuItem key={conversation.id}>
-                      <SidebarMenuButton
-                        onClick={() => onConversationSelect(conversation.id)}
-                        className={`w-full p-2 rounded-lg transition-colors text-left ${
-                          currentConversationId === conversation.id
-                            ? "bg-gray-800 text-white"
-                            : "hover:bg-gray-900 text-gray-300 hover:text-white"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 w-full min-w-0">
-                          <MessageSquare className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                          <span className="text-sm truncate font-normal">
-                            {smartTitle}
-                          </span>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+            {olderConversations.length > 0 && (
+              <SidebarGroup className="mt-4">
+                <SidebarGroupLabel className="text-gray-400 font-medium text-xs mb-2 px-2">
+                  Yesterday
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu className="space-y-1">
+                    {olderConversations.map((conversation) => {
+                      const userMessages = conversation.messages.filter(msg => msg.isUser);
+                      const firstUserMessage = userMessages.length > 0 ? userMessages[0].content : "";
+                      const smartTitle = generateSmartTitle(firstUserMessage);
+                      
+                      return (
+                        <SidebarMenuItem key={conversation.id}>
+                          <SidebarMenuButton
+                            onClick={() => onConversationSelect(conversation.id)}
+                            className={`w-full p-2 rounded-lg transition-colors text-left ${
+                              currentConversationId === conversation.id
+                                ? "bg-gray-800 text-white"
+                                : "hover:bg-gray-900 text-gray-300 hover:text-white"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 w-full min-w-0">
+                              <MessageSquare className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                              <span className="text-sm truncate font-normal">
+                                {smartTitle}
+                              </span>
+                            </div>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )}
+          </>
         )}
       </SidebarContent>
 
@@ -167,12 +184,12 @@ const ChatSidebar = ({
           <PopoverContent className="w-64 p-0 bg-gray-900 border-gray-700" align="end">
             <div className="p-4 space-y-3">
               <div className="border-b border-gray-700 pb-3">
-                <p className="text-sm font-medium text-white">sayyadshokan21@gmail.com</p>
+                <p className="text-sm font-medium text-gray-400 opacity-70">sayyadshokan21@gmail.com</p>
               </div>
               
               <Button
                 variant="ghost"
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
               >
                 <Settings className="w-4 h-4 mr-3" />
                 Settings
@@ -180,7 +197,7 @@ const ChatSidebar = ({
               
               <Button
                 variant="ghost"
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
               >
                 <LogOut className="w-4 h-4 mr-3" />
                 Log Out
