@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,14 +27,6 @@ const ConnectivityPanel = () => {
       name: "Slack",
       description: "Integrate with your team communications", 
       icon: "/lovable-uploads/2b21fecb-5fe6-44fb-8e1a-ac8d0a358617.png",
-      connected: false,
-      color: "bg-white"
-    },
-    {
-      id: "onedrive",
-      name: "OneDrive",
-      description: "Access Microsoft cloud storage",
-      icon: "/lovable-uploads/a25695ba-ae63-4adf-8026-526c4e08e395.png", 
       connected: false,
       color: "bg-white"
     },

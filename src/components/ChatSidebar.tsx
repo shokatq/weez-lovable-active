@@ -50,8 +50,8 @@ const ChatSidebar = ({
   });
 
   return (
-    <Sidebar className="border-r border-gray-800 bg-black/80 backdrop-blur-xl">
-      <SidebarHeader className="p-3 border-b border-gray-800">
+    <Sidebar className="bg-black/80 backdrop-blur-xl">
+      <SidebarHeader className="p-3">
         <Button
           onClick={onNewConversation}
           className="w-full bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 font-normal rounded-lg h-10 justify-start text-sm"
@@ -137,7 +137,7 @@ const ChatSidebar = ({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="p-3 border-t border-gray-800">
+      <SidebarFooter className="p-3">
         <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer">
           <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
             <User className="w-4 h-4 text-gray-300" />

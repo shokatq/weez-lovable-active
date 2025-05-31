@@ -14,7 +14,7 @@ const ChatHeader = () => {
   const [showConnectivity, setShowConnectivity] = useState(false);
 
   return (
-    <header className="flex items-center justify-between p-4 border-b border-gray-800 bg-black">
+    <header className="flex items-center justify-between p-4 bg-black">
       <div className="flex items-center gap-4">
         <SidebarTrigger className="text-gray-400 hover:text-white hover:bg-gray-800 h-8 w-8 p-0 rounded-lg">
           <Menu className="w-4 h-4" />
