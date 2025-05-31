@@ -1,5 +1,5 @@
 
-import { MessageSquare, Plus, User } from "lucide-react";
+import { MessageSquare, Plus, User, Settings, LogOut, Search } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +13,12 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Conversation } from "./ChatInterface";
 
 interface ChatSidebarProps {
@@ -51,7 +57,7 @@ const ChatSidebar = ({
 
   return (
     <Sidebar className="bg-black/80 backdrop-blur-xl">
-      <SidebarHeader className="p-3">
+      <SidebarHeader className="p-3 space-y-3">
         <Button
           onClick={onNewConversation}
           className="w-full bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 font-normal rounded-lg h-10 justify-start text-sm"
@@ -59,6 +65,14 @@ const ChatSidebar = ({
           <Plus className="w-4 h-4 mr-3" />
           New chat
         </Button>
+        
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="Search conversations..."
+            className="w-full bg-gray-900 border-gray-700 text-white placeholder:text-gray-400 pl-10 h-10 rounded-lg focus:border-gray-600"
+          />
+        </div>
       </SidebarHeader>
 
       <SidebarContent className="p-2">
@@ -138,15 +152,42 @@ const ChatSidebar = ({
       </SidebarContent>
 
       <SidebarFooter className="p-3">
-        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer">
-          <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-            <User className="w-4 h-4 text-gray-300" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">User Account</p>
-            <p className="text-xs text-gray-400 truncate">user@example.com</p>
-          </div>
-        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-900 transition-colors cursor-pointer">
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                <User className="w-4 h-4 text-gray-300" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">User Account</p>
+                <p className="text-xs text-gray-400 truncate">user@example.com</p>
+              </div>
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0 bg-gray-900 border-gray-700" align="end">
+            <div className="p-4 space-y-3">
+              <div className="border-b border-gray-700 pb-3">
+                <p className="text-sm font-medium text-white">sayyadshokan21@gmail.com</p>
+              </div>
+              
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
+              >
+                <Settings className="w-4 h-4 mr-3" />
+                Settings
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-800"
+              >
+                <LogOut className="w-4 h-4 mr-3" />
+                Log Out
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
       </SidebarFooter>
     </Sidebar>
   );

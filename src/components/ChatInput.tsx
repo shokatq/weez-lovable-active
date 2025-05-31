@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Send, Globe, Lightbulb } from "lucide-react";
+import { Mic, Send, Lightbulb } from "lucide-react";
 import FileUpload from "./FileUpload";
 
 interface ChatInputProps {
@@ -52,18 +52,9 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   return (
     <div className="p-4 bg-black">
       <div className="max-w-3xl mx-auto">
-        <div className="relative flex items-end gap-3 px-4 py-3 bg-gray-900 rounded-2xl border border-gray-800">
+        <div className="relative flex items-center gap-3 px-4 py-3 bg-gray-900 rounded-2xl border border-gray-800">
           <div className="flex items-center gap-1">
             <FileUpload onFileSelect={handleFileSelect} />
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white hover:bg-gray-800 rounded-full p-2 h-8 w-8"
-              onClick={() => console.log('Search')}
-            >
-              <Globe className="w-4 h-4" />
-            </Button>
             
             <Button
               variant="ghost"
