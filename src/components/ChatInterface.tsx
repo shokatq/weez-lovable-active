@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Building2, Sparkles, Search, FileText, Brain, Upload } from "lucide-react";
+import { Building2, Sparkles, Search, FileText, Brain, Upload, ArrowRight, Zap } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
@@ -114,31 +114,35 @@ const ChatInterface = () => {
   const quickActions = [
     {
       icon: Search,
-      title: "Search Files",
-      description: "Find documents across all platforms",
+      title: "Smart Search",
+      description: "AI-powered document discovery",
       action: () => handleSendMessage("Search for my recent files"),
-      gradient: "from-blue-500 to-blue-600"
+      gradient: "from-blue-500 via-blue-600 to-indigo-600",
+      accentColor: "blue"
     },
     {
       icon: FileText,
-      title: "Summarize Document",
-      description: "Get quick summaries of your files",
+      title: "Instant Summary",
+      description: "Quick document insights",
       action: () => handleSendMessage("Summarize my latest document"),
-      gradient: "from-emerald-500 to-emerald-600"
+      gradient: "from-emerald-500 via-emerald-600 to-teal-600",
+      accentColor: "emerald"
     },
     {
       icon: Brain,
-      title: "Ask Questions",
-      description: "Query your document content",
+      title: "Smart Q&A",
+      description: "Query your content intelligently",
       action: () => handleSendMessage("Answer questions about my files"),
-      gradient: "from-purple-500 to-purple-600"
+      gradient: "from-purple-500 via-purple-600 to-violet-600",
+      accentColor: "purple"
     },
     {
       icon: Upload,
       title: "Upload & Analyze",
-      description: "Upload new files for analysis",
+      description: "Process new documents instantly",
       action: () => handleSendMessage("Help me upload and analyze a new file"),
-      gradient: "from-orange-500 to-orange-600"
+      gradient: "from-orange-500 via-orange-600 to-amber-600",
+      accentColor: "orange"
     }
   ];
 
@@ -153,10 +157,11 @@ const ChatInterface = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white relative overflow-hidden">
-        {/* Enhanced background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_70%,rgba(120,119,198,0.04),transparent_50%)] pointer-events-none"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.02),transparent_50%)] pointer-events-none"></div>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-950 via-gray-900 to-slate-950 text-white relative overflow-hidden">
+        {/* Modern background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.1),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.08),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,rgba(59,130,246,0.03)_60deg,transparent_120deg)] pointer-events-none"></div>
         
         <ChatSidebar 
           conversations={conversations}
@@ -171,66 +176,110 @@ const ChatInterface = () => {
 
           <div className="flex-1 flex flex-col">
             {messages.length === 0 ? (
-              <div className="flex-1 flex flex-col px-2 py-6 md:px-10 md:py-10 lg:py-14">
-                {/* Welcome Section */}
-                <div className="flex flex-col md:flex-row gap-8 items-center justify-center mb-10 w-full max-w-6xl mx-auto">
-                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl shadow-xl p-6 md:w-60 w-full flex flex-col items-center justify-center relative overflow-hidden border border-blue-400/20">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-400 flex items-center justify-center shadow-lg mb-4">
-                      <Sparkles className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold text-white mb-1">Welcome!</h2>
-                      <p className="text-gray-200 text-sm font-medium">Weezy, your file AI assistant.</p>
+              <div className="flex-1 flex flex-col px-4 py-8 md:px-12 md:py-16 lg:py-20">
+                {/* Hero Section */}
+                <div className="flex flex-col items-center justify-center mb-16 w-full max-w-7xl mx-auto">
+                  <div className="relative mb-8">
+                    <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-2xl border border-blue-400/20 relative">
+                      <Sparkles className="w-10 h-10 text-white animate-pulse" />
+                      <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-3xl blur-xl animate-pulse"></div>
                     </div>
                   </div>
-                  <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-                    <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-3 tracking-tight">
-                      Intelligent Workspace Assistant
+                  
+                  <div className="text-center max-w-4xl">
+                    <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent mb-6 tracking-tight leading-tight">
+                      Meet Weezy
                     </h1>
-                    <p className="text-gray-400 text-lg md:text-xl font-medium max-w-2xl">
-                      Search, summarize, analyze, and organize your documents with one smart assistant.
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                      <p className="text-xl md:text-2xl text-gray-300 font-medium">
+                        Your Intelligent Document Assistant
+                      </p>
+                      <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
+                    </div>
+                    <p className="text-lg md:text-xl text-gray-400 font-normal max-w-3xl mx-auto leading-relaxed">
+                      Unlock the power of AI to search, analyze, and understand your documents like never before. 
+                      <span className="text-blue-400 font-medium"> Transform chaos into clarity.</span>
                     </p>
                   </div>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="mb-10 max-w-6xl mx-auto w-full">
-                  <h2 className="text-lg md:text-xl font-semibold text-gray-200 mb-3 md:mb-5 text-center">
-                    Quick Actions
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Modern Quick Actions Grid */}
+                <div className="mb-16 max-w-7xl mx-auto w-full">
+                  <div className="text-center mb-12">
+                    <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+                      What can I help you with?
+                    </h2>
+                    <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto"></div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {quickActions.map((action, idx) => (
                       <div
                         key={idx}
                         onClick={action.action}
-                        className="group p-5 bg-gradient-to-br from-gray-900/80 to-gray-800/70 border border-gray-700/50 rounded-xl cursor-pointer hover:scale-105 transition-all duration-300 hover:border-blue-500/40 hover:shadow-blue-600/10 shadow-sm hover:shadow-lg relative"
+                        className="group relative p-8 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 overflow-hidden"
                       >
-                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-200`}>
-                          <action.icon className="w-5 h-5 text-white" />
+                        {/* Hover gradient overlay */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>
+                        
+                        {/* Icon container */}
+                        <div className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300 shadow-lg`}>
+                          <action.icon className="w-7 h-7 text-white" />
+                          <div className={`absolute -inset-1 bg-gradient-to-br ${action.gradient} opacity-50 blur-lg group-hover:opacity-75 transition-opacity duration-300 rounded-2xl`}></div>
                         </div>
-                        <h3 className="text-white font-semibold mb-1 text-lg">{action.title}</h3>
-                        <p className="text-gray-400 text-xs md:text-sm">{action.description}</p>
+                        
+                        {/* Content */}
+                        <div className="relative">
+                          <h3 className="text-white font-bold mb-3 text-xl group-hover:text-blue-100 transition-colors duration-300">
+                            {action.title}
+                          </h3>
+                          <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
+                            {action.description}
+                          </p>
+                        </div>
+                        
+                        {/* Arrow indicator */}
+                        <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                          <ArrowRight className="w-5 h-5 text-white/70" />
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Chat Input Section (card-like) */}
-                <div className="max-w-2xl mx-auto bg-gray-900/60 border border-gray-800/80 rounded-2xl p-3 md:p-6 shadow-lg">
-                  <ChatInput onSendMessage={handleSendMessage} />
-                  <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+                {/* Modern Chat Input Section */}
+                <div className="max-w-4xl mx-auto w-full">
+                  <div className="relative p-8 bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl">
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse"></div>
+                    </div>
+                    
+                    <div className="mb-6 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <Zap className="w-5 h-5 text-blue-400" />
+                        <span className="text-lg font-semibold text-white">Start Your Conversation</span>
+                        <Zap className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <p className="text-gray-400 text-sm">Ask me anything about your documents</p>
+                    </div>
+                    
+                    <ChatInput onSendMessage={handleSendMessage} />
+                    <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+                  </div>
                 </div>
               </div>
             ) : (
               <>
-                {/* Conversation panel look */}
-                <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full bg-gray-900/70 border border-gray-800/80 rounded-2xl mt-3 shadow-lg">
+                {/* Modern conversation panel */}
+                <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-3xl mt-6 shadow-2xl overflow-hidden">
                   <ChatMessages 
                     messages={messages} 
                     isThinking={isThinking}
                     thinkingType={thinkingType}
                   />
-                  <div className="mt-auto">
+                  <div className="mt-auto border-t border-white/10">
                     <ChatInput onSendMessage={handleSendMessage} />
                     <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
                   </div>
@@ -245,4 +294,3 @@ const ChatInterface = () => {
 };
 
 export default ChatInterface;
-
