@@ -1,8 +1,8 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Building2, Sparkles } from "lucide-react";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
@@ -112,38 +112,40 @@ const ChatInterface = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
-      <ChatSidebar 
-        conversations={conversations}
-        currentConversationId={currentConversationId}
-        onConversationSelect={handleConversationSelect}
-        onNewConversation={handleNewConversation}
-      />
-      
-      <div className="flex-1 flex flex-col relative">
-        <ChatHeader />
-        
-        {/* Workspace Dashboard Button */}
-        <div className="absolute top-4 right-6 z-10">
-          <Button
-            onClick={() => navigate("/workspace")}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg border border-blue-500/20 backdrop-blur-sm"
-          >
-            <Building2 className="w-5 h-5 mr-2" />
-            Workspace Dashboard
-            <Sparkles className="w-4 h-4 ml-2 opacity-70" />
-          </Button>
-        </div>
-
-        <ChatMessages 
-          messages={messages} 
-          isThinking={isThinking}
-          thinkingType={thinkingType}
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-black text-white">
+        <ChatSidebar 
+          conversations={conversations}
+          currentConversationId={currentConversationId}
+          onConversationSelect={handleConversationSelect}
+          onNewConversation={handleNewConversation}
         />
-        <ChatInput onSendMessage={handleSendMessage} />
-        <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+        
+        <SidebarInset className="flex-1 flex flex-col relative">
+          <ChatHeader />
+          
+          {/* Workspace Dashboard Button */}
+          <div className="absolute top-4 right-6 z-10">
+            <Button
+              onClick={() => navigate("/workspace")}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg border border-blue-500/20 backdrop-blur-sm"
+            >
+              <Building2 className="w-5 h-5 mr-2" />
+              Workspace Dashboard
+              <Sparkles className="w-4 h-4 ml-2 opacity-70" />
+            </Button>
+          </div>
+
+          <ChatMessages 
+            messages={messages} 
+            isThinking={isThinking}
+            thinkingType={thinkingType}
+          />
+          <ChatInput onSendMessage={handleSendMessage} />
+          <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
