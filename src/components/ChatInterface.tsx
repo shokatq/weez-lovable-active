@@ -107,12 +107,12 @@ const ChatInterface = () => {
 
   // File-related suggestions instead of general ones
   const suggestions = [
-    "Find all PDF files from last month",
-    "Summarize my latest project documents", 
-    "Search for files containing 'budget' or 'financial'",
-    "Show me all shared documents in Google Drive",
-    "List files modified by team members today",
-    "Find presentation files larger than 10MB"
+    "Find recent PDFs",
+    "List Excel files", 
+    "Search shared docs",
+    "Show large files",
+    "Recent presentations",
+    "Find project files"
   ];
 
   return (
@@ -121,7 +121,6 @@ const ChatInterface = () => {
         {/* Enhanced background effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.02),transparent_50%)] pointer-events-none"></div>
-        <div className="absolute inset-0 bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,rgba(59,130,246,0.03)_60deg,transparent_120deg)] pointer-events-none"></div>
         
         <ChatSidebar 
           conversations={conversations}
@@ -134,15 +133,17 @@ const ChatInterface = () => {
         <SidebarInset className="flex-1 flex flex-col relative z-10">
           <ChatHeader />
 
-          <ChatMessages 
-            messages={messages} 
-            isThinking={isThinking}
-            thinkingType={thinkingType}
-          />
-          
-          <div className="mt-auto">
-            <ChatInput onSendMessage={handleSendMessage} />
-            <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+          <div className="flex-1 flex flex-col">
+            <ChatMessages 
+              messages={messages} 
+              isThinking={isThinking}
+              thinkingType={thinkingType}
+            />
+            
+            <div className="mt-auto">
+              <ChatInput onSendMessage={handleSendMessage} />
+              <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+            </div>
           </div>
         </SidebarInset>
       </div>
