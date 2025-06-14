@@ -44,7 +44,7 @@ const ChatInterface = () => {
 
   const [currentConversationId, setCurrentConversationId] = useState("1");
   const [isThinking, setIsThinking] = useState(false);
-  const [thinkingType, setThinkingType] = useState<'search' | 'summary' | 'rag' | 'upload' | 'general'>('general');
+  const [thinkingType, setThinkingType] = useState<'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general'>('general');
 
   const currentConversation = conversations.find(
     (conv) => conv.id === currentConversationId

@@ -7,7 +7,7 @@ import { FileText } from "lucide-react";
 interface ChatMessagesProps {
   messages: Message[];
   isThinking: boolean;
-  thinkingType?: 'search' | 'summary' | 'rag' | 'upload' | 'general';
+  thinkingType?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general';
 }
 
 const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps) => {
