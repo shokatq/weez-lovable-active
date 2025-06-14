@@ -2,6 +2,8 @@
 import { useEffect, useRef } from "react";
 import { Message } from "./ChatInterface";
 import ThinkingAnimation from "./ThinkingAnimation";
+import { Badge } from "@/components/ui/badge";
+import { FileText } from "lucide-react";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -20,11 +22,10 @@ const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
   }, [messages, isThinking]);
 
   const welcomeQuestions = [
-    "What can Weezy help you with today?",
-    "Ask me about anything - I'm here to assist!",
-    "How can I make your day more productive?",
-    "Need help with research, writing, or analysis?",
-    "What would you like to explore together?"
+    "Find my deep learning files",
+    "Summarize my latest financial report", 
+    "Explain ResNet implementation in my files",
+    "Upload this presentation to Google Drive"
   ];
 
   return (
@@ -35,8 +36,9 @@ const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
             <span className="text-black font-bold text-xl">W</span>
           </div>
           <h2 className="text-3xl font-semibold text-white mb-4">How can Weezy help you today?</h2>
+          <p className="text-gray-400 mb-6">Try these example queries:</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg">
-            {welcomeQuestions.slice(1, 5).map((question, index) => (
+            {welcomeQuestions.map((question, index) => (
               <div
                 key={index}
                 className="p-4 bg-gray-900 border border-gray-800 rounded-xl text-gray-300 text-sm hover:bg-gray-800 transition-colors cursor-pointer"
@@ -68,7 +70,28 @@ const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
                 : "bg-gray-900 text-white border border-gray-800"
             }`}
           >
-            <p className="text-sm leading-relaxed">{message.content}</p>
+            <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
+            
+            {message.files && message.files.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <h4 className="text-sm font-medium text-gray-300">Related Files:</h4>
+                {message.files.map((file) => (
+                  <div key={file.id} className="bg-gray-800 rounded-lg p-3 flex items-center gap-3">
+                    <FileText className="w-4 h-4 text-gray-400" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-white">{file.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary" className="bg-gray-700 text-gray-300 text-xs">
+                          {file.platform}
+                        </Badge>
+                        <span className="text-gray-400 text-xs">{file.size}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             <span className={`text-xs mt-2 block ${
               message.isUser ? "text-gray-600" : "text-gray-400"
             }`}>
