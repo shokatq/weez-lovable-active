@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Building2, Sparkles, Search, FileText, Brain, Upload } from "lucide-react";
@@ -155,7 +155,7 @@ const ChatInterface = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white relative overflow-hidden">
         {/* Enhanced background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_70%,rgba(120,119,198,0.04),transparent_50%)] pointer-events-none"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.02),transparent_50%)] pointer-events-none"></div>
         
         <ChatSidebar 
@@ -171,63 +171,69 @@ const ChatInterface = () => {
 
           <div className="flex-1 flex flex-col">
             {messages.length === 0 ? (
-              <div className="flex-1 px-6 py-8 flex flex-col">
+              <div className="flex-1 flex flex-col px-2 py-6 md:px-10 md:py-10 lg:py-14">
                 {/* Welcome Section */}
-                <div className="text-center mb-12">
-                  <div className="relative mb-8">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-2xl mx-auto">
-                      <Sparkles className="w-8 h-8 text-white" />
+                <div className="flex flex-col md:flex-row gap-8 items-center justify-center mb-10 w-full max-w-6xl mx-auto">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl shadow-xl p-6 md:w-60 w-full flex flex-col items-center justify-center relative overflow-hidden border border-blue-400/20">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-400 flex items-center justify-center shadow-lg mb-4">
+                      <Sparkles className="w-7 h-7 text-white" />
                     </div>
-                    <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-2xl opacity-60 animate-pulse"></div>
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-white mb-1">Welcome!</h2>
+                      <p className="text-gray-200 text-sm font-medium">Weezy, your file AI assistant.</p>
+                    </div>
                   </div>
-                  
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent mb-4">
-                    Welcome to Weezy AI
-                  </h1>
-                  <p className="text-gray-400 text-lg font-medium">
-                    Your intelligent file assistant for search, summarization, and analysis
-                  </p>
+                  <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+                    <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-3 tracking-tight">
+                      Intelligent Workspace Assistant
+                    </h1>
+                    <p className="text-gray-400 text-lg md:text-xl font-medium max-w-2xl">
+                      Search, summarize, analyze, and organize your documents with one smart assistant.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Quick Actions */}
-                <div className="mb-12">
-                  <h2 className="text-xl font-semibold text-gray-300 mb-6 text-center">
-                    What would you like to do?
+                <div className="mb-10 max-w-6xl mx-auto w-full">
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-200 mb-3 md:mb-5 text-center">
+                    Quick Actions
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-                    {quickActions.map((action, index) => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {quickActions.map((action, idx) => (
                       <div
-                        key={index}
+                        key={idx}
                         onClick={action.action}
-                        className="group p-6 bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-105 hover:border-gray-600/60 backdrop-blur-sm"
+                        className="group p-5 bg-gradient-to-br from-gray-900/80 to-gray-800/70 border border-gray-700/50 rounded-xl cursor-pointer hover:scale-105 transition-all duration-300 hover:border-blue-500/40 hover:shadow-blue-600/10 shadow-sm hover:shadow-lg relative"
                       >
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                          <action.icon className="w-6 h-6 text-white" />
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-200`}>
+                          <action.icon className="w-5 h-5 text-white" />
                         </div>
-                        <h3 className="text-white font-semibold mb-2">{action.title}</h3>
-                        <p className="text-gray-400 text-sm">{action.description}</p>
+                        <h3 className="text-white font-semibold mb-1 text-lg">{action.title}</h3>
+                        <p className="text-gray-400 text-xs md:text-sm">{action.description}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Chat Input Section */}
-                <div className="mt-auto">
+                {/* Chat Input Section (card-like) */}
+                <div className="max-w-2xl mx-auto bg-gray-900/60 border border-gray-800/80 rounded-2xl p-3 md:p-6 shadow-lg">
                   <ChatInput onSendMessage={handleSendMessage} />
                   <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
                 </div>
               </div>
             ) : (
               <>
-                <ChatMessages 
-                  messages={messages} 
-                  isThinking={isThinking}
-                  thinkingType={thinkingType}
-                />
-                
-                <div className="mt-auto">
-                  <ChatInput onSendMessage={handleSendMessage} />
-                  <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+                {/* Conversation panel look */}
+                <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full bg-gray-900/70 border border-gray-800/80 rounded-2xl mt-3 shadow-lg">
+                  <ChatMessages 
+                    messages={messages} 
+                    isThinking={isThinking}
+                    thinkingType={thinkingType}
+                  />
+                  <div className="mt-auto">
+                    <ChatInput onSendMessage={handleSendMessage} />
+                    <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+                  </div>
                 </div>
               </>
             )}
@@ -239,3 +245,4 @@ const ChatInterface = () => {
 };
 
 export default ChatInterface;
+
