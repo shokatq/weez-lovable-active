@@ -1,8 +1,9 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Menu, Settings } from "lucide-react";
+import { Menu, Settings, Play } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -12,6 +13,7 @@ import ConnectivityPanel from "./ConnectivityPanel";
 
 const ChatHeader = () => {
   const [showConnectivity, setShowConnectivity] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="flex items-center justify-between p-4 bg-black">
@@ -31,6 +33,16 @@ const ChatHeader = () => {
       </div>
 
       <div className="flex items-center gap-2">
+        <Button
+          onClick={() => navigate('/demo')}
+          variant="outline"
+          size="sm"
+          className="text-gray-400 border-gray-800 hover:bg-gray-800 hover:text-white bg-black"
+        >
+          <Play className="w-4 h-4 mr-2" />
+          View Demo
+        </Button>
+        
         <Popover open={showConnectivity} onOpenChange={setShowConnectivity}>
           <PopoverTrigger asChild>
             <Button
