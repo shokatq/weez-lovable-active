@@ -1,42 +1,27 @@
 
-import { useState, useEffect } from "react";
+import { MessageSquare } from "lucide-react";
 
-const suggestions = [
-  "Summarize my documents",
-  "Find my documents",
-  "Help me write an email",
-  "Analyze this data",
-  "Create a presentation",
-  "Schedule my tasks",
-];
+interface SuggestionBubblesProps {
+  suggestions: string[];
+  onSendMessage: (message: string) => void;
+}
 
-const SuggestionBubbles = () => {
-  const [visibleSuggestions, setVisibleSuggestions] = useState(
-    suggestions.slice(0, 3)
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setVisibleSuggestions((prev) => {
-        const newSuggestions = [...suggestions];
-        return newSuggestions.slice(0, 3);
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
+const SuggestionBubbles = ({ suggestions, onSendMessage }: SuggestionBubblesProps) => {
   return (
-    <div className="absolute bottom-full mb-4 left-1/2 transform -translate-x-1/2 w-full max-w-3xl">
-      <div className="flex flex-wrap justify-center gap-3 px-4">
-        {visibleSuggestions.map((suggestion, index) => (
-          <div
-            key={suggestion}
-            className="bg-gray-900 border border-gray-800 rounded-full px-4 py-2 text-sm text-white cursor-pointer hover:bg-gray-800 hover:border-gray-700 transition-colors shadow-sm"
-          >
-            {suggestion}
-          </div>
-        ))}
+    <div className="px-6 pb-4">
+      <div className="max-w-3xl mx-auto">
+        <div className="flex flex-wrap gap-3 justify-center">
+          {suggestions.map((suggestion, index) => (
+            <button
+              key={index}
+              onClick={() => onSendMessage(suggestion)}
+              className="group flex items-center gap-2 px-4 py-2 bg-gray-900/80 hover:bg-gray-800 border border-gray-700 hover:border-gray-600 rounded-full text-sm text-gray-300 hover:text-white transition-all duration-300 backdrop-blur-sm hover:shadow-lg hover:scale-105"
+            >
+              <MessageSquare className="w-4 h-4 opacity-70 group-hover:opacity-100" />
+              {suggestion}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,61 +8,117 @@ import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import ChatSidebar from "./ChatSidebar";
 import SuggestionBubbles from "./SuggestionBubbles";
-import { demoMessages } from "@/data/demoData";
+
+export interface Message {
+  id: string;
+  content: string;
+  isUser: boolean;
+  timestamp: Date;
+  files?: Array<{
+    id: string;
+    name: string;
+    platform: string;
+    size: string;
+  }>;
+}
+
+export interface Conversation {
+  id: string;
+  messages: Message[];
+  timestamp: Date;
+}
 
 const ChatInterface = () => {
-  const [messages, setMessages] = useState(demoMessages);
-  const [input, setInput] = useState("");
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [conversations, setConversations] = useState<Conversation[]>([
+    {
+      id: "1",
+      messages: [
+        {
+          id: "1",
+          content: "Hello! I'm Weezy, your AI-powered assistant. I can help you search through your files, summarize documents, answer questions about your content, and manage your workspace. How can I assist you today?",
+          isUser: false,
+          timestamp: new Date(Date.now() - 60000),
+        }
+      ],
+      timestamp: new Date(Date.now() - 60000),
+    }
+  ]);
+  
+  const [currentConversationId, setCurrentConversationId] = useState("1");
+  const [isThinking, setIsThinking] = useState(false);
+  const [thinkingType, setThinkingType] = useState<'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general'>('general');
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const currentConversation = conversations.find(c => c.id === currentConversationId);
+  const messages = currentConversation?.messages || [];
 
-  const sendMessage = (newMessage: string) => {
-    if (newMessage.trim() === "") return;
+  const navigate = useNavigate();
 
-    const userMessage = {
-      id: String(Date.now()),
-      text: newMessage,
-      sender: "user",
-      timestamp: new Date().toLocaleTimeString(),
+  const handleSendMessage = (content: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      content,
+      isUser: true,
+      timestamp: new Date(),
     };
 
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setInput("");
+    setConversations(prev => prev.map(conv => 
+      conv.id === currentConversationId 
+        ? { ...conv, messages: [...conv.messages, newMessage] }
+        : conv
+    ));
 
+    // Simulate AI response
+    setIsThinking(true);
+    setThinkingType('general');
+    
     setTimeout(() => {
-      const aiResponse = {
-        id: String(Date.now() + 1),
-        text: "This is a demo AI response to your message.",
-        sender: "ai",
-        timestamp: new Date().toLocaleTimeString(),
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "I understand your request. Let me help you with that. This is a demo response to show the interface functionality.",
+        isUser: false,
+        timestamp: new Date(),
       };
-      setMessages((prevMessages) => [...prevMessages, aiResponse]);
-    }, 1000);
+
+      setConversations(prev => prev.map(conv => 
+        conv.id === currentConversationId 
+          ? { ...conv, messages: [...conv.messages, aiResponse] }
+          : conv
+      ));
+      
+      setIsThinking(false);
+    }, 2000);
   };
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
+  const handleNewConversation = () => {
+    const newConversation: Conversation = {
+      id: Date.now().toString(),
+      messages: [],
+      timestamp: new Date(),
+    };
+    
+    setConversations(prev => [...prev, newConversation]);
+    setCurrentConversationId(newConversation.id);
+  };
+
+  const handleConversationSelect = (id: string) => {
+    setCurrentConversationId(id);
+  };
 
   const suggestions = [
     "Explain quantum physics",
-    "Write a poem about the moon",
+    "Write a poem about the moon", 
     "Translate 'hello' to Spanish",
     "Summarize the plot of Hamlet",
   ];
 
-  const navigate = useNavigate();
-
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden">
-      <ChatSidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <ChatSidebar 
+        conversations={conversations}
+        currentConversationId={currentConversationId}
+        onConversationSelect={handleConversationSelect}
+        onNewConversation={handleNewConversation}
+      />
       
       <div className="flex-1 flex flex-col relative">
         <ChatHeader />
@@ -78,9 +135,13 @@ const ChatInterface = () => {
           </Button>
         </div>
 
-        <ChatMessages messages={messages} chatContainerRef={chatContainerRef} />
-        <ChatInput input={input} setInput={setInput} sendMessage={sendMessage} />
-        <SuggestionBubbles suggestions={suggestions} sendMessage={sendMessage} />
+        <ChatMessages 
+          messages={messages} 
+          isThinking={isThinking}
+          thinkingType={thinkingType}
+        />
+        <ChatInput onSendMessage={handleSendMessage} />
+        <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
       </div>
     </div>
   );
