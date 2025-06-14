@@ -1,6 +1,6 @@
 
 interface ThinkingAnimationProps {
-  type?: 'search' | 'summary' | 'rag' | 'upload' | 'general';
+  type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general';
 }
 
 const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
@@ -14,6 +14,8 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
         return 'Reading and understanding...';
       case 'upload':
         return 'Preparing for upload...';
+      case 'workspace':
+        return 'Loading workspace data...';
       default:
         return 'Weezy is thinking...';
     }
@@ -29,6 +31,8 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
         return '🧠';
       case 'upload':
         return '☁️';
+      case 'workspace':
+        return '🏢';
       default:
         return '💭';
     }

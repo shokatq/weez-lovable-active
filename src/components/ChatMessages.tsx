@@ -25,6 +25,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps)
     "Find my deep learning files",
     "Summarize my latest financial report", 
     "Explain ResNet implementation in my files",
+    "Show me the workspace dashboard",
+    "Add new employee to our team",
     "Upload this presentation to Google Drive"
   ];
 

@@ -72,6 +72,11 @@ const ChatInterface = () => {
     if (lowerQuery.includes('upload') || lowerQuery.includes('save to') || lowerQuery.includes('add to')) {
       return 'upload';
     }
+
+    // Workspace intent
+    if (lowerQuery.includes('workspace') || lowerQuery.includes('dashboard') || lowerQuery.includes('employees') || lowerQuery.includes('team') || lowerQuery.includes('stats')) {
+      return 'workspace';
+    }
     
     return 'general';
   };
@@ -108,9 +113,14 @@ const ChatInterface = () => {
           content: "☁️ **Upload Successful!**\n\n✅ **File Upload Completed**\n\n**Upload Details:**\n📁 Destination: Company Cloud Storage\n🔗 Shareable link generated\n👥 Permissions: Team access configured\n📊 File integrity verified\n⚡ Upload speed: 4.2 MB/s\n\n**Security Features:**\n• End-to-end encryption applied\n• Virus scan completed (Clean)\n• Backup copy created\n• Version history enabled\n\n**Next Steps:**\nYour file is now accessible to authorized team members. Would you like me to notify specific people or create a sharing link?",
           files: []
         };
+      case 'workspace':
+        return {
+          content: "🏢 **Workspace Management**\n\n**Enterprise Dashboard Access**\n\nI can help you with workspace management:\n\n**Available Actions:**\n📊 **Dashboard Overview** - View file statistics and analytics\n👥 **Employee Management** - Add, remove, or promote team members\n📈 **Platform Analytics** - See file distribution across platforms\n🔒 **Permission Control** - Manage admin and employee roles\n\n**Current Workspace Status:**\n• Total Employees: 4 (2 Admins, 2 Employees)\n• Total Files: 7,774 across 5 platforms\n• Recent Activity: 4 actions in the last 6 hours\n\n**Quick Actions:**\n• \"Show me the dashboard\" - Access full analytics\n• \"Add new employee\" - Invite team member\n• \"View file statistics\" - See detailed breakdowns\n\nWould you like me to open the workspace dashboard or help with specific employee management tasks?",
+          files: []
+        };
       default:
         return {
-          content: `💭 **Understanding Your Request**\n\nI'm analyzing your query: "${query}"\n\n**Available Capabilities:**\n\n🔍 **Smart Search** - Find files across all platforms\n• Natural language search\n• Content-based discovery\n• Multi-platform scanning\n\n📄 **Intelligent Summaries** - Extract key insights\n• Automatic content analysis\n• Key points extraction\n• Executive summaries\n\n🧠 **Knowledge Q&A** - Answer questions about your content\n• Document-based responses\n• Cross-referencing information\n• Contextual explanations\n\n☁️ **Seamless Uploads** - Save files anywhere\n• Multi-platform support\n• Automated organization\n• Team collaboration\n\n**Try asking:** "Find my project files" or "Summarize my latest report"`,
+          content: `💭 **Understanding Your Request**\n\nI'm analyzing your query: "${query}"\n\n**Available Capabilities:**\n\n🔍 **Smart Search** - Find files across all platforms\n• Natural language search\n• Content-based discovery\n• Multi-platform scanning\n\n📄 **Intelligent Summaries** - Extract key insights\n• Automatic content analysis\n• Key points extraction\n• Executive summaries\n\n🧠 **Knowledge Q&A** - Answer questions about your content\n• Document-based responses\n• Cross-referencing information\n• Contextual explanations\n\n☁️ **Seamless Uploads** - Save files anywhere\n• Multi-platform support\n• Automated organization\n• Team collaboration\n\n🏢 **Workspace Management** - Enterprise features\n• Employee management\n• Analytics dashboard\n• Permission controls\n• File statistics\n\n**Try asking:** "Find my project files", "Summarize my latest report", "Show workspace dashboard", or "Add new employee"`,
           files: []
         };
     }
