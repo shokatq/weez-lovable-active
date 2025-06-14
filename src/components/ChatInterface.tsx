@@ -176,28 +176,28 @@ const ChatInterface = () => {
 
           <div className="flex-1 flex flex-col">
             {messages.length === 0 ? (
-              <div className="flex-1 flex flex-col px-4 py-8 md:px-12 md:py-16 lg:py-20">
+              <div className="flex-1 flex flex-col items-center px-6 md:px-12 py-10 lg:py-16 overflow-y-auto">
                 {/* Hero Section */}
-                <div className="flex flex-col items-center justify-center mb-16 w-full max-w-7xl mx-auto">
-                  <div className="relative mb-8">
-                    <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-2xl border border-blue-400/20 relative">
-                      <Sparkles className="w-10 h-10 text-white animate-pulse" />
-                      <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-3xl blur-xl animate-pulse"></div>
+                <div className="flex flex-col items-center justify-center mb-12 w-full max-w-7xl mx-auto">
+                  <div className="relative mb-6">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-2xl border border-blue-400/20 relative">
+                      <Sparkles className="w-8 h-8 text-white animate-pulse" />
+                      <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-2xl blur-xl animate-pulse"></div>
                     </div>
                   </div>
                   
                   <div className="text-center max-w-4xl">
-                    <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent mb-6 tracking-tight leading-tight">
+                    <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent mb-4 tracking-tight leading-tight">
                       Meet Weezy
                     </h1>
-                    <div className="flex items-center justify-center gap-3 mb-6">
+                    <div className="flex items-center justify-center gap-3 mb-4">
                       <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                      <p className="text-xl md:text-2xl text-gray-300 font-medium">
+                      <p className="text-lg md:text-xl text-gray-300 font-medium">
                         Your Intelligent Document Assistant
                       </p>
                       <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
                     </div>
-                    <p className="text-lg md:text-xl text-gray-400 font-normal max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-base md:text-lg text-gray-400 font-normal max-w-3xl mx-auto leading-relaxed">
                       Unlock the power of AI to search, analyze, and understand your documents like never before. 
                       <span className="text-blue-400 font-medium"> Transform chaos into clarity.</span>
                     </p>
@@ -205,12 +205,12 @@ const ChatInterface = () => {
                 </div>
 
                 {/* Modern Quick Actions Grid */}
-                <div className="mb-16 max-w-7xl mx-auto w-full">
-                  <div className="text-center mb-12">
-                    <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+                <div className="mb-12 max-w-7xl mx-auto w-full">
+                  <div className="text-center mb-10">
+                    <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3">
                       What can I help you with?
                     </h2>
-                    <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto"></div>
+                    <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto"></div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -218,20 +218,20 @@ const ChatInterface = () => {
                       <div
                         key={idx}
                         onClick={action.action}
-                        className="group relative p-8 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 overflow-hidden"
+                        className="group relative p-6 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 overflow-hidden"
                       >
                         {/* Hover gradient overlay */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>
                         
                         {/* Icon container */}
-                        <div className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300 shadow-lg`}>
-                          <action.icon className="w-7 h-7 text-white" />
-                          <div className={`absolute -inset-1 bg-gradient-to-br ${action.gradient} opacity-50 blur-lg group-hover:opacity-75 transition-opacity duration-300 rounded-2xl`}></div>
+                        <div className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-all duration-300 shadow-lg`}>
+                          <action.icon className="w-6 h-6 text-white" />
+                          <div className={`absolute -inset-1 bg-gradient-to-br ${action.gradient} opacity-50 blur-lg group-hover:opacity-75 transition-opacity duration-300 rounded-xl`}></div>
                         </div>
                         
                         {/* Content */}
                         <div className="relative">
-                          <h3 className="text-white font-bold mb-3 text-xl group-hover:text-blue-100 transition-colors duration-300">
+                          <h3 className="text-white font-bold mb-2 text-lg group-hover:text-blue-100 transition-colors duration-300">
                             {action.title}
                           </h3>
                           <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
@@ -250,19 +250,19 @@ const ChatInterface = () => {
 
                 {/* Modern Chat Input Section */}
                 <div className="max-w-4xl mx-auto w-full">
-                  <div className="relative p-8 bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl">
+                  <div className="relative p-6 bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl">
                     {/* Decorative elements */}
                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                       <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse"></div>
                     </div>
                     
-                    <div className="mb-6 text-center">
-                      <div className="flex items-center justify-center gap-2 mb-3">
-                        <Zap className="w-5 h-5 text-blue-400" />
-                        <span className="text-lg font-semibold text-white">Start Your Conversation</span>
-                        <Zap className="w-5 h-5 text-purple-400" />
+                    <div className="mb-4 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Zap className="w-4 h-4 text-blue-400" />
+                        <span className="font-semibold text-white">Start Your Conversation</span>
+                        <Zap className="w-4 h-4 text-purple-400" />
                       </div>
-                      <p className="text-gray-400 text-sm">Ask me anything about your documents</p>
+                      <p className="text-gray-400 text-xs">Ask me anything about your documents</p>
                     </div>
                     
                     <ChatInput onSendMessage={handleSendMessage} />
@@ -273,13 +273,13 @@ const ChatInterface = () => {
             ) : (
               <>
                 {/* Modern conversation panel */}
-                <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-3xl mt-6 shadow-2xl overflow-hidden">
+                <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-2xl mt-6 shadow-2xl overflow-hidden">
                   <ChatMessages 
                     messages={messages} 
                     isThinking={isThinking}
                     thinkingType={thinkingType}
                   />
-                  <div className="mt-auto border-t border-white/10">
+                  <div className="mt-auto border-t border-white/10 p-4">
                     <ChatInput onSendMessage={handleSendMessage} />
                     <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
                   </div>
