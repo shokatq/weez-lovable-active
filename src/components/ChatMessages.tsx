@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import { Message } from "./ChatInterface";
 import ThinkingAnimation from "./ThinkingAnimation";
@@ -8,9 +7,10 @@ import { FileText } from "lucide-react";
 interface ChatMessagesProps {
   messages: Message[];
   isThinking: boolean;
+  thinkingType?: 'search' | 'summary' | 'rag' | 'upload' | 'general';
 }
 
-const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
+const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -117,7 +117,7 @@ const ChatMessages = ({ messages, isThinking }: ChatMessagesProps) => {
           </div>
           
           <div className="bg-gray-900 text-white border border-gray-800 rounded-2xl px-4 py-3">
-            <ThinkingAnimation />
+            <ThinkingAnimation type={thinkingType} />
           </div>
         </div>
       )}

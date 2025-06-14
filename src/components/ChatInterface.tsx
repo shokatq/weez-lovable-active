@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import ChatSidebar from "./ChatSidebar";
@@ -45,6 +44,7 @@ const ChatInterface = () => {
 
   const [currentConversationId, setCurrentConversationId] = useState("1");
   const [isThinking, setIsThinking] = useState(false);
+  const [thinkingType, setThinkingType] = useState<'search' | 'summary' | 'rag' | 'upload' | 'general'>('general');
 
   const currentConversation = conversations.find(
     (conv) => conv.id === currentConversationId
@@ -86,31 +86,31 @@ const ChatInterface = () => {
       };
     }
     
-    // Fallback responses
+    // Enhanced fallback responses with more detail
     switch (intent) {
       case 'search':
         return {
-          content: "I found several files that match your search criteria. Here are the most relevant ones:",
+          content: "🔍 **Search Results**\n\nI found several files matching your criteria across your connected platforms:\n\n**Files Found:**\n• Deep Learning Research Papers (2 files)\n• Implementation Guides (1 file)\n• Related Documentation (3 files)\n\n**Search took 0.8 seconds** - Scanned 1,247 files across Google Drive, Notion, and OneDrive\n\nWould you like me to refine the search or open any specific file?",
           files: [demoFiles[0], demoFiles[1]]
         };
       case 'summary':
         return {
-          content: "Here's a summary of your requested document:\n\n• Key findings and insights\n• Main topics covered\n• Important metrics and data points\n• Actionable recommendations",
+          content: "📄 **Document Summary Generated**\n\n**Executive Summary:**\nYour requested document has been analyzed and summarized with key insights extracted.\n\n**Key Highlights:**\n• Main objectives and findings clearly identified\n• Critical data points and metrics highlighted\n• Actionable recommendations provided\n• Supporting evidence and references included\n\n**Analysis Depth:** Comprehensive (95% content coverage)\n**Processing Time:** 1.2 seconds\n**Confidence Score:** 94%\n\nWould you like me to dive deeper into any specific section?",
           files: [demoFiles[1]]
         };
       case 'rag':
         return {
-          content: "Based on your files, here's what I found about that topic:\n\n• Detailed explanation of the concept\n• Key implementation details\n• Best practices and recommendations\n• Related topics you might find interesting",
+          content: "🧠 **Knowledge Analysis Complete**\n\n**Topic Analysis:** Based on your document collection\n\nI've analyzed your files and extracted relevant information about your query:\n\n**Key Insights:**\n• Comprehensive explanation based on your documents\n• Cross-referenced information from multiple sources\n• Technical details and implementation specifics\n• Best practices and recommendations\n• Related concepts you might find interesting\n\n**Sources Analyzed:** 3 documents\n**Relevance Score:** 96%\n**Processing Time:** 2.1 seconds\n\nWould you like me to explore any related topics or provide more specific details?",
           files: [demoFiles[0]]
         };
       case 'upload':
         return {
-          content: "✅ Successfully uploaded your file!\n\n📁 Location: Cloud Storage\n🔗 File accessible to team members\n⏰ Upload completed successfully",
+          content: "☁️ **Upload Successful!**\n\n✅ **File Upload Completed**\n\n**Upload Details:**\n📁 Destination: Company Cloud Storage\n🔗 Shareable link generated\n👥 Permissions: Team access configured\n📊 File integrity verified\n⚡ Upload speed: 4.2 MB/s\n\n**Security Features:**\n• End-to-end encryption applied\n• Virus scan completed (Clean)\n• Backup copy created\n• Version history enabled\n\n**Next Steps:**\nYour file is now accessible to authorized team members. Would you like me to notify specific people or create a sharing link?",
           files: []
         };
       default:
         return {
-          content: `I understand you're asking about "${query}". I can help you with:\n\n• 🔍 Searching files across platforms\n• 📄 Summarizing documents\n• 💡 Answering questions about your content\n• ☁️ Uploading files to cloud services\n\nTry asking me to "find my project files" or "summarize my latest report"!`,
+          content: `💭 **Understanding Your Request**\n\nI'm analyzing your query: "${query}"\n\n**Available Capabilities:**\n\n🔍 **Smart Search** - Find files across all platforms\n• Natural language search\n• Content-based discovery\n• Multi-platform scanning\n\n📄 **Intelligent Summaries** - Extract key insights\n• Automatic content analysis\n• Key points extraction\n• Executive summaries\n\n🧠 **Knowledge Q&A** - Answer questions about your content\n• Document-based responses\n• Cross-referencing information\n• Contextual explanations\n\n☁️ **Seamless Uploads** - Save files anywhere\n• Multi-platform support\n• Automated organization\n• Team collaboration\n\n**Try asking:** "Find my project files" or "Summarize my latest report"`,
           files: []
         };
     }
@@ -140,12 +140,13 @@ const ChatInterface = () => {
       )
     );
 
-    // Show thinking animation
+    // Detect intent and set thinking type
+    const intent = detectIntent(content);
+    setThinkingType(intent);
     setIsThinking(true);
 
-    // Detect intent and generate response
+    // Generate response with longer delay for more realistic feel
     setTimeout(() => {
-      const intent = detectIntent(content);
       const response = getResponseForIntent(intent, content);
       
       const aiMessage: Message = {
@@ -170,7 +171,7 @@ const ChatInterface = () => {
       );
 
       setIsThinking(false);
-    }, 2000);
+    }, 3000); // Increased delay for more realistic demonstration
   };
 
   const createNewConversation = () => {
@@ -203,6 +204,7 @@ const ChatInterface = () => {
             <ChatMessages 
               messages={currentConversation?.messages || []} 
               isThinking={isThinking}
+              thinkingType={thinkingType}
             />
             
             <div className="relative">
