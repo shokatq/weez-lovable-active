@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Building2, Sparkles, Search, FileText, Brain, Upload, ArrowRight, Zap } from "lucide-react";
+import { Sparkles, Search, FileText, Brain, Upload, ArrowRight, Zap } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
@@ -157,7 +156,7 @@ const ChatInterface = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-950 via-gray-900 to-slate-950 text-white relative overflow-hidden">
+      <div className="min-h-screen flex w-full bg-black text-white relative overflow-hidden">
         {/* Modern background effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.1),transparent_50%)] pointer-events-none"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.08),transparent_50%)] pointer-events-none"></div>
@@ -218,10 +217,10 @@ const ChatInterface = () => {
                       <div
                         key={idx}
                         onClick={action.action}
-                        className="group relative p-6 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-blue-500/10 overflow-hidden"
+                        className="group relative p-6 bg-gray-900/50 border border-gray-800 rounded-2xl cursor-pointer hover:scale-105 transition-all duration-500 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 overflow-hidden"
                       >
                         {/* Hover gradient overlay */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>
+                        <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl`}></div>
                         
                         {/* Icon container */}
                         <div className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-all duration-300 shadow-lg`}>
@@ -250,7 +249,7 @@ const ChatInterface = () => {
 
                 {/* Modern Chat Input Section */}
                 <div className="max-w-4xl mx-auto w-full">
-                  <div className="relative p-6 bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl">
+                  <div className="relative p-6 bg-gray-900/50 border border-gray-800 rounded-2xl shadow-2xl">
                     {/* Decorative elements */}
                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                       <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse"></div>
@@ -271,20 +270,17 @@ const ChatInterface = () => {
                 </div>
               </div>
             ) : (
-              <>
-                {/* Modern conversation panel */}
-                <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-2xl mt-6 shadow-2xl overflow-hidden">
-                  <ChatMessages 
-                    messages={messages} 
-                    isThinking={isThinking}
-                    thinkingType={thinkingType}
-                  />
-                  <div className="mt-auto border-t border-white/10 p-4">
-                    <ChatInput onSendMessage={handleSendMessage} />
-                    <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
-                  </div>
+              <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+                <ChatMessages 
+                  messages={messages} 
+                  isThinking={isThinking}
+                  thinkingType={thinkingType}
+                />
+                <div className="mt-auto">
+                  <ChatInput onSendMessage={handleSendMessage} />
+                  <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
                 </div>
-              </>
+              </div>
             )}
           </div>
         </SidebarInset>

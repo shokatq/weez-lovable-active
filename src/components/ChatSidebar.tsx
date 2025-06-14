@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -38,18 +37,18 @@ const ChatSidebar = ({
   const getConversationPreview = (conversation: Conversation) => {
     if (conversation.messages.length === 0) return "New conversation";
     const lastMessage = conversation.messages[conversation.messages.length - 1];
-    return lastMessage.content.slice(0, 60) + (lastMessage.content.length > 60 ? "..." : "");
+    return lastMessage.isUser ? `You: ${lastMessage.content}` : lastMessage.content;
   };
 
   return (
     <Sidebar className="w-80 bg-gray-950/95 border-r border-gray-800/50 backdrop-blur-xl">
-      <SidebarHeader className="p-6 border-b border-gray-800/50">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+      <SidebarHeader className="p-4 border-b border-gray-800/50">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
             <MessageSquare className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h2 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Weezy AI
             </h2>
             <p className="text-xs text-gray-400 font-medium">File Assistant</p>
@@ -58,22 +57,22 @@ const ChatSidebar = ({
         
         <Button
           onClick={onNewConversation}
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg border border-blue-500/20"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           New Chat
         </Button>
       </SidebarHeader>
 
-      <SidebarContent className="flex-1 p-4">
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3 px-2">
+      <SidebarContent className="flex-1 p-2">
+        <div className="my-2">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
             Recent Conversations
           </h3>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="space-y-2">
+          <div className="space-y-1 px-2">
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
@@ -84,43 +83,40 @@ const ChatSidebar = ({
                 <Button
                   variant="ghost"
                   onClick={() => onConversationSelect(conversation.id)}
-                  className={`w-full justify-start text-left p-4 h-auto rounded-xl transition-all duration-300 hover:bg-gray-800/50 border ${
+                  className={`w-full justify-start text-left p-3 h-auto rounded-lg transition-all duration-200 border ${
                     currentConversationId === conversation.id 
-                      ? 'bg-blue-600/20 border-blue-500/30 text-white shadow-lg' 
-                      : 'border-transparent text-gray-300 hover:text-white hover:border-gray-700/50'
+                      ? 'bg-blue-500/20 border-blue-500 text-white' 
+                      : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <MessageSquare className={`w-4 h-4 flex-shrink-0 ${
-                        currentConversationId === conversation.id ? 'text-blue-400' : 'text-gray-500'
-                      }`} />
+                    <p className="text-sm font-medium line-clamp-2 leading-snug mb-1">
+                      {getConversationPreview(conversation)}
+                    </p>
+                    <div className="flex items-center gap-2">
                       <Clock className="w-3 h-3 text-gray-500" />
                       <span className="text-xs text-gray-500 font-medium">
                         {formatTime(conversation.timestamp)}
                       </span>
                     </div>
-                    <p className="text-sm line-clamp-2 leading-relaxed">
-                      {getConversationPreview(conversation)}
-                    </p>
                   </div>
                 </Button>
                 
                 {hoveredConversation === conversation.id && (
-                  <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="w-7 h-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
+                      size="icon"
+                      className="w-7 h-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-md"
                     >
-                      <Edit className="w-3 h-3" />
+                      <Edit className="w-3.5 h-3.5" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="w-7 h-7 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg"
+                      size="icon"
+                      className="w-7 h-7 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-md"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                 )}
@@ -130,33 +126,30 @@ const ChatSidebar = ({
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-gray-800/50">
+      <SidebarFooter className="p-4 border-t border-gray-800/50 space-y-4">
         <Button
           onClick={onNavigateToWorkspace}
-          className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg border border-emerald-500/20"
+          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg"
         >
           <Building2 className="w-5 h-5 mr-2" />
           Workspace Dashboard
-          <Sparkles className="w-4 h-4 ml-2 opacity-70" />
         </Button>
         
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-xl border border-gray-700/30">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
-              U
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-white">User Account</p>
-              <p className="text-xs text-gray-400">Premium Plan</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-7 h-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+            U
           </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white">User Account</p>
+            <p className="text-xs text-gray-400">Premium Plan</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>

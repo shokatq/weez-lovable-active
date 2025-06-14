@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Send, Lightbulb } from "lucide-react";
+import { Mic, Send } from "lucide-react";
 import FileUpload from "./FileUpload";
 
 interface ChatInputProps {
@@ -11,7 +11,6 @@ interface ChatInputProps {
 
 const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   const [message, setMessage] = useState("");
-  const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
@@ -39,70 +38,52 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
     textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
   };
 
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-  };
-
   const handleFileSelect = (files: FileList) => {
     console.log('Files selected:', Array.from(files).map(f => f.name));
   };
 
   return (
-    <div className="p-4 bg-black">
-      <div className="max-w-3xl mx-auto">
-        <div className="relative flex items-center gap-3 px-4 py-3 bg-gray-900 rounded-2xl border border-gray-800">
-          <div className="flex items-center gap-1">
-            <div className="text-white">
-              <FileUpload onFileSelect={handleFileSelect} />
-            </div>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white hover:bg-gray-800 rounded-full p-2 h-8 w-8"
-              onClick={() => console.log('Reason')}
-            >
-              <Lightbulb className="w-4 h-4" />
-            </Button>
+    <div className="pt-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="relative flex items-center w-full p-2 bg-gray-900/90 rounded-2xl border border-gray-700/60 shadow-lg backdrop-blur-sm">
+          <div className="pl-2">
+            <FileUpload onFileSelect={handleFileSelect} />
           </div>
 
-          <div className="flex-1 relative">
+          <div className="flex-1 mx-2">
             <Textarea
               ref={textareaRef}
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
-              placeholder="Ask anything"
-              className="w-full min-h-[24px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-gray-400 focus:ring-0 focus:ring-offset-0 text-sm p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0 overflow-hidden"
-              style={{ height: '24px' }}
+              placeholder="Ask anything..."
+              className="w-full min-h-[28px] max-h-[120px] bg-transparent border-none resize-none text-white placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-base p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0"
+              rows={1}
             />
           </div>
 
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`text-gray-400 hover:text-white rounded-full p-2 h-8 w-8 ${
-                isRecording ? "text-red-500 hover:text-red-400" : ""
-              }`}
-              onClick={toggleRecording}
-            >
-              <Mic className="w-4 h-4" />
-            </Button>
-
-            {message.trim() && (
+          <div className="flex items-center gap-2 pr-1">
+            {message.trim() ? (
               <Button
                 onClick={handleSend}
-                size="sm"
-                className="bg-white text-black hover:bg-gray-200 rounded-full p-2 h-8 w-8"
+                size="icon"
+                className="bg-blue-600 text-white hover:bg-blue-700 rounded-lg h-9 w-9 flex-shrink-0"
               >
                 <Send className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-400 hover:text-white rounded-lg h-9 w-9 flex-shrink-0"
+              >
+                <Mic className="w-4 h-4" />
               </Button>
             )}
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-3">
+        <p className="text-center text-xs text-gray-500 mt-3">
           Weezy can make mistakes. Consider checking important information.
         </p>
       </div>

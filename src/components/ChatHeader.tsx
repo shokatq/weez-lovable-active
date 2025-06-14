@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Menu, Settings, Bot, Zap } from "lucide-react";
+import { Menu, Settings, Bot } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -16,27 +16,28 @@ const ChatHeader = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="flex items-center justify-between p-6 bg-black border-b border-gray-800">
-      <div className="flex items-center gap-6">
-        <SidebarTrigger className="text-gray-400 hover:text-white hover:bg-gray-800 h-10 w-10 p-0 rounded-xl transition-all duration-300 hover:scale-105">
+    <header className="flex items-center justify-between p-4 bg-transparent border-b border-gray-800/50">
+      <div className="flex items-center gap-4">
+        <SidebarTrigger className="text-gray-400 hover:text-white hover:bg-gray-800 h-10 w-10 p-0 rounded-lg transition-colors">
           <Menu className="w-5 h-5" />
         </SidebarTrigger>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-              <Bot className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+              <Bot className="w-5 h-5 text-white" />
             </div>
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl opacity-30 animate-pulse"></div>
           </div>
           <div>
-            <h1 className="font-bold text-xl bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h1 className="font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Weezy
             </h1>
-            <p className="text-xs text-gray-400 flex items-center gap-1">
-              <Zap className="w-3 h-3" />
-              AI-Powered Assistant
-            </p>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              <p className="text-xs text-gray-400">
+                Online
+              </p>
+            </div>
           </div>
         </div>
       </div>
