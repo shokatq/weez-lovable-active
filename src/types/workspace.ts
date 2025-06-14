@@ -18,6 +18,16 @@ export interface FileStats {
   };
 }
 
+export interface SampleFile {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  platform: string;
+  lastModified: Date;
+  owner: string;
+}
+
 export interface WorkspaceStats {
   totalEmployees: number;
   totalFiles: number;

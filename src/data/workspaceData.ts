@@ -92,6 +92,81 @@ export const demoFileStats: FileStats[] = [
   }
 ];
 
+export const sampleFiles = [
+  {
+    id: "1",
+    name: "Project_Proposal_2024.pdf",
+    type: "pdf",
+    size: "2.4 MB",
+    platform: "Google Drive",
+    lastModified: new Date("2024-06-10"),
+    owner: "John Smith"
+  },
+  {
+    id: "2",
+    name: "Marketing_Strategy.docx",
+    type: "docx",
+    size: "1.8 MB",
+    platform: "OneDrive",
+    lastModified: new Date("2024-06-12"),
+    owner: "Sarah Johnson"
+  },
+  {
+    id: "3",
+    name: "Sales_Report_Q2.xlsx",
+    type: "xlsx",
+    size: "956 KB",
+    platform: "Google Drive",
+    lastModified: new Date("2024-06-11"),
+    owner: "Mike Davis"
+  },
+  {
+    id: "4",
+    name: "Team_Meeting_Notes.md",
+    type: "md",
+    size: "124 KB",
+    platform: "Notion",
+    lastModified: new Date("2024-06-13"),
+    owner: "Emily Chen"
+  },
+  {
+    id: "5",
+    name: "Budget_Analysis.xlsx",
+    type: "xlsx",
+    size: "2.1 MB",
+    platform: "OneDrive",
+    lastModified: new Date("2024-06-09"),
+    owner: "John Smith"
+  },
+  {
+    id: "6",
+    name: "Product_Roadmap.pptx",
+    type: "pptx",
+    size: "3.2 MB",
+    platform: "Google Drive",
+    lastModified: new Date("2024-06-08"),
+    owner: "Sarah Johnson"
+  },
+  {
+    id: "7",
+    name: "User_Feedback.pdf",
+    type: "pdf",
+    size: "1.5 MB",
+    platform: "Dropbox",
+    lastModified: new Date("2024-06-07"),
+    owner: "Mike Davis"
+  },
+  {
+    id: "8",
+    name: "Design_Guidelines.pdf",
+    type: "pdf",
+    size: "4.1 MB",
+    platform: "Slack",
+    lastModified: new Date("2024-06-06"),
+    owner: "Emily Chen"
+  }
+];
+
 export const demoWorkspace: Workspace = {
   id: "workspace-1",
   name: "TechCorp Enterprise",
