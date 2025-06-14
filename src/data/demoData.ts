@@ -51,13 +51,33 @@ export const demoFiles: DemoFile[] = [
   },
   {
     id: "4",
-    name: "Team_Meeting_Notes.txt",
-    type: "Text",
-    platform: "Slack",
-    size: "156 KB", 
-    lastModified: "2024-06-13",
-    content: "Weekly team meeting notes discussing progress updates, blockers, and next steps...",
-    summary: "Team meeting notes covering sprint progress, identified blockers in the authentication system, and plans for user testing phase."
+    name: "Marketing_Strategy_Presentation.pptx",
+    type: "PowerPoint",
+    platform: "Google Drive",
+    size: "3.2 MB", 
+    lastModified: "2024-06-11",
+    content: "Marketing strategy presentation with market analysis, competitor research, and campaign proposals...",
+    summary: "Marketing strategy presentation outlining Q4 campaigns, target demographics, budget allocation, and projected ROI of 340%."
+  },
+  {
+    id: "5",
+    name: "Employee_Performance_Analysis.xlsx",
+    type: "Excel",
+    platform: "OneDrive",
+    size: "876 KB",
+    lastModified: "2024-06-09",
+    content: "Comprehensive employee performance data with metrics, reviews, and development plans...",
+    summary: "Performance analysis showing 87% employee satisfaction, identification of top performers, and recommended development programs."
+  },
+  {
+    id: "6",
+    name: "Technical_Architecture_Documentation.pdf",
+    type: "PDF",
+    platform: "Dropbox",
+    size: "4.1 MB",
+    lastModified: "2024-06-07",
+    content: "Technical documentation covering system architecture, API specifications, and deployment guidelines...",
+    summary: "Technical architecture documentation detailing microservices design, database schemas, security protocols, and scalability considerations."
   }
 ];
 
