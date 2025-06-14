@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -104,45 +105,45 @@ const ChatInterface = () => {
     setCurrentConversationId(id);
   };
 
+  // File-related suggestions instead of general ones
   const suggestions = [
-    "Explain quantum physics",
-    "Write a poem about the moon", 
-    "Translate 'hello' to Spanish",
-    "Summarize the plot of Hamlet",
+    "Find all PDF files from last month",
+    "Summarize my latest project documents", 
+    "Search for files containing 'budget' or 'financial'",
+    "Show me all shared documents in Google Drive",
+    "List files modified by team members today",
+    "Find presentation files larger than 10MB"
   ];
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-black text-white">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white relative overflow-hidden">
+        {/* Enhanced background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.02),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,rgba(59,130,246,0.03)_60deg,transparent_120deg)] pointer-events-none"></div>
+        
         <ChatSidebar 
           conversations={conversations}
           currentConversationId={currentConversationId}
           onConversationSelect={handleConversationSelect}
           onNewConversation={handleNewConversation}
+          onNavigateToWorkspace={() => navigate("/workspace")}
         />
         
-        <SidebarInset className="flex-1 flex flex-col relative">
+        <SidebarInset className="flex-1 flex flex-col relative z-10">
           <ChatHeader />
-          
-          {/* Workspace Dashboard Button */}
-          <div className="absolute top-4 right-6 z-10">
-            <Button
-              onClick={() => navigate("/workspace")}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg border border-blue-500/20 backdrop-blur-sm"
-            >
-              <Building2 className="w-5 h-5 mr-2" />
-              Workspace Dashboard
-              <Sparkles className="w-4 h-4 ml-2 opacity-70" />
-            </Button>
-          </div>
 
           <ChatMessages 
             messages={messages} 
             isThinking={isThinking}
             thinkingType={thinkingType}
           />
-          <ChatInput onSendMessage={handleSendMessage} />
-          <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+          
+          <div className="mt-auto">
+            <ChatInput onSendMessage={handleSendMessage} />
+            <SuggestionBubbles suggestions={suggestions} onSendMessage={handleSendMessage} />
+          </div>
         </SidebarInset>
       </div>
     </SidebarProvider>
