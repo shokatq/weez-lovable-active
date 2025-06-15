@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -26,7 +27,7 @@ const ChatHeader = () => {
             {/* Centered, maximum-size circular logo with no white bg */}
             <div className="w-14 h-14 flex items-center justify-center rounded-full bg-transparent overflow-hidden">
               <img
-                src="/lovable-uploads/ae55ce09-55ea-49f9-9ded-6af5c01e4b6f.png"
+                src="/lovable-uploads/e0f928c0-dff8-4bf7-b4c6-4bf23259e327.png"
                 alt="Weezy AI Logo"
                 className="w-full h-full object-contain rounded-full block bg-transparent"
                 style={{
