@@ -25,15 +25,18 @@ const ChatHeader = () => {
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center">
             {/* Centered, maximum-size circular logo with no white bg */}
-            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-transparent overflow-hidden">
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent overflow-hidden">
               <img
-                src="/lovable-uploads/e337fa8d-e4f4-41b6-a0bd-c43716da2acd.png"
+                src="/lovable-uploads/ae55ce09-55ea-49f9-9ded-6af5c01e4b6f.png"
                 alt="Weezy AI Logo"
-                className="w-full h-full object-cover rounded-full block"
+                className="w-full h-full object-contain rounded-full block bg-transparent"
                 style={{
                   background: "transparent",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   objectPosition: "center",
+                  // Remove white background, focus only on the logo
+                  // Additional inline styles if needed to tighten white border
+                  padding: "0px"
                 }}
               />
             </div>
