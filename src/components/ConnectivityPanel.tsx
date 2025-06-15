@@ -24,6 +24,22 @@ const ConnectivityPanel = () => {
       color: "bg-white"
     },
     {
+      id: "onedrive",
+      name: "OneDrive",
+      description: "Sync files from Microsoft OneDrive",
+      icon: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Office_OneDrive_%282019%E2%80%93present%29.svg",
+      connected: false,
+      color: "bg-blue-600"
+    },
+    {
+      id: "dropbox",
+      name: "Dropbox",
+      description: "Connect to your Dropbox storage",
+      icon: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Dropbox_logo_2017.svg",
+      connected: false,
+      color: "bg-blue-500"
+    },
+    {
       id: "slack",
       name: "Slack",
       description: "Integrate with your team communications", 
