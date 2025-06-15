@@ -39,11 +39,11 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }, [messages, isThinking]);
 
   const suggestions = [
-    "Find my financial reports",
-    "Summarize the project roadmap",
-    "What is deep learning?",
-    "Upload this to Google Drive",
-    "Delete old marketing files",
+    "Find my deep learning papers",
+    "Give me a summary of the project proposal", 
+    "What is ResNet architecture?",
+    "Save this to Google Drive",
+    "Remove the old report from Dropbox",
     "Show me API documentation"
   ];
 

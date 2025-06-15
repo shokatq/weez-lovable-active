@@ -10,7 +10,7 @@ const SuggestionBubbles = ({ suggestions, onSendMessage }: SuggestionBubblesProp
   return (
     <div className="pb-3">
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {suggestions.slice(0, 4).map((suggestion, index) => (
+        {suggestions.slice(0, 6).map((suggestion, index) => (
           <button
             key={index}
             onClick={() => onSendMessage(suggestion)}
