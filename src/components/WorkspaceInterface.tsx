@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, FileText, TrendingUp, Settings, Plus, Search, Filter, ArrowRight, Zap, Target, Globe, Calendar, Download, Eye, ArrowLeft, Star, Clock, Share, MoreHorizontal, FolderOpen, User, UserPlus, Activity, Database, Shield } from "lucide-react";
 import { demoWorkspace, sampleFiles } from "@/data/workspaceData";
 import AddMemberDialog from "./AddMemberDialog";
+import WorkspaceWelcomeDialog from "./WorkspaceWelcomeDialog";
 import { useToast } from "@/hooks/use-toast";
 
 const WorkspaceInterface = () => {
@@ -16,6 +17,7 @@ const WorkspaceInterface = () => {
   const [teamMembers, setTeamMembers] = useState(demoWorkspace.employees);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
@@ -441,6 +443,11 @@ const WorkspaceInterface = () => {
         open={isAddMemberOpen}
         onOpenChange={setIsAddMemberOpen}
         onAddMember={handleAddMember}
+      />
+
+      <WorkspaceWelcomeDialog 
+        open={showWelcome} 
+        onOpenChange={setShowWelcome} 
       />
     </div>
   );
