@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -41,14 +42,14 @@ const ChatSidebar = ({
   };
 
   return (
-    <Sidebar className="w-80 bg-black border-r border-gray-800/50 backdrop-blur-xl">
-      <SidebarHeader className="p-4 border-b border-gray-800/50">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg">
-            <MessageSquare className="w-5 h-5 text-white" />
+    <Sidebar className="w-72 bg-black border-r border-gray-800/50 backdrop-blur-xl">
+      <SidebarHeader className="p-3 border-b border-gray-800/50">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg">
+            <MessageSquare className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-base font-bold text-white">
               Weezy AI
             </h2>
             <p className="text-xs text-gray-400 font-medium">File Assistant</p>
@@ -57,7 +58,8 @@ const ChatSidebar = ({
         
         <Button
           onClick={onNewConversation}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-[0_4px_14px_0_rgb(59,130,246,0.39)] hover:shadow-[0_6px_20px_0_rgb(59,130,246,0.23)]"
+          size="sm"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded-lg transition-all duration-300 text-sm"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Chat
@@ -72,7 +74,7 @@ const ChatSidebar = ({
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="space-y-1 px-2 pb-4">
+          <div className="space-y-1 px-1 pb-4">
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
@@ -81,19 +83,20 @@ const ChatSidebar = ({
                 <Button
                   variant="ghost"
                   onClick={() => onConversationSelect(conversation.id)}
-                  className={`w-full justify-start text-left p-2 h-auto rounded-lg transition-all duration-200 border ${
+                  size="sm"
+                  className={`w-full justify-start text-left p-2 h-auto rounded-md transition-all duration-200 border ${
                     currentConversationId === conversation.id 
                       ? 'bg-slate-800 border-blue-600 text-white' 
                       : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-2 leading-snug mb-1">
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <p className="text-xs font-medium line-clamp-2 leading-tight mb-1 truncate">
                       {getConversationPreview(conversation)}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3 h-3 text-gray-500" />
-                      <span className="text-xs text-gray-500 font-medium">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                      <span className="text-xs text-gray-500 font-medium truncate">
                         {formatTime(conversation.timestamp)}
                       </span>
                     </div>
@@ -105,29 +108,30 @@ const ChatSidebar = ({
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-gray-800/50 space-y-3">
+      <SidebarFooter className="p-3 border-t border-gray-800/50 space-y-2">
         <Button
           onClick={onNavigateToWorkspace}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20"
+          size="sm"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-lg transition-all duration-300 text-sm"
         >
-          <Building2 className="w-5 h-5 mr-2" />
+          <Building2 className="w-4 h-4 mr-2" />
           Workspace Dashboard
         </Button>
         
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
             U
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-white">User Account</p>
-            <p className="text-xs text-gray-400">Premium Plan</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">User Account</p>
+            <p className="text-xs text-gray-400 truncate">Premium Plan</p>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
+            className="w-7 h-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg flex-shrink-0"
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <MoreHorizontal className="w-3 h-3" />
           </Button>
         </div>
       </SidebarFooter>
