@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
 import SuggestionBubbles from "./SuggestionBubbles";
@@ -30,14 +30,29 @@ const renderFormattedText = (text: string) => {
 
 const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: ChatMessagesProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (shouldAutoScroll) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Handle scroll events to detect if user is manually scrolling
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLDivElement;
+    const { scrollTop, scrollHeight, clientHeight } = target;
+    const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 10;
+    setShouldAutoScroll(isAtBottom);
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isThinking]);
+    // Only auto-scroll if user hasn't manually scrolled up
+    if (shouldAutoScroll) {
+      scrollToBottom();
+    }
+  }, [messages, isThinking, shouldAutoScroll]);
 
   const suggestions = [
     "Find my deep learning papers from last year",
@@ -70,9 +85,9 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }
 
   return (
-    <div className="flex-1 min-h-0">
-      <ScrollArea className="h-full">
-        <div className="px-6 py-8 space-y-8 max-w-3xl mx-auto w-full">
+    <div className="flex-1 overflow-hidden">
+      <ScrollArea className="h-full" onScrollCapture={handleScroll}>
+        <div className="px-6 py-8 space-y-8 max-w-3xl mx-auto w-full min-h-full">
           {messages.map((message) => (
             <div
               key={message.id}
