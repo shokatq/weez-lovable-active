@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, useSidebar } from "@/components/ui/sidebar";
 import { Plus, MessageSquare, Building2, Sparkles, Clock, Trash2, Edit, MoreHorizontal } from "lucide-react";
 import { Conversation } from "./ChatInterface";
 
@@ -22,6 +22,7 @@ const ChatSidebar = ({
   onNavigateToWorkspace 
 }: ChatSidebarProps) => {
   const [hoveredConversation, setHoveredConversation] = useState<string | null>(null);
+  const { state } = useSidebar();
 
   const formatTime = (date: Date) => {
     const now = new Date();
@@ -44,36 +45,40 @@ const ChatSidebar = ({
   return (
     <Sidebar className="w-80 bg-black border-r border-gray-800/50 backdrop-blur-xl">
       <SidebarHeader className="p-4 border-b border-gray-800/50">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+        <div className={`flex items-center gap-3 mb-4 ${state === 'collapsed' ? 'justify-center' : ''}`}>
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg flex-shrink-0">
             <MessageSquare className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              Weezy AI
-            </h2>
-            <p className="text-xs text-gray-400 font-medium">File Assistant</p>
-          </div>
+          {state === 'expanded' && (
+            <div>
+              <h2 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                Weezy AI
+              </h2>
+              <p className="text-xs text-gray-400 font-medium">File Assistant</p>
+            </div>
+          )}
         </div>
         
         <Button
           onClick={onNewConversation}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-[0_4px_14px_0_rgb(59,130,246,0.39)] hover:shadow-[0_6px_20px_0_rgb(59,130,246,0.23)]"
+          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-[0_4px_14px_0_rgb(59,130,246,0.39)] hover:shadow-[0_6px_20px_0_rgb(59,130,246,0.23)] ${state === 'expanded' ? 'justify-start px-4' : 'justify-center'}`}
         >
-          <Plus className="w-4 h-4 mr-2" />
-          New Chat
+          <Plus className={`w-4 h-4 ${state === 'expanded' ? 'mr-2' : ''}`} />
+          {state === 'expanded' && <span>New Chat</span>}
         </Button>
       </SidebarHeader>
 
       <SidebarContent className="flex-1 p-2">
-        <div className="my-2">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
-            Recent Conversations
-          </h3>
-        </div>
+        {state === 'expanded' && (
+          <div className="my-2">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
+              Recent Conversations
+            </h3>
+          </div>
+        )}
         
         <ScrollArea className="flex-1">
-          <div className="space-y-1 px-2 pb-4">
+          <div className={`space-y-1 pb-4 ${state === 'expanded' ? 'px-2' : 'px-0.5'}`}>
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
@@ -84,26 +89,34 @@ const ChatSidebar = ({
                 <Button
                   variant="ghost"
                   onClick={() => onConversationSelect(conversation.id)}
-                  className={`w-full justify-start text-left p-3 h-auto rounded-lg transition-all duration-200 border ${
+                  className={`w-full rounded-lg transition-all duration-200 border ${
                     currentConversationId === conversation.id 
                       ? 'bg-blue-900/40 border-blue-600 text-white' 
                       : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
+                  } ${
+                    state === 'expanded' 
+                    ? 'justify-start text-left p-3 h-auto'
+                    : 'justify-center h-12 w-12'
                   }`}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-2 leading-snug mb-1.5">
-                      {getConversationPreview(conversation)}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3 h-3 text-gray-500" />
-                      <span className="text-xs text-gray-500 font-medium">
-                        {formatTime(conversation.timestamp)}
-                      </span>
+                  {state === 'expanded' ? (
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium line-clamp-2 leading-snug mb-1.5">
+                        {getConversationPreview(conversation)}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3 h-3 text-gray-500" />
+                        <span className="text-xs text-gray-500 font-medium">
+                          {formatTime(conversation.timestamp)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <MessageSquare className="w-5 h-5" />
+                  )}
                 </Button>
                 
-                {hoveredConversation === conversation.id && (
+                {hoveredConversation === conversation.id && state === 'expanded' && (
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Button
                       variant="ghost"
@@ -130,27 +143,31 @@ const ChatSidebar = ({
       <SidebarFooter className="p-4 border-t border-gray-800/50 space-y-3">
         <Button
           onClick={onNavigateToWorkspace}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20"
+          className={`w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20 ${state === 'expanded' ? 'justify-start px-4' : 'justify-center'}`}
         >
-          <Building2 className="w-5 h-5 mr-2" />
-          Workspace Dashboard
+          <Building2 className={`w-5 h-5 ${state === 'expanded' ? 'mr-2' : ''}`} />
+          {state === 'expanded' && <span>Workspace Dashboard</span>}
         </Button>
         
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">
+        <div className={`flex items-center gap-3 ${state === 'collapsed' ? 'justify-center' : ''}`}>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
             U
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-white">User Account</p>
-            <p className="text-xs text-gray-400">Premium Plan</p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-8 h-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
+          {state === 'expanded' && (
+            <>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-white">User Account</p>
+                <p className="text-xs text-gray-400">Premium Plan</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </>
+          )}
         </div>
       </SidebarFooter>
     </Sidebar>
