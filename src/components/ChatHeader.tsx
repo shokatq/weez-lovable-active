@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -25,7 +24,7 @@ const ChatHeader = () => {
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center">
             {/* Centered, maximum-size circular logo with no white bg */}
-            <div className="w-18 h-18 flex items-center justify-center rounded-full bg-transparent overflow-hidden">
+            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-transparent overflow-hidden">
               <img
                 src="/lovable-uploads/ae55ce09-55ea-49f9-9ded-6af5c01e4b6f.png"
                 alt="Weezy AI Logo"
