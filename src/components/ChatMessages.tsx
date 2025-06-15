@@ -40,12 +40,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }, [messages, isThinking]);
 
   const suggestions = [
-    "Find my deep learning papers",
-    "Give me a summary of the project proposal", 
-    "What is ResNet architecture?",
-    "Save this to Google Drive",
-    "Remove the old report from Dropbox",
-    "Show me API documentation"
+    "Find my deep learning papers from last year",
+    "Give me a detailed summary of the project proposal document", 
+    "What is ResNet architecture and how does it work?",
+    "Upload this quarterly report to Google Drive",
+    "Remove the old marketing presentation from Dropbox",
+    "Show me the API integration documentation"
   ];
 
   if (messages.length === 0 && !isThinking) {
@@ -53,7 +53,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto p-4">
         <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg mb-6">
           <img 
-            src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=80&h=80&fit=crop&crop=center" 
+            src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=80&h=80&fit=crop&crop=center" 
             alt="Weezy AI Robot"
             className="w-full h-full object-cover"
           />
@@ -70,90 +70,92 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }
 
   return (
-    <ScrollArea className="flex-1 h-full">
-      <div className="px-6 py-8 space-y-8 max-w-3xl mx-auto w-full">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex gap-4 items-start ${
-              message.isUser ? "" : ""
-            }`}
-          >
-            {!message.isUser && (
+    <div className="flex-1 min-h-0">
+      <ScrollArea className="h-full">
+        <div className="px-6 py-8 space-y-8 max-w-3xl mx-auto w-full">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex gap-4 items-start ${
+                message.isUser ? "" : ""
+              }`}
+            >
+              {!message.isUser && (
+                <div className="w-9 h-9 rounded-full overflow-hidden shadow-lg flex-shrink-0">
+                  <img 
+                    src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=36&h=36&fit=crop&crop=center" 
+                    alt="Weezy AI"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              
+              <div className={`flex flex-col gap-2 w-full ${message.isUser ? 'items-end' : 'items-start'}`}>
+                <div
+                  className={`max-w-[90%] rounded-2xl px-5 py-3 text-left ${
+                    message.isUser
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-800 text-gray-200"
+                  } ${message.isUploading ? 'animate-pulse' : ''}`}
+                >
+                  {message.isUploading && (
+                    <div className="flex items-center gap-3 mb-3">
+                      <Upload className="w-5 h-5 text-blue-400 animate-bounce" />
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="text-sm font-medium whitespace-pre-wrap">
+                    {renderFormattedText(message.content)}
+                  </div>
+                  
+                  {message.files && message.files.length > 0 && (
+                    <div className="mt-4 space-y-2 border-t border-gray-700 pt-3">
+                      {message.files.map((file) => (
+                        <div key={file.id} className={`bg-gray-700/50 rounded-lg p-3 flex items-center gap-3 border border-gray-600/50 ${message.isUploading ? 'animate-pulse' : ''}`}>
+                          <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                          <div className="flex-1 overflow-hidden">
+                            <p className="text-sm font-medium text-white truncate">{file.name}</p>
+                            <span className="text-xs text-gray-400">{file.platform} - {file.size}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {message.isUser && (
+                <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                  <User className="w-5 h-5 text-gray-300" />
+                </div>
+              )}
+            </div>
+          ))}
+
+          {isThinking && (
+            <div className="flex gap-4 items-start">
               <div className="w-9 h-9 rounded-full overflow-hidden shadow-lg flex-shrink-0">
                 <img 
-                  src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=36&h=36&fit=crop&crop=center" 
+                  src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=36&h=36&fit=crop&crop=center" 
                   alt="Weezy AI"
                   className="w-full h-full object-cover"
                 />
               </div>
-            )}
-            
-            <div className={`flex flex-col gap-2 w-full ${message.isUser ? 'items-end' : 'items-start'}`}>
-              <div
-                className={`max-w-[90%] rounded-2xl px-5 py-3 text-left ${
-                  message.isUser
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-200"
-                } ${message.isUploading ? 'animate-pulse' : ''}`}
-              >
-                {message.isUploading && (
-                  <div className="flex items-center gap-3 mb-3">
-                    <Upload className="w-5 h-5 text-blue-400 animate-bounce" />
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="text-sm font-medium whitespace-pre-wrap">
-                  {renderFormattedText(message.content)}
-                </div>
-                
-                {message.files && message.files.length > 0 && (
-                  <div className="mt-4 space-y-2 border-t border-gray-700 pt-3">
-                    {message.files.map((file) => (
-                      <div key={file.id} className={`bg-gray-700/50 rounded-lg p-3 flex items-center gap-3 border border-gray-600/50 ${message.isUploading ? 'animate-pulse' : ''}`}>
-                        <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                        <div className="flex-1 overflow-hidden">
-                          <p className="text-sm font-medium text-white truncate">{file.name}</p>
-                          <span className="text-xs text-gray-400">{file.platform} - {file.size}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div className="bg-gray-800 rounded-2xl">
+                <ThinkingAnimation type={thinkingType} />
               </div>
             </div>
+          )}
 
-            {message.isUser && (
-              <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                <User className="w-5 h-5 text-gray-300" />
-              </div>
-            )}
-          </div>
-        ))}
-
-        {isThinking && (
-          <div className="flex gap-4 items-start">
-            <div className="w-9 h-9 rounded-full overflow-hidden shadow-lg flex-shrink-0">
-              <img 
-                src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=36&h=36&fit=crop&crop=center" 
-                alt="Weezy AI"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="bg-gray-800 rounded-2xl">
-              <ThinkingAnimation type={thinkingType} />
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-    </ScrollArea>
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 

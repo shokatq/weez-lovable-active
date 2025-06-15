@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,6 +56,14 @@ const ConnectivityPanel = () => {
       icon: "/lovable-uploads/ff191e8c-d8df-45af-a5da-a8f49ee636ee.png",
       connected: false,
       color: "bg-white"
+    },
+    {
+      id: "confluence",
+      name: "Confluence",
+      description: "Access team documentation and wikis",
+      icon: "https://upload.wikimedia.org/wikipedia/commons/0/09/Confluence_icon.svg",
+      connected: false,
+      color: "bg-blue-700"
     },
     {
       id: "custom-request",
