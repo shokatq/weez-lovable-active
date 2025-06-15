@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
-import { Plus, MessageSquare, Building2, Sparkles, Clock, Trash2, Edit, MoreHorizontal } from "lucide-react";
+import { Plus, MessageSquare, Building2, Clock, MoreHorizontal } from "lucide-react";
 import { Conversation } from "./ChatInterface";
 
 interface ChatSidebarProps {
@@ -45,11 +44,11 @@ const ChatSidebar = ({
     <Sidebar className="w-80 bg-black border-r border-gray-800/50 backdrop-blur-xl">
       <SidebarHeader className="p-4 border-b border-gray-800/50">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+          <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg">
             <MessageSquare className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h2 className="text-lg font-bold text-white">
               Weezy AI
             </h2>
             <p className="text-xs text-gray-400 font-medium">File Assistant</p>
@@ -77,8 +76,6 @@ const ChatSidebar = ({
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
-                onMouseEnter={() => setHoveredConversation(conversation.id)}
-                onMouseLeave={() => setHoveredConversation(null)}
                 className="relative group"
               >
                 <Button
@@ -86,7 +83,7 @@ const ChatSidebar = ({
                   onClick={() => onConversationSelect(conversation.id)}
                   className={`w-full justify-start text-left p-2 h-auto rounded-lg transition-all duration-200 border ${
                     currentConversationId === conversation.id 
-                      ? 'bg-blue-900/40 border-blue-600 text-white' 
+                      ? 'bg-slate-800 border-blue-600 text-white' 
                       : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
@@ -102,25 +99,6 @@ const ChatSidebar = ({
                     </div>
                   </div>
                 </Button>
-                
-                {hoveredConversation === conversation.id && (
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-7 h-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-md"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-7 h-7 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-md"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                )}
               </div>
             ))}
           </div>
