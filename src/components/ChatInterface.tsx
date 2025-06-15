@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMessages from "@/components/ChatMessages";
@@ -65,42 +66,44 @@ const ChatInterface = () => {
   };
 
   return (
-    <div className="h-screen flex bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.15),transparent_50%)] pointer-events-none"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.1),transparent_50%)] pointer-events-none"></div>
-      
-      <div className="relative z-10 flex w-full">
-        <ChatSidebar 
-          conversations={conversations}
-          currentConversationId={currentConversationId}
-          onConversationSelect={handleConversationSelect}
-          onNewConversation={handleNewConversation}
-          onNavigateToWorkspace={handleNavigateToWorkspace}
-        />
+    <SidebarProvider>
+      <div className="h-screen flex bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white overflow-hidden w-full">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.15),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.1),transparent_50%)] pointer-events-none"></div>
         
-        <div className="flex-1 flex flex-col">
-          <ChatHeader />
+        <div className="relative z-10 flex w-full">
+          <ChatSidebar 
+            conversations={conversations}
+            currentConversationId={currentConversationId}
+            onConversationSelect={handleConversationSelect}
+            onNewConversation={handleNewConversation}
+            onNavigateToWorkspace={handleNavigateToWorkspace}
+          />
           
-          <div className="flex-1 flex">
-            <div className="flex-1 flex flex-col">
-              <ChatMessages 
-                messages={messages} 
-                isThinking={isThinking} 
-              />
-              <ChatInput onSendMessage={handleSendMessage} />
-            </div>
+          <div className="flex-1 flex flex-col">
+            <ChatHeader />
             
-            <ConnectivityPanel />
+            <div className="flex-1 flex">
+              <div className="flex-1 flex flex-col">
+                <ChatMessages 
+                  messages={messages} 
+                  isThinking={isThinking} 
+                />
+                <ChatInput onSendMessage={handleSendMessage} />
+              </div>
+              
+              <ConnectivityPanel />
+            </div>
           </div>
         </div>
-      </div>
 
-      <ChatWelcomeDialog 
-        open={showWelcome} 
-        onOpenChange={setShowWelcome} 
-      />
-    </div>
+        <ChatWelcomeDialog 
+          open={showWelcome} 
+          onOpenChange={setShowWelcome} 
+        />
+      </div>
+    </SidebarProvider>
   );
 };
 
