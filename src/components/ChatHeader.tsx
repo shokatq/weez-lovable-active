@@ -24,13 +24,18 @@ const ChatHeader = () => {
         
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center">
-            {/* Logo container with image */}
-            <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg overflow-hidden">
+            {/* Logo container with tight-cropped image and center alignment */}
+            <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-transparent overflow-hidden">
               <img
-                src="/lovable-uploads/a9903f09-c5ae-4328-9bf8-8bf6272e2cb6.png"
+                src="/lovable-uploads/e337fa8d-e4f4-41b6-a0bd-c43716da2acd.png"
                 alt="Weezy AI Logo"
-                className="w-7 h-7 object-contain mx-auto my-auto flex items-center justify-center"
-                style={{ display: "block" }}
+                className="w-9 h-9 object-contain"
+                style={{
+                  background: "transparent",
+                  display: "block",
+                  objectFit: "contain",
+                  objectPosition: "center"
+                }}
               />
             </div>
           </div>
