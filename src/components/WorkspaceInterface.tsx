@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, FileText, TrendingUp, Settings, Plus, Search, Filter, ArrowRight, Zap, Target, Globe, Calendar, Download, Eye, ArrowLeft, Star, Clock, Share, MoreHorizontal, FolderOpen, User, UserPlus, Activity, Database, Shield } from "lucide-react";
+import { Users, FileText, TrendingUp, Settings, Plus, Search, Filter, ArrowRight, Zap, Target, Globe, Calendar, Download, Eye, ArrowLeft, Star, Clock, Share, MoreHorizontal, FolderOpen, User, UserPlus, Activity, Database, Shield, MessageSquare, Trash2, Edit3, Lock } from "lucide-react";
 import { demoWorkspace, sampleFiles } from "@/data/workspaceData";
 import AddMemberDialog from "./AddMemberDialog";
 import WorkspaceWelcomeDialog from "./WorkspaceWelcomeDialog";
@@ -21,6 +21,7 @@ const WorkspaceInterface = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
+    { id: 'files-weezy', label: 'Files Stored with Weezy', icon: Database },
     { id: 'files', label: 'File Management', icon: FileText },
     { id: 'team', label: 'Team Management', icon: Users },
     { id: 'analytics', label: 'Analytics', icon: Activity },
@@ -82,6 +83,37 @@ const WorkspaceInterface = () => {
       case 'pptx': return 'text-orange-400 bg-orange-500/10 border-orange-500/20';
       case 'md': return 'text-gray-400 bg-gray-500/10 border-gray-500/20';
       default: return 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+    }
+  };
+
+  const handleFileAction = (action: string, fileId: string, fileName: string) => {
+    switch (action) {
+      case 'summarise':
+        toast({
+          title: "Summarizing File",
+          description: `Generating summary for ${fileName}...`,
+        });
+        break;
+      case 'delete':
+        toast({
+          title: "File Deleted",
+          description: `${fileName} has been deleted from Weezy storage.`,
+        });
+        break;
+      case 'rename':
+        toast({
+          title: "Rename File",
+          description: `Opening rename dialog for ${fileName}...`,
+        });
+        break;
+      case 'permissions':
+        toast({
+          title: "Access Permissions",
+          description: `Opening permissions settings for ${fileName}...`,
+        });
+        break;
+      default:
+        break;
     }
   };
 
@@ -189,7 +221,7 @@ const WorkspaceInterface = () => {
                         <p className="text-white font-semibold text-base">{activity.action}</p>
                         <p className="text-gray-400 text-sm">by {activity.user}</p>
                         {activity.file && (
-                          <Badge variant="secondary" className="mt-2 bg-blue-500/10 text-blue-400 text-sm border border-blue-500/20">
+                          <Badge variant="secondary" className="mt-2 bg-blue-500/10 text-blue-400 border-blue-500/20">
                             {activity.file}
                           </Badge>
                         )}
@@ -226,6 +258,152 @@ const WorkspaceInterface = () => {
                       </div>
                     </div>
                   ))}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'files-weezy' && (
+            <div className="space-y-8">
+              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
+                      <Database className="w-6 h-6 text-white" />
+                    </div>
+                    Files Stored with Weezy
+                  </CardTitle>
+                  <CardDescription className="text-gray-400 text-lg">
+                    Manage and search through all files stored in Weezy's intelligent storage system
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row gap-4 mb-8">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input
+                          type="text"
+                          placeholder="Semantic search across all your files..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all duration-300"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <select
+                        value={selectedPlatform}
+                        onChange={(e) => setSelectedPlatform(e.target.value)}
+                        className="px-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-xl text-white focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all duration-300"
+                      >
+                        {platforms.map(platform => (
+                          <option key={platform} value={platform} className="bg-gray-800">
+                            {platform === 'all' ? 'All Platforms' : platform}
+                          </option>
+                        ))}
+                      </select>
+                      <Button variant="outline" className="border-gray-700/50 text-gray-300 hover:bg-gray-800/50 hover:border-gray-600 px-6 py-3 rounded-xl">
+                        <Filter className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-6">
+                    {filteredFiles.map((file) => (
+                      <Card key={file.id} className="bg-gray-800/30 border-gray-700/30 backdrop-blur-md hover:border-purple-500/50 transition-all duration-300 hover:bg-gray-800/50 shadow-lg hover:shadow-xl group">
+                        <CardContent className="p-8">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-8">
+                              <div className="relative">
+                                <div className="text-5xl mb-2">{getFileIcon(file.type)}</div>
+                                <Badge className={`absolute -bottom-2 -right-2 text-xs font-bold ${getFileTypeColor(file.type)} px-2 py-1`}>
+                                  {file.type.toUpperCase()}
+                                </Badge>
+                              </div>
+                              
+                              <div className="space-y-3">
+                                <div>
+                                  <h3 className="text-white font-bold text-xl mb-1 group-hover:text-purple-400 transition-colors duration-300">
+                                    {file.name}
+                                  </h3>
+                                  <div className="flex items-center gap-4 text-sm">
+                                    <div className="flex items-center gap-2 text-gray-400">
+                                      <User className="w-4 h-4" />
+                                      <span className="font-medium">{file.owner}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-gray-400">
+                                      <Clock className="w-4 h-4" />
+                                      <span>{file.lastModified.toLocaleDateString()}</span>
+                                    </div>
+                                    <Badge className={`${getPlatformBadgeColor(file.platform)} font-semibold`}>
+                                      Original: {file.platform}
+                                    </Badge>
+                                    <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 font-semibold">
+                                      Stored with Weezy
+                                    </Badge>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-6 text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                                    <span className="text-gray-300 font-medium">Size: {file.size}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                    <span className="text-gray-300 font-medium">Stored: {file.lastModified.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              <div className="flex gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleFileAction('summarise', file.id, file.name)}
+                                  className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 p-3 rounded-xl transition-all duration-300" 
+                                  title="Summarise"
+                                >
+                                  <MessageSquare className="w-5 h-5" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleFileAction('rename', file.id, file.name)}
+                                  className="text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10 p-3 rounded-xl transition-all duration-300" 
+                                  title="Rename"
+                                >
+                                  <Edit3 className="w-5 h-5" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleFileAction('permissions', file.id, file.name)}
+                                  className="text-gray-400 hover:text-green-400 hover:bg-green-500/10 p-3 rounded-xl transition-all duration-300" 
+                                  title="Access Permissions"
+                                >
+                                  <Lock className="w-5 h-5" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleFileAction('delete', file.id, file.name)}
+                                  className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 p-3 rounded-xl transition-all duration-300" 
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-5 h-5" />
+                                </Button>
+                              </div>
+                              <ArrowRight className="w-6 h-6 text-gray-500 group-hover:text-purple-400 transition-colors duration-300" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -359,13 +537,13 @@ const WorkspaceInterface = () => {
                         
                         <div className="flex items-center gap-3">
                           <div className="flex gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 p-3 rounded-xl transition-all duration-300" title="Preview">
+                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-3 rounded-xl transition-all duration-300" title="Preview">
                               <Eye className="w-5 h-5" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/10 p-3 rounded-xl transition-all duration-300" title="Download">
+                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-3 rounded-xl transition-all duration-300" title="Download">
                               <Download className="w-5 h-5" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-violet-400 hover:bg-violet-500/10 p-3 rounded-xl transition-all duration-300" title="Share">
+                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-3 rounded-xl transition-all duration-300" title="Share">
                               <Share className="w-5 h-5" />
                             </Button>
                           </div>
