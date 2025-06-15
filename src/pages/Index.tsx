@@ -39,13 +39,6 @@ const Index = () => {
     }
   ];
 
-  const stats = [
-    { label: "Documents Processed", value: "2.4M+", icon: FileText },
-    { label: "Active Users", value: "50K+", icon: Users },
-    { label: "Queries Per Day", value: "1M+", icon: Search },
-    { label: "Uptime", value: "99.9%", icon: TrendingUp }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white overflow-hidden">
       {/* Enhanced Background Effects */}
@@ -101,7 +94,7 @@ const Index = () => {
             
             <div className="flex items-center justify-center gap-6 mb-16">
               <Button 
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/chat")}
                 size="lg"
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-12 py-6 rounded-2xl text-lg transition-all duration-300 hover:scale-105 shadow-lg shadow-blue-500/25"
               >
@@ -117,19 +110,6 @@ const Index = () => {
                 <Building2 className="w-6 h-6 mr-3" />
                 Enterprise Workspace
               </Button>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-gray-800/50 border border-gray-700/50 flex items-center justify-center mx-auto mb-4">
-                    <stat.icon className="w-8 h-8 text-blue-400" />
-                  </div>
-                  <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
@@ -195,7 +175,7 @@ const Index = () => {
                 </p>
                 <div className="flex items-center justify-center gap-6">
                   <Button 
-                    onClick={() => navigate("/home")}
+                    onClick={() => navigate("/chat")}
                     size="lg"
                     className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-semibold px-10 py-4 rounded-xl text-lg transition-all duration-300 hover:scale-105 shadow-lg"
                   >
