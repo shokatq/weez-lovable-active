@@ -21,20 +21,19 @@ const ChatHeader = () => {
         <SidebarTrigger className="text-gray-400 hover:text-white hover:bg-gray-800 h-10 w-10 p-0 rounded-lg transition-colors flex items-center justify-center">
           <Menu className="w-5 h-5" />
         </SidebarTrigger>
-        
+
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center">
-            {/* Logo container with tight-cropped image and center alignment */}
-            <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-transparent overflow-hidden">
+            {/* Centered, maximum-size circular logo with no white bg */}
+            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-transparent overflow-hidden">
               <img
                 src="/lovable-uploads/e337fa8d-e4f4-41b6-a0bd-c43716da2acd.png"
                 alt="Weezy AI Logo"
-                className="w-9 h-9 object-contain"
+                className="w-full h-full object-cover rounded-full block"
                 style={{
                   background: "transparent",
-                  display: "block",
-                  objectFit: "contain",
-                  objectPosition: "center"
+                  objectFit: "cover",
+                  objectPosition: "center",
                 }}
               />
             </div>
