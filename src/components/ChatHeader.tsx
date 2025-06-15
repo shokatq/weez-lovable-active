@@ -27,7 +27,7 @@ const ChatHeader = () => {
             {/* Centered, maximum-size circular logo with no white bg */}
             <div className="w-14 h-14 flex items-center justify-center rounded-full bg-transparent overflow-hidden">
               <img
-                src="/lovable-uploads/e0f928c0-dff8-4bf7-b4c6-4bf23259e327.png"
+                src="/lovable-uploads/14e6ff0d-be34-457c-98ea-83c837d44b74.png"
                 alt="Weezy AI Logo"
                 className="w-full h-full object-contain rounded-full block bg-transparent"
                 style={{
