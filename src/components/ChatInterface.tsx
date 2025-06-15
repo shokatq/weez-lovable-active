@@ -6,7 +6,6 @@ import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMessages from "@/components/ChatMessages";
 import ChatInput from "@/components/ChatInput";
-import ConnectivityPanel from "@/components/ConnectivityPanel";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import { Message, Conversation } from "@/types/chat";
 
@@ -84,16 +83,12 @@ const ChatInterface = () => {
           <div className="flex-1 flex flex-col">
             <ChatHeader />
             
-            <div className="flex-1 flex">
-              <div className="flex-1 flex flex-col">
-                <ChatMessages 
-                  messages={messages} 
-                  isThinking={isThinking} 
-                />
-                <ChatInput onSendMessage={handleSendMessage} />
-              </div>
-              
-              <ConnectivityPanel />
+            <div className="flex-1 flex flex-col">
+              <ChatMessages 
+                messages={messages} 
+                isThinking={isThinking} 
+              />
+              <ChatInput onSendMessage={handleSendMessage} />
             </div>
           </div>
         </div>
