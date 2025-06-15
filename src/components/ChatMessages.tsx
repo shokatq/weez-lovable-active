@@ -1,9 +1,9 @@
-
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
 import SuggestionBubbles from "./SuggestionBubbles";
-import { FileText, Bot, User, Upload } from "lucide-react";
+import { FileText, User, Upload } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -29,43 +29,21 @@ const renderFormattedText = (text: string) => {
 
 const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: ChatMessagesProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
   const scrollToBottom = () => {
-    if (shouldAutoScroll && messagesEndRef.current) {
+    if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  // Handle scroll events to detect if user is manually scrolling
-  const handleScroll = () => {
-    if (!scrollContainerRef.current) return;
-    
-    const container = scrollContainerRef.current;
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const isNearBottom = scrollHeight - scrollTop - clientHeight < 50;
-    setShouldAutoScroll(isNearBottom);
-  };
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
-    }
-  }, []);
-
   useEffect(() => {
     // Small delay to ensure DOM is updated
     const timer = setTimeout(() => {
-      if (shouldAutoScroll) {
-        scrollToBottom();
-      }
+      scrollToBottom();
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [messages, isThinking, shouldAutoScroll]);
+  }, [messages, isThinking]);
 
   const suggestions = [
     "Find my deep learning papers from last year",
@@ -98,16 +76,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
-      <div 
-        ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto px-6 py-8 scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-500"
-        style={{ 
-          height: '100%',
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#4B5563 #1F2937'
-        }}
-      >
+    <ScrollArea className="flex-1">
+      <div className="px-6 py-8">
         <div className="space-y-8 max-w-3xl mx-auto w-full">
           {messages.map((message) => (
             <div
@@ -191,7 +161,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
           <div ref={messagesEndRef} />
         </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 };
 
