@@ -4,7 +4,6 @@ import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
 import SuggestionBubbles from "./SuggestionBubbles";
 import { FileText, Bot, User, Upload } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -102,8 +101,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <div 
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto px-6 py-8"
-        style={{ height: '100%' }}
+        className="flex-1 overflow-y-auto px-6 py-8 scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-500"
+        style={{ 
+          height: '100%',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#4B5563 #1F2937'
+        }}
       >
         <div className="space-y-8 max-w-3xl mx-auto w-full">
           {messages.map((message) => (
