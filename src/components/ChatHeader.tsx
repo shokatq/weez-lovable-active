@@ -24,12 +24,12 @@ const ChatHeader = () => {
 
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center">
-            {/* Centered, maximum-size circular logo with no white bg */}
-            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-transparent overflow-hidden">
+            {/* Larger, maximum-size circular logo */}
+            <div className="w-20 h-20 flex items-center justify-center rounded-full bg-transparent overflow-hidden">
               <img
                 src="/lovable-uploads/14e6ff0d-be34-457c-98ea-83c837d44b74.png"
                 alt="Weezy AI Logo"
-                className="w-16 h-16 object-contain rounded-full block bg-transparent"
+                className="w-20 h-20 object-contain rounded-full block bg-transparent"
                 style={{
                   background: "transparent",
                   objectFit: "contain",
@@ -40,7 +40,7 @@ const ChatHeader = () => {
             </div>
           </div>
           <div>
-            <h1 className="font-semibold text-base bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h1 className="font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Weezy
             </h1>
             <div className="flex items-center gap-1.5">
