@@ -300,6 +300,7 @@ const ChatInterface = () => {
                 messages={messages} 
                 isThinking={isThinking}
                 thinkingType={thinkingType}
+                onSendMessage={handleSendMessage}
               />
               <ChatInput onSendMessage={handleSendMessage} />
             </div>

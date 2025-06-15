@@ -2,12 +2,14 @@
 import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
+import SuggestionBubbles from "./SuggestionBubbles";
 import { FileText, Bot, User, Upload } from "lucide-react";
 
 interface ChatMessagesProps {
   messages: Message[];
   isThinking: boolean;
   thinkingType?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
+  onSendMessage: (message: string) => void;
 }
 
 // Helper function to render text with markdown-style bold formatting
@@ -25,7 +27,7 @@ const renderFormattedText = (text: string) => {
   });
 };
 
-const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps) => {
+const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: ChatMessagesProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -36,14 +38,32 @@ const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps)
     scrollToBottom();
   }, [messages, isThinking]);
 
+  const suggestions = [
+    "Find my financial reports",
+    "Summarize the project roadmap",
+    "What is deep learning?",
+    "Upload this to Google Drive",
+    "Delete old marketing files",
+    "Show me API documentation"
+  ];
+
   if (messages.length === 0 && !isThinking) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto p-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg mb-6">
-          <Bot className="w-8 h-8 text-white" />
+        <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg mb-6">
+          <img 
+            src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=80&h=80&fit=crop&crop=center" 
+            alt="Weezy AI Robot"
+            className="w-full h-full object-cover"
+          />
         </div>
         <h2 className="text-3xl font-bold text-white mb-2">Weezy AI</h2>
-        <p className="text-gray-400 text-lg">How can I help you today?</p>
+        <p className="text-gray-400 text-lg mb-8">How can I help you today?</p>
+        
+        <div className="w-full max-w-md mb-4">
+          <h3 className="text-lg font-semibold text-white mb-4">Try these suggestions:</h3>
+          <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
+        </div>
       </div>
     );
   }
@@ -59,8 +79,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps)
             }`}
           >
             {!message.isUser && (
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg flex-shrink-0">
-                <Bot className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 rounded-full overflow-hidden shadow-lg flex-shrink-0">
+                <img 
+                  src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=36&h=36&fit=crop&crop=center" 
+                  alt="Weezy AI"
+                  className="w-full h-full object-cover"
+                />
               </div>
             )}
             
@@ -113,8 +137,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps)
 
         {isThinking && (
           <div className="flex gap-4 items-start">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg flex-shrink-0">
-              <Bot className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-full overflow-hidden shadow-lg flex-shrink-0">
+              <img 
+                src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=36&h=36&fit=crop&crop=center" 
+                alt="Weezy AI"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="bg-gray-800 rounded-2xl">
               <ThinkingAnimation type={thinkingType} />
