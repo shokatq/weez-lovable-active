@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -41,7 +42,7 @@ const ChatSidebar = ({
   };
 
   return (
-    <Sidebar className="w-80 bg-gray-950/95 border-r border-gray-800/50 backdrop-blur-xl">
+    <Sidebar className="w-80 bg-black border-r border-gray-800/50 backdrop-blur-xl">
       <SidebarHeader className="p-4 border-b border-gray-800/50">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
@@ -57,7 +58,7 @@ const ChatSidebar = ({
         
         <Button
           onClick={onNewConversation}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-[0_4px_14px_0_rgb(59,130,246,0.39)] hover:shadow-[0_6px_20px_0_rgb(59,130,246,0.23)]"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Chat
@@ -72,7 +73,7 @@ const ChatSidebar = ({
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="space-y-1 px-2">
+          <div className="space-y-1 px-2 pb-4">
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
@@ -85,12 +86,12 @@ const ChatSidebar = ({
                   onClick={() => onConversationSelect(conversation.id)}
                   className={`w-full justify-start text-left p-3 h-auto rounded-lg transition-all duration-200 border ${
                     currentConversationId === conversation.id 
-                      ? 'bg-blue-500/20 border-blue-500 text-white' 
+                      ? 'bg-blue-900/40 border-blue-600 text-white' 
                       : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-2 leading-snug mb-1">
+                    <p className="text-sm font-medium line-clamp-2 leading-snug mb-1.5">
                       {getConversationPreview(conversation)}
                     </p>
                     <div className="flex items-center gap-2">
@@ -126,10 +127,10 @@ const ChatSidebar = ({
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-gray-800/50 space-y-4">
+      <SidebarFooter className="p-4 border-t border-gray-800/50 space-y-3">
         <Button
           onClick={onNavigateToWorkspace}
-          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-300 shadow-lg shadow-emerald-500/20"
         >
           <Building2 className="w-5 h-5 mr-2" />
           Workspace Dashboard

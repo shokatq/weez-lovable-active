@@ -8,6 +8,8 @@ import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import ChatSidebar from "./ChatSidebar";
 import SuggestionBubbles from "./SuggestionBubbles";
+import { demoResponses, demoFiles } from "@/data/demoData";
+import { ThinkingAnimationProps } from "@/components/ThinkingAnimation";
 
 export interface Message {
   id: string;
@@ -46,7 +48,7 @@ const ChatInterface = () => {
   
   const [currentConversationId, setCurrentConversationId] = useState("1");
   const [isThinking, setIsThinking] = useState(false);
-  const [thinkingType, setThinkingType] = useState<'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general'>('general');
+  const [thinkingType, setThinkingType] = useState<ThinkingAnimationProps['type']>('general');
 
   const currentConversation = conversations.find(c => c.id === currentConversationId);
   const messages = currentConversation?.messages || [];
@@ -67,20 +69,78 @@ const ChatInterface = () => {
         : conv
     ));
 
-    // Simulate AI response with appropriate thinking type
     setIsThinking(true);
-    if (content.toLowerCase().includes('search') || content.toLowerCase().includes('find')) {
-      setThinkingType('search');
-    } else if (content.toLowerCase().includes('summarize') || content.toLowerCase().includes('summary')) {
-      setThinkingType('summary');
-    } else {
-      setThinkingType('general');
+    let currentThinkingType: ThinkingAnimationProps['type'] = 'general';
+    let response: Message | null = null;
+    const lowerContent = content.toLowerCase();
+
+    // Demo logic
+    if (lowerContent.includes('find pdf reports')) {
+        currentThinkingType = 'search';
+        const pdfs = demoFiles.filter(f => f.type === 'PDF');
+        response = {
+            id: (Date.now() + 1).toString(),
+            content: `I found ${pdfs.length} PDF reports for you.`,
+            isUser: false,
+            timestamp: new Date(),
+            files: pdfs as any, // Cast to any to match Message type
+        };
+    } else if (lowerContent.includes('search') || lowerContent.includes('find') || lowerContent.includes('show excel')) {
+        currentThinkingType = 'search';
+        const demoResponse = demoResponses.find(r => r.type === 'search');
+        if (demoResponse) {
+            response = {
+                id: (Date.now() + 1).toString(),
+                content: demoResponse.response,
+                isUser: false,
+                timestamp: new Date(),
+                files: demoResponse.files as any,
+            };
+        }
+    } else if (lowerContent.includes('summarize')) {
+        currentThinkingType = 'summary';
+        const demoResponse = demoResponses.find(r => r.type === 'summary');
+        if (demoResponse) {
+             response = {
+                id: (Date.now() + 1).toString(),
+                content: demoResponse.response,
+                isUser: false,
+                timestamp: new Date(),
+                files: demoResponse.files as any,
+            };
+        }
+    } else if (lowerContent.includes('explain')) {
+        currentThinkingType = 'rag';
+        const demoResponse = demoResponses.find(r => r.type === 'rag');
+        if (demoResponse) {
+            response = {
+                id: (Date.now() + 1).toString(),
+                content: demoResponse.response,
+                isUser: false,
+                timestamp: new Date(),
+                files: demoResponse.files as any,
+            };
+        }
+    } else if (lowerContent.includes('upload')) {
+        currentThinkingType = 'upload';
+        const demoResponse = demoResponses.find(r => r.type === 'upload');
+        if (demoResponse) {
+            response = {
+                id: (Date.now() + 1).toString(),
+                content: demoResponse.response,
+                isUser: false,
+                timestamp: new Date(),
+                files: demoResponse.files as any,
+            };
+        }
     }
     
+    setThinkingType(currentThinkingType);
+    
     setTimeout(() => {
-      const aiResponse: Message = {
+      const aiResponse: Message = response || {
         id: (Date.now() + 1).toString(),
-        content: "I understand your request. Let me help you with that. This is a demo response to show the interface functionality.",
+        content: "I can help with that! This is a demo response to showcase the functionality. Try asking me to 'find my financial reports' or 'summarize the ResNet paper'.",
         isUser: false,
         timestamp: new Date(),
       };
@@ -167,7 +227,7 @@ const ChatInterface = () => {
           currentConversationId={currentConversationId}
           onConversationSelect={handleConversationSelect}
           onNewConversation={handleNewConversation}
-          onNavigateToWorkspace={() => navigate("/workspace")}
+          onNavigateToWorkspace={() => navigate("/workspace-new")}
         />
         
         <SidebarInset className="flex-1 flex flex-col relative z-10">

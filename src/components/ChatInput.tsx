@@ -45,7 +45,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   return (
     <div className="pt-4">
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-center w-full p-2 bg-gray-900/90 rounded-2xl border border-gray-700/60 shadow-lg backdrop-blur-sm">
+        <div className="relative flex items-center w-full p-2 bg-gray-950/80 rounded-2xl border border-gray-700/80 shadow-lg backdrop-blur-sm">
           <div className="pl-2">
             <FileUpload onFileSelect={handleFileSelect} />
           </div>

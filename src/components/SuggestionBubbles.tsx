@@ -28,7 +28,7 @@ const SuggestionBubbles = ({ suggestions, onSendMessage }: SuggestionBubblesProp
               <button
                 key={index}
                 onClick={() => onSendMessage(suggestion)}
-                className="group flex items-center gap-2 px-3 py-2 bg-gray-900/60 hover:bg-gray-800/80 border border-gray-700/40 hover:border-gray-600/50 rounded-lg text-xs text-gray-300 hover:text-white transition-all duration-200 backdrop-blur-sm"
+                className="group flex items-center gap-2 px-3 py-2 bg-gray-950/80 hover:bg-gray-800/90 border border-gray-700/60 hover:border-gray-600/70 rounded-lg text-xs text-gray-300 hover:text-white transition-all duration-200 backdrop-blur-sm"
               >
                 <Icon className="w-3.5 h-3.5 text-gray-400 group-hover:text-white transition-colors" />
                 <span className="font-medium leading-tight whitespace-nowrap">
