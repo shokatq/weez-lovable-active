@@ -30,28 +30,42 @@ const renderFormattedText = (text: string) => {
 
 const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: ChatMessagesProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
   const scrollToBottom = () => {
-    if (shouldAutoScroll) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (shouldAutoScroll && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   // Handle scroll events to detect if user is manually scrolling
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLDivElement;
-    const { scrollTop, scrollHeight, clientHeight } = target;
-    const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 10;
-    setShouldAutoScroll(isAtBottom);
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    
+    const container = scrollContainerRef.current;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 50;
+    setShouldAutoScroll(isNearBottom);
   };
 
   useEffect(() => {
-    // Only auto-scroll if user hasn't manually scrolled up
-    if (shouldAutoScroll) {
-      scrollToBottom();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
     }
+  }, []);
+
+  useEffect(() => {
+    // Small delay to ensure DOM is updated
+    const timer = setTimeout(() => {
+      if (shouldAutoScroll) {
+        scrollToBottom();
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [messages, isThinking, shouldAutoScroll]);
 
   const suggestions = [
@@ -85,9 +99,13 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }
 
   return (
-    <div className="flex-1 overflow-hidden">
-      <ScrollArea className="h-full" onScrollCapture={handleScroll}>
-        <div className="px-6 py-8 space-y-8 max-w-3xl mx-auto w-full min-h-full">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto px-6 py-8"
+        style={{ height: '100%' }}
+      >
+        <div className="space-y-8 max-w-3xl mx-auto w-full">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -169,7 +187,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
 
           <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
