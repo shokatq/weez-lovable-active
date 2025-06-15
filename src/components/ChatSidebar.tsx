@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import { Plus, MessageSquare, Building2, Clock, MoreHorizontal } from "lucide-react";
-import { Conversation } from "./ChatInterface";
+import { Conversation } from "@/types/chat";
 
 interface ChatSidebarProps {
   conversations: Conversation[];

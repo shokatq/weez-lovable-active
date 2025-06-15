@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { Message } from "./ChatInterface";
+import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
 import { FileText, Bot, User, Upload } from "lucide-react";
 
