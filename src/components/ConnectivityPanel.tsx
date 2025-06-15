@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Plus } from "lucide-react";
 
 interface Integration {
   id: string;
@@ -11,6 +11,7 @@ interface Integration {
   icon: string;
   connected: boolean;
   color: string;
+  isCustomRequest?: boolean;
 }
 
 const ConnectivityPanel = () => {
@@ -54,10 +55,25 @@ const ConnectivityPanel = () => {
       icon: "/lovable-uploads/ff191e8c-d8df-45af-a5da-a8f49ee636ee.png",
       connected: false,
       color: "bg-white"
+    },
+    {
+      id: "custom-request",
+      name: "Request Customised Connection",
+      description: "Need a specific integration? Let us know!",
+      icon: "",
+      connected: false,
+      color: "bg-gradient-to-br from-purple-500 to-purple-600",
+      isCustomRequest: true
     }
   ]);
 
   const handleConnect = (id: string) => {
+    if (id === "custom-request") {
+      // Handle custom request logic here
+      console.log("Custom connection request initiated");
+      return;
+    }
+    
     setIntegrations(prev => 
       prev.map(integration => 
         integration.id === id 
@@ -80,16 +96,20 @@ const ConnectivityPanel = () => {
           <div key={integration.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-900 hover:bg-gray-800 transition-colors">
             <div className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-lg ${integration.color} p-1 flex items-center justify-center`}>
-                <img 
-                  src={integration.icon} 
-                  alt={integration.name}
-                  className="w-6 h-6 object-contain"
-                />
+                {integration.isCustomRequest ? (
+                  <Plus className="w-5 h-5 text-white" />
+                ) : (
+                  <img 
+                    src={integration.icon} 
+                    alt={integration.name}
+                    className="w-6 h-6 object-contain"
+                  />
+                )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h3 className="font-medium text-white text-sm">{integration.name}</h3>
-                  {integration.connected && (
+                  {integration.connected && !integration.isCustomRequest && (
                     <Badge variant="secondary" className="bg-green-500/20 text-green-400 text-xs border-green-500/30">
                       Connected
                     </Badge>
@@ -100,14 +120,17 @@ const ConnectivityPanel = () => {
             </div>
             <Button
               onClick={() => handleConnect(integration.id)}
-              variant={integration.connected ? "outline" : "default"}
+              variant={integration.connected && !integration.isCustomRequest ? "outline" : "default"}
               size="sm"
-              className={integration.connected ? 
-                "text-gray-400 border-gray-700 hover:bg-gray-800 text-xs h-7 px-2 bg-black" : 
-                "bg-white hover:bg-gray-200 text-black text-xs h-7 px-2"
+              className={
+                integration.isCustomRequest 
+                  ? "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-xs h-7 px-2"
+                  : integration.connected 
+                    ? "text-gray-400 border-gray-700 hover:bg-gray-800 text-xs h-7 px-2 bg-black" 
+                    : "bg-white hover:bg-gray-200 text-black text-xs h-7 px-2"
               }
             >
-              {integration.connected ? "Disconnect" : "Connect"}
+              {integration.isCustomRequest ? "Request" : integration.connected ? "Disconnect" : "Connect"}
             </Button>
           </div>
         ))}
