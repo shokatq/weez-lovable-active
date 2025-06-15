@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -17,18 +18,19 @@ const ChatHeader = () => {
   return (
     <header className="flex items-center justify-between p-4 bg-transparent border-b border-gray-800/50">
       <div className="flex items-center gap-4">
-        <SidebarTrigger className="text-gray-400 hover:text-white hover:bg-gray-800 h-10 w-10 p-0 rounded-lg transition-colors">
+        <SidebarTrigger className="text-gray-400 hover:text-white hover:bg-gray-800 h-10 w-10 p-0 rounded-lg transition-colors flex items-center justify-center">
           <Menu className="w-5 h-5" />
         </SidebarTrigger>
         
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-              <Bot className="w-5 h-5 text-white" />
+          <div className="relative flex items-center justify-center">
+            {/* Reduced logo container and icon size for perfect alignment and no cut-off */}
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+              <Bot className="w-4 h-4 text-white" />
             </div>
           </div>
           <div>
-            <h1 className="font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h1 className="font-semibold text-base bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Weezy
             </h1>
             <div className="flex items-center gap-1.5">
@@ -63,3 +65,4 @@ const ChatHeader = () => {
 };
 
 export default ChatHeader;
+
