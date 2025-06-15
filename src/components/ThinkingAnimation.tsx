@@ -1,8 +1,8 @@
 
-import { Bot, Search, FileText, Upload, Building2, Brain } from 'lucide-react';
+import { Bot, Search, FileText, Upload, Building2, Brain, Trash2 } from 'lucide-react';
 
 export interface ThinkingAnimationProps {
-  type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general';
+  type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
 }
 
 const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
@@ -31,6 +31,12 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
           icon: <Upload className="w-4 h-4 text-orange-400" />,
           text: "Uploading to cloud storage...",
           dots: "bg-orange-400"
+        };
+      case 'delete':
+        return {
+          icon: <Trash2 className="w-4 h-4 text-red-400" />,
+          text: "Processing file deletion...",
+          dots: "bg-red-400"
         };
       case 'workspace':
         return {
