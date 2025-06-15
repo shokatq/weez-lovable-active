@@ -23,6 +23,13 @@ const ChatHeader = () => {
         </SidebarTrigger>
 
         <div className="flex items-center gap-3">
+          <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white overflow-hidden">
+            <img
+              src="/lovable-uploads/d4f20da4-03a4-408d-b408-5bfd1a57067f.png"
+              alt="Weezy AI Logo"
+              className="w-10 h-10 object-contain"
+            />
+          </div>
           <div>
             <h1 className="font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               Weezy
