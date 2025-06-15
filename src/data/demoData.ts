@@ -1,4 +1,3 @@
-
 export interface DemoFile {
   id: string;
   name: string;
@@ -78,6 +77,46 @@ export const demoFiles: DemoFile[] = [
     lastModified: "2024-06-07",
     content: "Technical documentation covering system architecture, API specifications, and deployment guidelines...",
     summary: "Technical architecture documentation detailing microservices design, database schemas, security protocols, and scalability considerations."
+  },
+  {
+    id: "7",
+    name: "Sales_Dashboard_Data.xlsx",
+    type: "Excel",
+    platform: "Google Drive",
+    size: "2.1 MB",
+    lastModified: "2024-06-13",
+    content: "Sales performance data with customer analytics, conversion rates, and revenue tracking...",
+    summary: "Sales dashboard showing 15% increase in conversions, top performing products, and customer acquisition cost analysis."
+  },
+  {
+    id: "8",
+    name: "Machine_Learning_Model_Training.pdf",
+    type: "PDF",
+    platform: "OneDrive",
+    size: "3.8 MB",
+    lastModified: "2024-06-05",
+    content: "ML model training documentation with hyperparameter tuning, validation metrics, and deployment strategies...",
+    summary: "Machine learning model achieving 94.2% accuracy on test data with detailed training procedures and optimization techniques."
+  },
+  {
+    id: "9",
+    name: "User_Research_Findings.docx",
+    type: "Word",
+    platform: "Notion",
+    size: "1.3 MB",
+    lastModified: "2024-06-14",
+    content: "User research study results with survey data, interview insights, and usability testing outcomes...",
+    summary: "User research revealing key pain points in current interface, 78% satisfaction rate, and recommendations for UX improvements."
+  },
+  {
+    id: "10",
+    name: "Investment_Analysis_Report.xlsx",
+    type: "Excel",
+    platform: "Dropbox",
+    size: "1.9 MB",
+    lastModified: "2024-06-06",
+    content: "Investment portfolio analysis with risk assessments, return calculations, and market trend analysis...",
+    summary: "Investment analysis showing 12.4% annual return, diversified portfolio recommendations, and market volatility assessments."
   }
 ];
 

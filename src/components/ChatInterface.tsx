@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -49,6 +48,15 @@ const ChatInterface = () => {
 
   const navigate = useNavigate();
 
+  const getRandomFile = () => {
+    return demoFiles[Math.floor(Math.random() * demoFiles.length)];
+  };
+
+  const getRandomFiles = (count: number) => {
+    const shuffled = [...demoFiles].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
   const handleSendMessage = (content: string) => {
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -68,100 +76,67 @@ const ChatInterface = () => {
     let response: Message | null = null;
     const lowerContent = content.toLowerCase();
 
-    // Demo logic - more dynamic
-    const mentionedFile = demoFiles.find(file => lowerContent.includes(file.name.toLowerCase()));
-
-    if (lowerContent.includes('summarize')) {
+    if (lowerContent.includes('summarize') || lowerContent.includes('summary')) {
         currentThinkingType = 'summary';
-        if (mentionedFile) {
-            response = {
-                id: (Date.now() + 1).toString(),
-                content: `Here is a summary of "${mentionedFile.name}":\n\n${mentionedFile.summary}`,
-                isUser: false,
-                timestamp: new Date(),
-                files: [mentionedFile] as any,
-            };
-        } else {
-             response = {
-                id: (Date.now() + 1).toString(),
-                content: "Which file would you like me to summarize? Please include the full file name, for example: `Summarize Q4_Financial_Report.xlsx`",
-                isUser: false,
-                timestamp: new Date(),
-            };
-        }
-    } else if (lowerContent.includes('explain')) {
-        currentThinkingType = 'rag';
-        if (mentionedFile && mentionedFile.id === '1') { // ResNet paper
-            const ragResponse = demoResponses.find(r => r.type === 'rag');
-            if (ragResponse) {
-                response = {
-                    id: (Date.now() + 1).toString(),
-                    content: ragResponse.response,
-                    isUser: false,
-                    timestamp: new Date(),
-                    files: ragResponse.files as any,
-                };
-            }
-        } else if (mentionedFile) {
-            response = {
-                id: (Date.now() + 1).toString(),
-                content: `I can provide a detailed explanation for "Deep_Learning_ResNet_Implementation.pdf". For "${mentionedFile.name}", I can give you a summary. Would you like that?`,
-                isUser: false,
-                timestamp: new Date(),
-            };
-        } else {
-            response = {
-                id: (Date.now() + 1).toString(),
-                content: "Which document would you like me to explain? Try asking to 'explain Deep_Learning_ResNet_Implementation.pdf'.",
-                isUser: false,
-                timestamp: new Date(),
-            };
-        }
-    } else if (lowerContent.includes('find pdf reports')) {
-        currentThinkingType = 'search';
-        const pdfs = demoFiles.filter(f => f.type === 'PDF');
+        const randomFile = getRandomFile();
         response = {
             id: (Date.now() + 1).toString(),
-            content: `I found ${pdfs.length} PDF reports for you.`,
+            content: `Here is a summary of "${randomFile.name}":\n\n${randomFile.summary}`,
             isUser: false,
             timestamp: new Date(),
-            files: pdfs as any,
+            files: [randomFile] as any,
         };
-    } else if (lowerContent.includes('search') || lowerContent.includes('find') || lowerContent.includes('show excel')) {
+    } else if (lowerContent.includes('explain') || lowerContent.includes('explanation')) {
+        currentThinkingType = 'rag';
+        const randomFile = getRandomFile();
+        response = {
+            id: (Date.now() + 1).toString(),
+            content: `Based on your "${randomFile.name}" document:\n\n**Key Points:**\n\n• ${randomFile.summary}\n\n• This document contains detailed information about the subject matter\n\n• The content provides comprehensive insights and analysis\n\n• All data and findings are thoroughly documented`,
+            isUser: false,
+            timestamp: new Date(),
+            files: [randomFile] as any,
+        };
+    } else if (lowerContent.includes('find') || lowerContent.includes('search') || lowerContent.includes('show')) {
         currentThinkingType = 'search';
-        const excelFiles = demoFiles.filter(f => f.type === 'Excel');
-        if (lowerContent.includes('excel') && excelFiles.length > 0) {
-            response = {
-                id: (Date.now() + 1).toString(),
-                content: `I found ${excelFiles.length} Excel files for you.`,
-                isUser: false,
-                timestamp: new Date(),
-                files: excelFiles as any,
-            };
+        let filesToShow = [];
+        
+        if (lowerContent.includes('pdf')) {
+            filesToShow = demoFiles.filter(f => f.type === 'PDF');
+        } else if (lowerContent.includes('excel') || lowerContent.includes('xlsx')) {
+            filesToShow = demoFiles.filter(f => f.type === 'Excel');
+        } else if (lowerContent.includes('word') || lowerContent.includes('docx')) {
+            filesToShow = demoFiles.filter(f => f.type === 'Word');
         } else {
-            const demoResponse = demoResponses.find(r => r.type === 'search');
-            if (demoResponse) {
-                response = {
-                    id: (Date.now() + 1).toString(),
-                    content: demoResponse.response,
-                    isUser: false,
-                    timestamp: new Date(),
-                    files: demoResponse.files as any,
-                };
-            }
+            filesToShow = getRandomFiles(3);
         }
+        
+        response = {
+            id: (Date.now() + 1).toString(),
+            content: `I found ${filesToShow.length} files matching your search criteria.`,
+            isUser: false,
+            timestamp: new Date(),
+            files: filesToShow as any,
+        };
     } else if (lowerContent.includes('upload')) {
         currentThinkingType = 'upload';
-        const demoResponse = demoResponses.find(r => r.type === 'upload');
-        if (demoResponse) {
-            response = {
-                id: (Date.now() + 1).toString(),
-                content: demoResponse.response,
-                isUser: false,
-                timestamp: new Date(),
-                files: demoResponse.files as any,
-            };
-        }
+        const randomFile = getRandomFile();
+        response = {
+            id: (Date.now() + 1).toString(),
+            content: `✅ Successfully uploaded '${randomFile.name}' to ${randomFile.platform}\n\n📁 Location: /Documents/\n🔗 File accessible via your dashboard\n📊 File size: ${randomFile.size}\n⏰ Upload completed successfully`,
+            isUser: false,
+            timestamp: new Date(),
+            files: [randomFile] as any,
+        };
+    } else if (lowerContent.includes('analyze') || lowerContent.includes('analysis')) {
+        currentThinkingType = 'rag';
+        const randomFile = getRandomFile();
+        response = {
+            id: (Date.now() + 1).toString(),
+            content: `Analysis of "${randomFile.name}":\n\n📊 **File Analysis:**\n\n• Document type: ${randomFile.type}\n• Last modified: ${randomFile.lastModified}\n• Storage platform: ${randomFile.platform}\n• File size: ${randomFile.size}\n\n**Content Summary:**\n${randomFile.summary}`,
+            isUser: false,
+            timestamp: new Date(),
+            files: [randomFile] as any,
+        };
     }
     
     setThinkingType(currentThinkingType);
@@ -169,9 +144,10 @@ const ChatInterface = () => {
     setTimeout(() => {
       const aiResponse: Message = response || {
         id: (Date.now() + 1).toString(),
-        content: "I can help with that! This is a demo response to showcase the functionality. Try asking me to 'find my financial reports' or 'summarize Q4_Financial_Report.xlsx'.",
+        content: "I can help you with file operations. Try asking me to summarize, explain, find, or analyze your documents.",
         isUser: false,
         timestamp: new Date(),
+        files: [getRandomFile()] as any,
       };
 
       setConversations(prev => prev.map(conv => 
@@ -200,10 +176,10 @@ const ChatInterface = () => {
   };
 
   const suggestions = [
-    "Summarize 'Q4_Financial_Report.xlsx'",
-    "Explain 'Deep_Learning_ResNet_Implementation.pdf'",
-    "Find all my PDF reports",
-    "Show me my recent Excel files"
+    "Summarize a random file",
+    "Explain any document in detail",
+    "Find my PDF files",
+    "Analyze a document"
   ];
 
   return (
