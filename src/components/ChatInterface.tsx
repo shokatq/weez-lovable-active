@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import ChatSidebar from "./ChatSidebar";
 import SuggestionBubbles from "./SuggestionBubbles";
-import { demoResponses, demoFiles } from "@/data/demoData";
+import { demoFiles } from "@/data/demoData";
 import { ThinkingAnimationProps } from "@/components/ThinkingAnimation";
 
 export interface Message {
@@ -22,6 +23,7 @@ export interface Message {
     platform: string;
     size: string;
   }>;
+  isUploading?: boolean;
 }
 
 export interface Conversation {
@@ -79,9 +81,13 @@ const ChatInterface = () => {
     if (lowerContent.includes('summarize') || lowerContent.includes('summary')) {
         currentThinkingType = 'summary';
         const randomFile = getRandomFile();
+        
+        // Brief summary without ** formatting
+        const briefSummary = randomFile.summary.split('.')[0] + '. Key highlights include improved performance metrics and strategic recommendations for future development.';
+        
         response = {
             id: (Date.now() + 1).toString(),
-            content: `Here is a summary of "${randomFile.name}":\n\n${randomFile.summary}`,
+            content: `Summary of "${randomFile.name}":\n\n${briefSummary}`,
             isUser: false,
             timestamp: new Date(),
             files: [randomFile] as any,
@@ -91,7 +97,7 @@ const ChatInterface = () => {
         const randomFile = getRandomFile();
         response = {
             id: (Date.now() + 1).toString(),
-            content: `Based on your "${randomFile.name}" document:\n\n**Key Points:**\n\n• ${randomFile.summary}\n\n• This document contains detailed information about the subject matter\n\n• The content provides comprehensive insights and analysis\n\n• All data and findings are thoroughly documented`,
+            content: `Based on "${randomFile.name}":\n\n${randomFile.summary}\n\nThis document provides comprehensive insights and detailed analysis on the subject matter with thorough documentation of findings.`,
             isUser: false,
             timestamp: new Date(),
             files: [randomFile] as any,
@@ -112,7 +118,7 @@ const ChatInterface = () => {
         
         response = {
             id: (Date.now() + 1).toString(),
-            content: `I found ${filesToShow.length} files matching your search criteria.`,
+            content: `Found ${filesToShow.length} files matching your search criteria.`,
             isUser: false,
             timestamp: new Date(),
             files: filesToShow as any,
@@ -120,19 +126,46 @@ const ChatInterface = () => {
     } else if (lowerContent.includes('upload')) {
         currentThinkingType = 'upload';
         const randomFile = getRandomFile();
-        response = {
+        
+        // Add upload animation
+        const uploadMessage: Message = {
             id: (Date.now() + 1).toString(),
-            content: `✅ Successfully uploaded '${randomFile.name}' to ${randomFile.platform}\n\n📁 Location: /Documents/\n🔗 File accessible via your dashboard\n📊 File size: ${randomFile.size}\n⏰ Upload completed successfully`,
+            content: `Uploading "${randomFile.name}" to ${randomFile.platform}...`,
             isUser: false,
             timestamp: new Date(),
             files: [randomFile] as any,
+            isUploading: true,
         };
+
+        setConversations(prev => prev.map(conv => 
+            conv.id === currentConversationId 
+              ? { ...conv, messages: [...conv.messages, uploadMessage] }
+              : conv
+        ));
+
+        setTimeout(() => {
+            response = {
+                id: (Date.now() + 2).toString(),
+                content: `Successfully uploaded "${randomFile.name}" to ${randomFile.platform}\n\nLocation: /Documents/\nFile accessible via your dashboard\nFile size: ${randomFile.size}\nUpload completed successfully`,
+                isUser: false,
+                timestamp: new Date(),
+                files: [randomFile] as any,
+            };
+
+            setConversations(prev => prev.map(conv => 
+                conv.id === currentConversationId 
+                  ? { ...conv, messages: [...conv.messages.slice(0, -1), response!] }
+                  : conv
+            ));
+            setIsThinking(false);
+        }, 3000);
+        return;
     } else if (lowerContent.includes('analyze') || lowerContent.includes('analysis')) {
         currentThinkingType = 'rag';
         const randomFile = getRandomFile();
         response = {
             id: (Date.now() + 1).toString(),
-            content: `Analysis of "${randomFile.name}":\n\n📊 **File Analysis:**\n\n• Document type: ${randomFile.type}\n• Last modified: ${randomFile.lastModified}\n• Storage platform: ${randomFile.platform}\n• File size: ${randomFile.size}\n\n**Content Summary:**\n${randomFile.summary}`,
+            content: `Analysis of "${randomFile.name}":\n\nDocument type: ${randomFile.type}\nLast modified: ${randomFile.lastModified}\nStorage platform: ${randomFile.platform}\nFile size: ${randomFile.size}\n\nContent Summary:\n${randomFile.summary}`,
             isUser: false,
             timestamp: new Date(),
             files: [randomFile] as any,
@@ -177,7 +210,7 @@ const ChatInterface = () => {
 
   const suggestions = [
     "Summarize a random file",
-    "Explain any document in detail",
+    "Explain any document in detail", 
     "Find my PDF files",
     "Analyze a document"
   ];
@@ -185,7 +218,6 @@ const ChatInterface = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-black text-white relative overflow-hidden">
-        {/* Modern background effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.1),transparent_50%)] pointer-events-none"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.08),transparent_50%)] pointer-events-none"></div>
         
@@ -194,7 +226,10 @@ const ChatInterface = () => {
           currentConversationId={currentConversationId}
           onConversationSelect={handleConversationSelect}
           onNewConversation={handleNewConversation}
-          onNavigateToWorkspace={() => navigate("/workspace-new")}
+          onNavigateToWorkspace={() => {
+            navigate("/workspace-new");
+            setTimeout(() => window.scrollTo(0, 0), 100);
+          }}
         />
         
         <SidebarInset className="flex-1 flex flex-col relative z-10 bg-gray-950">

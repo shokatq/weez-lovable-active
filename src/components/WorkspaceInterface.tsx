@@ -1,31 +1,54 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, FileText, TrendingUp, Settings, Plus, Search, Filter, ArrowRight, Zap, Target, Globe, Calendar, Download, Eye, ArrowLeft, Star, Clock, Share, MoreHorizontal, FolderOpen, User } from "lucide-react";
+import { Users, FileText, TrendingUp, Settings, Plus, Search, Filter, ArrowRight, Zap, Target, Globe, Calendar, Download, Eye, ArrowLeft, Star, Clock, Share, MoreHorizontal, FolderOpen, User, UserPlus, Activity, Database, Shield } from "lucide-react";
 import { demoWorkspace, sampleFiles } from "@/data/workspaceData";
+import AddMemberDialog from "./AddMemberDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const WorkspaceInterface = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
+  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [teamMembers, setTeamMembers] = useState(demoWorkspace.employees);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
     { id: 'files', label: 'File Management', icon: FileText },
     { id: 'team', label: 'Team Management', icon: Users },
+    { id: 'analytics', label: 'Analytics', icon: Activity },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
   const quickStats = [
-    { label: 'Total Employees', value: demoWorkspace.stats.totalEmployees, icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+    { label: 'Total Employees', value: teamMembers.length, icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
     { label: 'Total Files', value: demoWorkspace.stats.totalFiles.toLocaleString(), icon: FileText, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-    { label: 'Active Projects', value: '12', icon: Target, color: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/20' },
-    { label: 'Storage Used', value: '387.2 GB', icon: Globe, color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' }
+    { label: 'Active Projects', value: '15', icon: Target, color: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/20' },
+    { label: 'Storage Used', value: '487.2 GB', icon: Database, color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' }
   ];
+
+  const handleAddMember = (member: { name: string; email: string; role: string; department: string }) => {
+    const newMember = {
+      id: Date.now().toString(),
+      name: member.name,
+      email: member.email,
+      role: member.role as 'admin' | 'employee',
+      department: member.department,
+      joinDate: new Date(),
+      lastActive: new Date(),
+    };
+    
+    setTeamMembers(prev => [...prev, newMember]);
+    toast({
+      title: "Member Added Successfully",
+      description: `${member.name} has been added to your workspace.`,
+    });
+  };
 
   const getFileIcon = (type: string) => {
     switch (type) {
@@ -71,12 +94,11 @@ const WorkspaceInterface = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.1),transparent_50%)] pointer-events-none"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.03),transparent_50%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.15),transparent_50%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.1),transparent_50%)] pointer-events-none"></div>
       
       <div className="relative z-10 p-8">
         <div className="max-w-7xl mx-auto">
-          {/* Enhanced Header */}
           <div className="flex items-center justify-between mb-12">
             <div className="flex items-center gap-6">
               <Button
@@ -90,7 +112,7 @@ const WorkspaceInterface = () => {
                 <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-gray-300 bg-clip-text text-transparent mb-3">
                   Enterprise Workspace
                 </h1>
-                <p className="text-gray-400 text-xl font-medium">Manage your team, files, and workspace analytics with precision</p>
+                <p className="text-gray-400 text-xl font-medium">Advanced workspace management with enhanced analytics and team collaboration</p>
               </div>
             </div>
             <div className="flex gap-4">
@@ -101,14 +123,16 @@ const WorkspaceInterface = () => {
                 <TrendingUp className="w-5 h-5 mr-3" />
                 Dashboard
               </Button>
-              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-blue-500/20">
-                <Plus className="w-5 h-5 mr-3" />
+              <Button 
+                onClick={() => setIsAddMemberOpen(true)}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-blue-500/20"
+              >
+                <UserPlus className="w-5 h-5 mr-3" />
                 Add Member
               </Button>
             </div>
           </div>
 
-          {/* Enhanced Navigation Tabs */}
           <div className="flex gap-3 mb-10 bg-gray-900/30 p-3 rounded-2xl backdrop-blur-md border border-gray-800/50 shadow-xl">
             {tabs.map((tab) => (
               <button
@@ -126,7 +150,6 @@ const WorkspaceInterface = () => {
             ))}
           </div>
 
-          {/* Enhanced Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {quickStats.map((stat, index) => (
               <Card key={index} className={`bg-gray-900/40 ${stat.border} border backdrop-blur-md hover:bg-gray-800/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl shadow-lg`}>
@@ -145,10 +168,8 @@ const WorkspaceInterface = () => {
             ))}
           </div>
 
-          {/* Content based on active tab */}
           {activeTab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* Recent Activity */}
               <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
                 <CardHeader className="pb-6">
                   <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
@@ -157,9 +178,6 @@ const WorkspaceInterface = () => {
                     </div>
                     Recent Activity
                   </CardTitle>
-                  <CardDescription className="text-gray-400 text-lg">
-                    Latest workspace activities and updates
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {demoWorkspace.stats.recentActivity.map((activity, index) => (
@@ -182,7 +200,6 @@ const WorkspaceInterface = () => {
                 </CardContent>
               </Card>
 
-              {/* Platform Distribution */}
               <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
                 <CardHeader className="pb-6">
                   <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
@@ -191,9 +208,6 @@ const WorkspaceInterface = () => {
                     </div>
                     Platform Distribution
                   </CardTitle>
-                  <CardDescription className="text-gray-400 text-lg">
-                    Files distributed across connected platforms
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {demoWorkspace.stats.filesByPlatform.map((platform, index) => (
@@ -215,9 +229,51 @@ const WorkspaceInterface = () => {
             </div>
           )}
 
+          {activeTab === 'team' && (
+            <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  Team Members ({teamMembers.length})
+                </CardTitle>
+                <CardDescription className="text-gray-400 text-lg">
+                  Manage your workspace team and permissions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6">
+                  {teamMembers.map((employee) => (
+                    <div key={employee.id} className="flex items-center justify-between p-6 bg-gray-800/30 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 hover:bg-gray-800/50">
+                      <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center font-bold text-white text-xl shadow-lg">
+                          {employee.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-white font-semibold text-lg">{employee.name}</p>
+                          <p className="text-gray-400 text-base">{employee.email}</p>
+                          <p className="text-gray-500 text-sm">{employee.department}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <Badge variant={employee.role === 'admin' ? 'default' : 'secondary'} 
+                               className={employee.role === 'admin' ? 'bg-blue-600/20 text-blue-400 border-blue-500/30 font-semibold' : 'bg-gray-700/30 text-gray-300 border-gray-600/30'}>
+                          {employee.role}
+                        </Badge>
+                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-3 rounded-lg">
+                          <ArrowRight className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {activeTab === 'files' && (
             <div className="space-y-8">
-              {/* Search and Filter Controls */}
               <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row gap-4">
@@ -253,14 +309,12 @@ const WorkspaceInterface = () => {
                 </CardContent>
               </Card>
 
-              {/* Enhanced File Grid */}
               <div className="grid gap-6">
                 {filteredFiles.map((file) => (
                   <Card key={file.id} className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md hover:border-gray-600/50 transition-all duration-300 hover:bg-gray-800/50 shadow-lg hover:shadow-xl group">
                     <CardContent className="p-8">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-8">
-                          {/* File Icon and Type */}
                           <div className="relative">
                             <div className="text-5xl mb-2">{getFileIcon(file.type)}</div>
                             <Badge className={`absolute -bottom-2 -right-2 text-xs font-bold ${getFileTypeColor(file.type)} px-2 py-1`}>
@@ -268,7 +322,6 @@ const WorkspaceInterface = () => {
                             </Badge>
                           </div>
                           
-                          {/* File Details */}
                           <div className="space-y-3">
                             <div>
                               <h3 className="text-white font-bold text-xl mb-1 group-hover:text-blue-400 transition-colors duration-300">
@@ -289,7 +342,6 @@ const WorkspaceInterface = () => {
                               </div>
                             </div>
                             
-                            {/* File Stats */}
                             <div className="flex items-center gap-6 text-sm">
                               <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
@@ -303,48 +355,16 @@ const WorkspaceInterface = () => {
                           </div>
                         </div>
                         
-                        {/* Action Buttons */}
                         <div className="flex items-center gap-3">
                           <div className="flex gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 p-3 rounded-xl transition-all duration-300"
-                              title="Preview"
-                            >
+                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 p-3 rounded-xl transition-all duration-300" title="Preview">
                               <Eye className="w-5 h-5" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/10 p-3 rounded-xl transition-all duration-300"
-                              title="Download"
-                            >
+                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/10 p-3 rounded-xl transition-all duration-300" title="Download">
                               <Download className="w-5 h-5" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-gray-400 hover:text-violet-400 hover:bg-violet-500/10 p-3 rounded-xl transition-all duration-300"
-                              title="Share"
-                            >
+                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-violet-400 hover:bg-violet-500/10 p-3 rounded-xl transition-all duration-300" title="Share">
                               <Share className="w-5 h-5" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10 p-3 rounded-xl transition-all duration-300"
-                              title="Add to favorites"
-                            >
-                              <Star className="w-5 h-5" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-3 rounded-xl transition-all duration-300"
-                              title="More options"
-                            >
-                              <MoreHorizontal className="w-5 h-5" />
                             </Button>
                           </div>
                           <ArrowRight className="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors duration-300" />
@@ -354,63 +374,74 @@ const WorkspaceInterface = () => {
                   </Card>
                 ))}
               </div>
-              
-              {filteredFiles.length === 0 && (
-                <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
-                  <CardContent className="p-12 text-center">
-                    <FolderOpen className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-white font-bold text-xl mb-2">No files found</h3>
-                    <p className="text-gray-400 text-lg">Try adjusting your search criteria or filters</p>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           )}
 
-          {activeTab === 'team' && (
-            <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
-              <CardHeader className="pb-6">
-                <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  Team Members
-                </CardTitle>
-                <CardDescription className="text-gray-400 text-lg">
-                  Manage your workspace team and permissions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-6">
-                  {demoWorkspace.employees.map((employee) => (
-                    <div key={employee.id} className="flex items-center justify-between p-6 bg-gray-800/30 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300 hover:bg-gray-800/50">
-                      <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center font-bold text-white text-xl shadow-lg">
-                          {employee.name.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="text-white font-semibold text-lg">{employee.name}</p>
-                          <p className="text-gray-400 text-base">{employee.email}</p>
-                          <p className="text-gray-500 text-sm">{employee.department}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <Badge variant={employee.role === 'admin' ? 'default' : 'secondary'} 
-                               className={employee.role === 'admin' ? 'bg-blue-600/20 text-blue-400 border-blue-500/30 font-semibold' : 'bg-gray-700/30 text-gray-300 border-gray-600/30'}>
-                          {employee.role}
-                        </Badge>
-                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-3 rounded-lg">
-                          <ArrowRight className="w-5 h-5" />
-                        </Button>
-                      </div>
+          {activeTab === 'analytics' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
+                <CardHeader>
+                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                      <Activity className="w-6 h-6 text-white" />
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    Performance Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <span className="text-gray-300">File Access Rate</span>
+                      <span className="text-emerald-400 font-bold">87.3%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <span className="text-gray-300">Team Productivity</span>
+                      <span className="text-blue-400 font-bold">94.1%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <span className="text-gray-300">Storage Efficiency</span>
+                      <span className="text-violet-400 font-bold">91.8%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
+                <CardHeader>
+                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                      <Shield className="w-6 h-6 text-white" />
+                    </div>
+                    Security Overview
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <span className="text-gray-300">Security Score</span>
+                      <span className="text-emerald-400 font-bold">98.5%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <span className="text-gray-300">Active Sessions</span>
+                      <span className="text-blue-400 font-bold">24</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <span className="text-gray-300">Last Backup</span>
+                      <span className="text-violet-400 font-bold">2 hrs ago</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
         </div>
       </div>
+
+      <AddMemberDialog 
+        open={isAddMemberOpen}
+        onOpenChange={setIsAddMemberOpen}
+        onAddMember={handleAddMember}
+      />
     </div>
   );
 };
