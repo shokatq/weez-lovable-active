@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
@@ -29,14 +28,11 @@ const renderFormattedText = (text: string) => {
 };
 
 const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: ChatMessagesProps) => {
-  const viewportRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    if (viewportRef.current) {
-      viewportRef.current.scrollTo({
-        top: viewportRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -80,7 +76,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }
 
   return (
-    <ScrollArea className="h-full w-full" viewportRef={viewportRef}>
+    <ScrollArea className="flex-1">
       <div className="px-6 py-8">
         <div className="space-y-8 max-w-3xl mx-auto w-full">
           {messages.map((message) => (
@@ -161,6 +157,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
               </div>
             </div>
           )}
+
+          <div ref={messagesEndRef} />
         </div>
       </div>
     </ScrollArea>
