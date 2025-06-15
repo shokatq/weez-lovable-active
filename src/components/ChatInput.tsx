@@ -11,6 +11,7 @@ interface ChatInputProps {
 
 const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   const [message, setMessage] = useState("");
+  const [uploadingFiles, setUploadingFiles] = useState<File[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
@@ -38,13 +39,36 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
     textarea.style.height = `${Math.min(textarea.scrollHeight, 128)}px`; // max height of 128px
   };
 
-  const handleFileSelect = (files: FileList) => {
-    console.log('Files selected:', Array.from(files).map(f => f.name));
-    // Here you would typically handle the file upload
+  const handleFileSelect = async (files: FileList) => {
+    const fileArray = Array.from(files);
+    setUploadingFiles(fileArray);
+    
+    // Simulate file upload process
+    const uploadMessage = `Uploading ${fileArray.length} file(s): ${fileArray.map(f => f.name).join(', ')}`;
+    onSendMessage(uploadMessage);
+    
+    // Clear uploading state after a delay
+    setTimeout(() => {
+      setUploadingFiles([]);
+    }, 2000);
   };
 
   return (
-    <div>
+    <div className="p-4">
+      {uploadingFiles.length > 0 && (
+        <div className="mb-3 p-3 bg-blue-900/30 border border-blue-600/50 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <span className="text-sm text-blue-300">Uploading files...</span>
+          </div>
+          {uploadingFiles.map((file, index) => (
+            <div key={index} className="text-xs text-gray-400 ml-4">
+              📄 {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+            </div>
+          ))}
+        </div>
+      )}
+      
       <div className="relative flex items-end w-full p-2 bg-gray-800 rounded-2xl border border-gray-700/80 shadow-lg">
         <div className="pl-2 pb-1.5">
           <FileUpload onFileSelect={handleFileSelect} />
@@ -56,7 +80,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             value={message}
             onChange={handleTextareaChange}
             onKeyPress={handleKeyPress}
-            placeholder="Message Weezy..."
+            placeholder="Ask Weezy to search, summarize, or analyze your files..."
             className="w-full min-h-[28px] max-h-[128px] bg-transparent border-none resize-none text-white placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-base p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0"
             rows={1}
           />
@@ -75,7 +99,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
       </div>
 
       <p className="text-center text-xs text-gray-500 mt-3">
-        Weezy can make mistakes. Consider checking important information.
+        Try: "Find my financial reports", "Summarize project roadmap", "Upload this to Google Drive"
       </p>
     </div>
   );
