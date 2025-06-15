@@ -84,14 +84,14 @@ const ChatSidebar = ({
                 <Button
                   variant="ghost"
                   onClick={() => onConversationSelect(conversation.id)}
-                  className={`w-full justify-start text-left p-3 h-auto rounded-lg transition-all duration-200 border ${
+                  className={`w-full justify-start text-left p-2 h-auto rounded-lg transition-all duration-200 border ${
                     currentConversationId === conversation.id 
                       ? 'bg-blue-900/40 border-blue-600 text-white' 
                       : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-2 leading-snug mb-1.5">
+                    <p className="text-sm font-medium line-clamp-2 leading-snug mb-1">
                       {getConversationPreview(conversation)}
                     </p>
                     <div className="flex items-center gap-2">

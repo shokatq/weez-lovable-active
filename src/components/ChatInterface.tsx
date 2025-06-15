@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -67,8 +68,56 @@ const ChatInterface = () => {
     let response: Message | null = null;
     const lowerContent = content.toLowerCase();
 
-    // Demo logic
-    if (lowerContent.includes('find pdf reports')) {
+    // Demo logic - more dynamic
+    const mentionedFile = demoFiles.find(file => lowerContent.includes(file.name.toLowerCase()));
+
+    if (lowerContent.includes('summarize')) {
+        currentThinkingType = 'summary';
+        if (mentionedFile) {
+            response = {
+                id: (Date.now() + 1).toString(),
+                content: `Here is a summary of "${mentionedFile.name}":\n\n${mentionedFile.summary}`,
+                isUser: false,
+                timestamp: new Date(),
+                files: [mentionedFile] as any,
+            };
+        } else {
+             response = {
+                id: (Date.now() + 1).toString(),
+                content: "Which file would you like me to summarize? Please include the full file name, for example: `Summarize Q4_Financial_Report.xlsx`",
+                isUser: false,
+                timestamp: new Date(),
+            };
+        }
+    } else if (lowerContent.includes('explain')) {
+        currentThinkingType = 'rag';
+        if (mentionedFile && mentionedFile.id === '1') { // ResNet paper
+            const ragResponse = demoResponses.find(r => r.type === 'rag');
+            if (ragResponse) {
+                response = {
+                    id: (Date.now() + 1).toString(),
+                    content: ragResponse.response,
+                    isUser: false,
+                    timestamp: new Date(),
+                    files: ragResponse.files as any,
+                };
+            }
+        } else if (mentionedFile) {
+            response = {
+                id: (Date.now() + 1).toString(),
+                content: `I can provide a detailed explanation for "Deep_Learning_ResNet_Implementation.pdf". For "${mentionedFile.name}", I can give you a summary. Would you like that?`,
+                isUser: false,
+                timestamp: new Date(),
+            };
+        } else {
+            response = {
+                id: (Date.now() + 1).toString(),
+                content: "Which document would you like me to explain? Try asking to 'explain Deep_Learning_ResNet_Implementation.pdf'.",
+                isUser: false,
+                timestamp: new Date(),
+            };
+        }
+    } else if (lowerContent.includes('find pdf reports')) {
         currentThinkingType = 'search';
         const pdfs = demoFiles.filter(f => f.type === 'PDF');
         response = {
@@ -76,43 +125,30 @@ const ChatInterface = () => {
             content: `I found ${pdfs.length} PDF reports for you.`,
             isUser: false,
             timestamp: new Date(),
-            files: pdfs as any, // Cast to any to match Message type
+            files: pdfs as any,
         };
     } else if (lowerContent.includes('search') || lowerContent.includes('find') || lowerContent.includes('show excel')) {
         currentThinkingType = 'search';
-        const demoResponse = demoResponses.find(r => r.type === 'search');
-        if (demoResponse) {
+        const excelFiles = demoFiles.filter(f => f.type === 'Excel');
+        if (lowerContent.includes('excel') && excelFiles.length > 0) {
             response = {
                 id: (Date.now() + 1).toString(),
-                content: demoResponse.response,
+                content: `I found ${excelFiles.length} Excel files for you.`,
                 isUser: false,
                 timestamp: new Date(),
-                files: demoResponse.files as any,
+                files: excelFiles as any,
             };
-        }
-    } else if (lowerContent.includes('summarize')) {
-        currentThinkingType = 'summary';
-        const demoResponse = demoResponses.find(r => r.type === 'summary');
-        if (demoResponse) {
-             response = {
-                id: (Date.now() + 1).toString(),
-                content: demoResponse.response,
-                isUser: false,
-                timestamp: new Date(),
-                files: demoResponse.files as any,
-            };
-        }
-    } else if (lowerContent.includes('explain')) {
-        currentThinkingType = 'rag';
-        const demoResponse = demoResponses.find(r => r.type === 'rag');
-        if (demoResponse) {
-            response = {
-                id: (Date.now() + 1).toString(),
-                content: demoResponse.response,
-                isUser: false,
-                timestamp: new Date(),
-                files: demoResponse.files as any,
-            };
+        } else {
+            const demoResponse = demoResponses.find(r => r.type === 'search');
+            if (demoResponse) {
+                response = {
+                    id: (Date.now() + 1).toString(),
+                    content: demoResponse.response,
+                    isUser: false,
+                    timestamp: new Date(),
+                    files: demoResponse.files as any,
+                };
+            }
         }
     } else if (lowerContent.includes('upload')) {
         currentThinkingType = 'upload';
@@ -133,7 +169,7 @@ const ChatInterface = () => {
     setTimeout(() => {
       const aiResponse: Message = response || {
         id: (Date.now() + 1).toString(),
-        content: "I can help with that! This is a demo response to showcase the functionality. Try asking me to 'find my financial reports' or 'summarize the ResNet paper'.",
+        content: "I can help with that! This is a demo response to showcase the functionality. Try asking me to 'find my financial reports' or 'summarize Q4_Financial_Report.xlsx'.",
         isUser: false,
         timestamp: new Date(),
       };
@@ -164,9 +200,9 @@ const ChatInterface = () => {
   };
 
   const suggestions = [
-    "Find PDF reports from last week",
-    "Summarize 'Q4 Financials.pdf'",
-    "What are the key takeaways from the 'ResNet' paper?",
+    "Summarize 'Q4_Financial_Report.xlsx'",
+    "Explain 'Deep_Learning_ResNet_Implementation.pdf'",
+    "Find all my PDF reports",
     "Show me my recent Excel files"
   ];
 
