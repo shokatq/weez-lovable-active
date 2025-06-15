@@ -29,7 +29,7 @@ const ChatHeader = () => {
               <img
                 src="/lovable-uploads/14e6ff0d-be34-457c-98ea-83c837d44b74.png"
                 alt="Weezy AI Logo"
-                className="w-full h-full object-contain rounded-full block bg-transparent"
+                className="w-16 h-16 object-contain rounded-full block bg-transparent"
                 style={{
                   background: "transparent",
                   objectFit: "contain",
