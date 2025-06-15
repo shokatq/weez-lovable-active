@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 
-interface ThinkingAnimationProps {
+export interface ThinkingAnimationProps {
   type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general';
 }
 
