@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Menu, Settings, Bot } from "lucide-react";
+import { Menu, Settings } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -24,9 +24,14 @@ const ChatHeader = () => {
         
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center">
-            {/* Reduced logo container and icon size for perfect alignment and no cut-off */}
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-              <Bot className="w-4 h-4 text-white" />
+            {/* Logo container with image */}
+            <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg overflow-hidden">
+              <img
+                src="/lovable-uploads/a9903f09-c5ae-4328-9bf8-8bf6272e2cb6.png"
+                alt="Weezy AI Logo"
+                className="w-7 h-7 object-contain mx-auto my-auto flex items-center justify-center"
+                style={{ display: "block" }}
+              />
             </div>
           </div>
           <div>
@@ -65,4 +70,3 @@ const ChatHeader = () => {
 };
 
 export default ChatHeader;
-
