@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
@@ -61,13 +62,6 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       {
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto p-4">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg mb-6">
-              <img 
-                src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=80&h=80&fit=crop&crop=center" 
-                alt="Weezy AI Robot"
-                className="w-full h-full object-cover"
-              />
-            </div>
             <h2 className="text-3xl font-bold text-white mb-2">Weezy AI</h2>
             <p className="text-gray-400 text-lg mb-8">How can I help you today?</p>
             
@@ -87,16 +81,6 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                       message.isUser ? "" : ""
                     }`}
                   >
-                    {!message.isUser && (
-                      <div className="w-9 h-9 rounded-full overflow-hidden shadow-lg flex-shrink-0">
-                        <img 
-                          src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=36&h=36&fit=crop&crop=center" 
-                          alt="Weezy AI"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    
                     <div className={`flex flex-col gap-2 w-full ${message.isUser ? 'items-end' : 'items-start'}`}>
                       <div
                         className={`max-w-[90%] rounded-2xl px-5 py-3 text-left ${
@@ -146,13 +130,6 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       
                 {isThinking && (
                   <div className="flex gap-4 items-start">
-                    <div className="w-9 h-9 rounded-full overflow-hidden shadow-lg flex-shrink-0">
-                      <img 
-                        src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=36&h=36&fit=crop&crop=center" 
-                        alt="Weezy AI"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
                     <div className="bg-gray-800 rounded-2xl">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
