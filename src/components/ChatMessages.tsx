@@ -7,8 +7,23 @@ import { FileText, Bot, User, Upload } from "lucide-react";
 interface ChatMessagesProps {
   messages: Message[];
   isThinking: boolean;
-  thinkingType?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general';
+  thinkingType?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
 }
+
+// Helper function to render text with markdown-style bold formatting
+const renderFormattedText = (text: string) => {
+  // Split text by **text** pattern and render bold parts
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      // Remove the ** markers and make bold
+      const boldText = part.slice(2, -2);
+      return <strong key={index} className="font-bold">{boldText}</strong>;
+    }
+    return part;
+  });
+};
 
 const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -68,8 +83,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType }: ChatMessagesProps)
                   </div>
                 )}
                 
-                <div className="prose prose-sm prose-invert max-w-none prose-p:my-0 prose-p:text-gray-200 whitespace-pre-wrap font-medium">
-                  {message.content}
+                <div className="text-sm font-medium whitespace-pre-wrap">
+                  {renderFormattedText(message.content)}
                 </div>
                 
                 {message.files && message.files.length > 0 && (
