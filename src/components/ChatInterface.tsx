@@ -580,12 +580,12 @@ ${platformFiles.map((file, index) =>
           response = await handleRAGOperation(userMessage);
           const ragLowerMessage = userMessage.toLowerCase();
           
-          // If it's a Weez knowledge management question, attach the WeezInfo.pdf
+          // If it's a Weez knowledge management question, attach a company document from Google Drive
           if (ragLowerMessage.match(/(why weez|weez.*better|weez.*competitive|weez.*differentiates|weez.*scalable|weez.*intelligent|knowledge management|km platform)/i)) {
             files = [{
-              id: 'weez-info-pdf',
-              name: 'WeezInfo.pdf',
-              platform: 'Knowledge Base',
+              id: 'weez-company-info',
+              name: 'Company_Overview_Weez.pdf',
+              platform: 'Google Drive',
               size: '2.4 MB'
             }];
           } else {
