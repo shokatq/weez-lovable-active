@@ -8,6 +8,7 @@ import ChatInput from "@/components/ChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import { Message, Conversation } from "@/types/chat";
 import { demoFiles, semanticSearch, findFileByDescription, extractTopicFromQuery } from "@/data/demoData";
+import { demopdfs, searchPDFs, getPDFsByPlatform, getAllPDFs, getRecentPDFs, PDFFile } from "@/data/pdfData";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -30,6 +31,12 @@ const ChatInterface = () => {
 
   const analyzeUserIntent = (message: string) => {
     const lowerMessage = message.toLowerCase();
+    
+    // PDF-specific patterns
+    if (lowerMessage.match(/(pdf|pdfs).*(from|in|across|stored|all|show|find|list|fetch|display|pull|where|get|give|search)/i) ||
+        lowerMessage.match(/(show|find|list|fetch|display|pull|get|give).*(pdf|pdfs)/i)) {
+      return 'pdf-search';
+    }
     
     // Weez knowledge management patterns
     if (lowerMessage.match(/(why weez|weez.*better|weez.*competitive|weez.*differentiates|weez.*scalable|weez.*intelligent|knowledge management|km platform)/i)) {
@@ -207,6 +214,103 @@ From instant document answers to deep enterprise-wide intelligence, Weez solves 
     return `✅ **Complete File Removal**\n\n📁 **File:** ${file.name}\n🗑️ **Removed from:** All connected platforms and central repository\n⚠️ **Status:** Permanently deleted\n🔄 **Recovery:** Available in system backup for 7 days\n⏰ **Operation completed in:** 1.8s`;
   };
 
+  const handlePDFSearchOperation = async (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    let pdfs: PDFFile[] = [];
+    let responseText = "";
+
+    // Check for platform-specific requests
+    const platforms = ['dropbox', 'slack', 'google drive', 'drive', 'onedrive', 'notion'];
+    const mentionedPlatforms = platforms.filter(platform => 
+      lowerMessage.includes(platform.toLowerCase())
+    );
+
+    // Check for "all platforms" or "across platforms" requests
+    if (lowerMessage.match(/(all|across|every|from all|pull up|compile|external integrations|cloud tools|workspaces|sources)/i)) {
+      pdfs = getAllPDFs();
+      responseText = `## 📄 All PDFs Across Your Connected Platforms
+
+I've compiled all PDF documents from your connected cloud services:
+
+**📊 Summary:**
+• **Google Drive:** ${pdfs.filter(p => p.platform === 'Google Drive').length} PDFs
+• **Slack:** ${pdfs.filter(p => p.platform === 'Slack').length} PDFs  
+• **Dropbox:** ${pdfs.filter(p => p.platform === 'Dropbox').length} PDFs
+• **OneDrive:** ${pdfs.filter(p => p.platform === 'OneDrive').length} PDFs
+• **Notion:** ${pdfs.filter(p => p.platform === 'Notion').length} PDFs
+
+**🗂️ Recent Documents:**
+${pdfs.slice(0, 8).map((pdf, index) => 
+  `${index + 1}. **${pdf.name}** (${pdf.platform} - ${pdf.size})\n   📅 ${pdf.lastModified} | 📋 ${pdf.summary.substring(0, 80)}...`
+).join('\n\n')}
+
+${pdfs.length > 8 ? `\n*...and ${pdfs.length - 8} more documents available.*` : ''}
+
+**💡 Next Steps:** Would you like me to filter these by date, platform, or content type?`;
+
+    } else if (lowerMessage.match(/recent/i)) {
+      pdfs = getRecentPDFs(30);
+      responseText = `## 📅 Recently Uploaded/Modified PDFs
+
+Here are your most recent PDF documents from the past 30 days:
+
+${pdfs.map((pdf, index) => 
+  `${index + 1}. **${pdf.name}** (${pdf.platform})\n   📅 ${pdf.lastModified} | 📊 ${pdf.size} | 👤 ${pdf.author || 'Unknown'}\n   📝 ${pdf.summary.substring(0, 100)}...`
+).join('\n\n')}
+
+**📈 Activity Summary:** ${pdfs.length} PDFs uploaded or modified in the last 30 days across all platforms.`;
+
+    } else if (mentionedPlatforms.length > 0) {
+      // Platform-specific search
+      pdfs = getPDFsByPlatform(mentionedPlatforms);
+      const platformNames = mentionedPlatforms.map(p => 
+        p === 'drive' ? 'Google Drive' : p.charAt(0).toUpperCase() + p.slice(1)
+      ).join(', ');
+      
+      responseText = `## 🔍 PDFs from ${platformNames}
+
+Found ${pdfs.length} PDF document(s) in your specified platform(s):
+
+${pdfs.map((pdf, index) => 
+  `${index + 1}. **${pdf.name}** (${pdf.platform} - ${pdf.size})\n   📅 Last modified: ${pdf.lastModified}\n   📄 ${pdf.summary.substring(0, 120)}...\n   🏷️ Tags: ${pdf.tags.slice(0, 3).join(', ')}`
+).join('\n\n')}
+
+**💼 Document Types:** ${[...new Set(pdfs.map(p => p.type))].join(', ')}`;
+
+    } else if (lowerMessage.match(/(onedrive|notion).*only/i)) {
+      // Specific platform query
+      const platform = lowerMessage.includes('onedrive') ? 'OneDrive' : 'Notion';
+      pdfs = demopdfs.filter(pdf => pdf.platform === platform);
+      
+      responseText = `## 📂 PDFs in ${platform}
+
+${pdfs.length > 0 ? 
+        `Found ${pdfs.length} PDF document(s) in your ${platform}:
+
+${pdfs.map((pdf, index) => 
+  `${index + 1}. **${pdf.name}** (${pdf.size})\n   📅 ${pdf.lastModified} | 👤 ${pdf.author || 'Unknown'}\n   📄 ${pdf.summary.substring(0, 100)}...`
+).join('\n\n')}` 
+        : 
+        `No PDF documents found in your ${platform} at this time.`
+      }`;
+
+    } else {
+      // General PDF search
+      pdfs = getAllPDFs().slice(0, 10);
+      responseText = `## 📋 PDF Document Search Results
+
+Here are the PDF documents I found across your connected platforms:
+
+${pdfs.map((pdf, index) => 
+  `${index + 1}. **${pdf.name}** (${pdf.platform})\n   📊 ${pdf.size} | 📅 ${pdf.lastModified}\n   📄 ${pdf.summary.substring(0, 100)}...`
+).join('\n\n')}
+
+**🔧 Available Actions:** View, download, summarize, or share any of these documents.`;
+    }
+
+    return { text: responseText, files: pdfs };
+  };
+
   const simulateAIResponse = async (userMessage: string) => {
     const intent = analyzeUserIntent(userMessage);
     let response = "";
@@ -251,6 +355,18 @@ From instant document answers to deep enterprise-wide intelligence, Weez solves 
           }
           break;
           
+        case 'pdf-search':
+          thinkingTime = 2200;
+          const pdfResult = await handlePDFSearchOperation(userMessage);
+          response = pdfResult.text;
+          files = pdfResult.files.slice(0, 5).map(pdf => ({
+            id: pdf.id,
+            name: pdf.name,
+            platform: pdf.platform,
+            size: pdf.size
+          }));
+          break;
+          
         case 'upload':
           thinkingTime = 3200;
           response = await handleUploadOperation(userMessage);
@@ -263,7 +379,7 @@ From instant document answers to deep enterprise-wide intelligence, Weez solves 
           
         default:
           thinkingTime = 1800;
-          response = "I'm here to help you with file operations! You can ask me to:\n\n• **Search** for files: 'Find my deep learning papers'\n• **Summarize** documents: 'Give me a summary of the project proposal'\n• **Answer questions** about your files: 'What is ResNet architecture?'\n• **Upload** files: 'Save this to Google Drive'\n• **Delete** files: 'Remove the old report from Dropbox'\n\nWhat would you like to do?";
+          response = "I'm here to help you with file operations! You can ask me to:\n\n• **Search** for files: 'Find my deep learning papers'\n• **Find PDFs**: 'Show me all PDFs from Google Drive and Slack'\n• **Summarize** documents: 'Give me a summary of the project proposal'\n• **Answer questions** about your files: 'What is ResNet architecture?'\n• **Upload** files: 'Save this to Google Drive'\n• **Delete** files: 'Remove the old report from Dropbox'\n\nWhat would you like to do?";
       }
     } catch (error) {
       console.error('Error in AI response:', error);

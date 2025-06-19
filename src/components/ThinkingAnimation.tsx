@@ -1,13 +1,18 @@
-
 import { Bot, Search, FileText, Upload, Building2, Brain, Trash2, BookOpen } from 'lucide-react';
 
 export interface ThinkingAnimationProps {
-  type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
+  type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete' | 'pdf-search';
 }
 
 const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
   const getThinkingConfig = () => {
     switch (type) {
+      case 'pdf-search':
+        return {
+          icon: <FileText className="w-4 h-4 text-red-400" />,
+          text: "Searching for PDFs across all platforms...",
+          dots: "bg-red-400"
+        };
       case 'search':
         return {
           icon: <Search className="w-4 h-4 text-blue-400" />,
