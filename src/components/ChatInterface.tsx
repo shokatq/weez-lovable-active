@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -32,6 +31,22 @@ const ChatInterface = () => {
 
   const analyzeUserIntent = (message: string) => {
     const lowerMessage = message.toLowerCase();
+    
+    // Summarization patterns
+    if (lowerMessage.match(/(summarize|summarise|summary|give me.+summary|explain.+detail|overview).+(file|document|pdf)/i) ||
+        lowerMessage.match(/(summarize|summarise).+(.pdf|document|file)/i)) {
+      return 'file-summary';
+    }
+    
+    // Location/Locate patterns
+    if (lowerMessage.match(/(locate|find location|where is|find.+location|locate.+file)/i)) {
+      return 'locate';
+    }
+    
+    // Update patterns
+    if (lowerMessage.match(/(update|modify|change|edit).+(file|document|pdf)/i)) {
+      return 'update';
+    }
     
     // PDF-specific patterns
     if (lowerMessage.match(/(pdf|pdfs).*(from|in|across|stored|all|show|find|list|fetch|display|pull|where|get|give|search)/i) ||
@@ -312,6 +327,155 @@ ${pdfs.map((pdf, index) =>
     return { text: responseText, files: pdfs };
   };
 
+  const handleFileSummaryOperation = async (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Extract file name and platform from the message
+    const fileNameMatch = message.match(/(?:summarize|summarise)(?:\s+the)?\s+(.+?)(?:\s+from\s+(.+?))?(?:\s+file|\s+document|\s+pdf|$)/i);
+    
+    if (!fileNameMatch) {
+      return "Please specify the file name you'd like me to summarize. For example: 'Summarize the Q4 Marketing Strategy from Google Drive'";
+    }
+    
+    const fileName = fileNameMatch[1].trim();
+    const platform = fileNameMatch[2]?.trim();
+    
+    const file = findPDFByNameAndPlatform(fileName, platform);
+    
+    if (!file) {
+      return `I couldn't find a file named "${fileName}"${platform ? ` in ${platform}` : ' in any of your connected platforms'}. Please check the file name and try again.`;
+    }
+    
+    const isDetailed = lowerMessage.includes('detail') || lowerMessage.includes('comprehensive') || lowerMessage.includes('full');
+    
+    if (isDetailed && file.detailedContent) {
+      return `## 📄 Detailed Summary: ${file.name}
+
+**📍 Platform:** ${file.platform}  
+**📊 Size:** ${file.size}  
+**📅 Last Modified:** ${file.lastModified}  
+**👤 Author:** ${file.author || 'Unknown'}  
+**📂 Location:** ${file.location}  
+**🔢 Version:** ${file.version}
+
+### 📋 Comprehensive Content Analysis:
+
+${file.detailedContent}
+
+### 🏷️ Key Topics & Tags:
+${file.tags.map(tag => `• ${tag.charAt(0).toUpperCase() + tag.slice(1)}`).join('\n')}
+
+### 📈 Document Insights:
+• **Document Type:** ${file.type.charAt(0).toUpperCase() + file.type.slice(1)} document
+• **Sharing Status:** ${file.shared ? 'Shared with team' : 'Private access only'}
+• **Last Updated:** ${file.lastUpdated ? new Date(file.lastUpdated).toLocaleString() : 'Not available'}
+
+**💡 This summary was generated from the actual document content stored in ${file.platform}.**`;
+    } else {
+      return `## 📄 Quick Summary: ${file.name}
+
+**📍 Platform:** ${file.platform} | **📊 Size:** ${file.size} | **👤 Author:** ${file.author || 'Unknown'}
+
+### 📋 Overview:
+${file.summary}
+
+### 🏷️ Key Topics:
+${file.tags.slice(0, 4).map(tag => `• ${tag.charAt(0).toUpperCase() + tag.slice(1)}`).join('\n')}
+
+### 📂 File Details:
+• **Location:** ${file.location}
+• **Version:** ${file.version}
+• **Last Modified:** ${file.lastModified}
+
+*For a more detailed summary, ask: "Give me a detailed summary of ${file.name}"*`;
+    }
+  };
+
+  const handleLocateOperation = async (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Extract file name and platform from the message
+    const fileNameMatch = message.match(/(?:locate|find|where is)(?:\s+the)?\s+(.+?)(?:\s+from\s+(.+?))?(?:\s+file|\s+document|\s+pdf|$)/i);
+    
+    if (!fileNameMatch) {
+      return "Please specify the file name you'd like me to locate. For example: 'Locate the Employee Handbook from Dropbox'";
+    }
+    
+    const fileName = fileNameMatch[1].trim();
+    const platform = fileNameMatch[2]?.trim();
+    
+    const result = locatePDF(fileName, platform);
+    
+    if (!result) {
+      return `I couldn't locate a file named "${fileName}"${platform ? ` in ${platform}` : ' in any of your connected platforms'}. Please check the file name and try again.`;
+    }
+    
+    const { file, location } = result;
+    
+    return `## 📍 File Location Found
+
+**📄 File:** ${file.name}  
+**📂 Full Path:** \`${location}\`  
+**☁️ Platform:** ${file.platform}  
+**📊 Size:** ${file.size}  
+**👤 Owner:** ${file.author || 'Unknown'}
+
+### 📋 Quick Details:
+• **Version:** ${file.version}
+• **Last Modified:** ${file.lastModified}
+• **Last Updated:** ${file.lastUpdated ? new Date(file.lastUpdated).toLocaleString() : 'Not available'}
+• **Sharing Status:** ${file.shared ? '🔓 Shared with team' : '🔒 Private access'}
+
+### 🏷️ File Tags:
+${file.tags.map(tag => `\`${tag}\``).join(' • ')}
+
+**💡 You can now access this file directly at the location above in your ${file.platform} workspace.**`;
+  };
+
+  const handleUpdateOperation = async (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Extract file name and platform from the message
+    const fileNameMatch = message.match(/(?:update|modify|change|edit)(?:\s+the)?\s+(.+?)(?:\s+from\s+(.+?))?(?:\s+file|\s+document|\s+pdf|$)/i);
+    
+    if (!fileNameMatch) {
+      return "Please specify the file name you'd like me to update. For example: 'Update the Project Timeline from OneDrive'";
+    }
+    
+    const fileName = fileNameMatch[1].trim();
+    const platform = fileNameMatch[2]?.trim();
+    
+    const updatedFile = updatePDFVersion(fileName, platform);
+    
+    if (!updatedFile) {
+      return `I couldn't find a file named "${fileName}"${platform ? ` in ${platform}` : ' in any of your connected platforms'}. Please check the file name and try again.`;
+    }
+    
+    return `## ✅ File Updated Successfully
+
+**📄 File:** ${updatedFile.name}  
+**☁️ Platform:** ${updatedFile.platform}  
+**📂 Location:** ${updatedFile.location}
+
+### 🔄 Update Details:
+• **New Version:** ${updatedFile.version} ⬆️
+• **Updated At:** ${new Date(updatedFile.lastUpdated!).toLocaleString()}
+• **Size:** ${updatedFile.size}
+• **Status:** Successfully synchronized across platform
+
+### 📋 File Information:
+• **Type:** ${updatedFile.type.charAt(0).toUpperCase() + updatedFile.type.slice(1)} document
+• **Author:** ${updatedFile.author || 'Unknown'}
+• **Tags:** ${updatedFile.tags.map(tag => `\`${tag}\``).join(' • ')}
+
+### 🔄 Next Steps:
+• All team members with access will see the updated version
+• Previous version is archived and available in version history
+• Change notifications have been sent to relevant stakeholders
+
+**💡 The file has been successfully updated and is ready for use in your ${updatedFile.platform} workspace.**`;
+  };
+
   const simulateAIResponse = async (userMessage: string) => {
     const intent = analyzeUserIntent(userMessage);
     let response = "";
@@ -366,6 +530,27 @@ ${pdfs.map((pdf, index) =>
             platform: pdf.platform,
             size: pdf.size
           }));
+          break;
+          
+        case 'file-summary':
+          thinkingTime = 2800;
+          response = await handleFileSummaryOperation(userMessage);
+          const summaryFile = findPDFByNameAndPlatform(userMessage);
+          if (summaryFile) files = [summaryFile];
+          break;
+          
+        case 'locate':
+          thinkingTime = 1800;
+          response = await handleLocateOperation(userMessage);
+          const locateResult = locatePDF(userMessage);
+          if (locateResult) files = [locateResult.file];
+          break;
+          
+        case 'update':
+          thinkingTime = 2500;
+          response = await handleUpdateOperation(userMessage);
+          const updateFile = findPDFByNameAndPlatform(userMessage);
+          if (updateFile) files = [updateFile];
           break;
           
         case 'upload':
