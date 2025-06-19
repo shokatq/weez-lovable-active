@@ -550,9 +550,9 @@ ${platformFiles.map((file, index) =>
           thinkingTime = 2800;
           response = await handlePlatformSummaryOperation(userMessage);
           // Get files from the mentioned platform for attachment
-          const lowerMessage = userMessage.toLowerCase();
+          const platformLowerMessage = userMessage.toLowerCase();
           const platforms = ['google drive', 'drive', 'dropbox', 'slack', 'notion', 'onedrive'];
-          const targetPlatform = platforms.find(platform => lowerMessage.includes(platform));
+          const targetPlatform = platforms.find(platform => platformLowerMessage.includes(platform));
           if (targetPlatform) {
             const normalizedPlatform = targetPlatform === 'drive' ? 'Google Drive' : 
                                     targetPlatform.charAt(0).toUpperCase() + targetPlatform.slice(1);
@@ -578,10 +578,10 @@ ${platformFiles.map((file, index) =>
         case 'rag':
           thinkingTime = 2800;
           response = await handleRAGOperation(userMessage);
-          const lowerMessage = userMessage.toLowerCase();
+          const ragLowerMessage = userMessage.toLowerCase();
           
           // If it's a Weez knowledge management question, attach the WeezInfo.pdf
-          if (lowerMessage.match(/(why weez|weez.*better|weez.*competitive|weez.*differentiates|weez.*scalable|weez.*intelligent|knowledge management|km platform)/i)) {
+          if (ragLowerMessage.match(/(why weez|weez.*better|weez.*competitive|weez.*differentiates|weez.*scalable|weez.*intelligent|knowledge management|km platform)/i)) {
             files = [{
               id: 'weez-info-pdf',
               name: 'WeezInfo.pdf',
