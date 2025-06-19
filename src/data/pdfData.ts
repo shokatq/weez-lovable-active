@@ -199,7 +199,7 @@ export const demoPDFs: PDFFile[] = [
 export const searchPDFs = (query: string): PDFFile[] => {
   const lowerQuery = query.toLowerCase();
   
-  return demopdfs.filter(pdf => 
+  return demoPDFs.filter(pdf => 
     pdf.name.toLowerCase().includes(lowerQuery) ||
     pdf.summary.toLowerCase().includes(lowerQuery) ||
     pdf.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
@@ -211,7 +211,7 @@ export const searchPDFs = (query: string): PDFFile[] => {
 export const getPDFsByPlatform = (platforms: string[]): PDFFile[] => {
   const normalizedPlatforms = platforms.map(p => p.toLowerCase());
   
-  return demopdfs.filter(pdf => 
+  return demoPDFs.filter(pdf => 
     normalizedPlatforms.some(platform => 
       pdf.platform.toLowerCase().includes(platform)
     )
@@ -219,14 +219,14 @@ export const getPDFsByPlatform = (platforms: string[]): PDFFile[] => {
 };
 
 export const getAllPDFs = (): PDFFile[] => {
-  return demopdfs;
+  return demoPDFs;
 };
 
 export const getRecentPDFs = (days: number = 30): PDFFile[] => {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
   
-  return demopdfs.filter(pdf => {
+  return demoPDFs.filter(pdf => {
     const uploadDate = new Date(pdf.uploadDate);
     return uploadDate >= cutoffDate;
   }).sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime());

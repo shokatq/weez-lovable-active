@@ -8,7 +8,7 @@ import ChatInput from "@/components/ChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import { Message, Conversation } from "@/types/chat";
 import { demoFiles, semanticSearch, findFileByDescription, extractTopicFromQuery } from "@/data/demoData";
-import { demopdfs, searchPDFs, getPDFsByPlatform, getAllPDFs, getRecentPDFs, PDFFile } from "@/data/pdfData";
+import { demoPDFs, searchPDFs, getPDFsByPlatform, getAllPDFs, getRecentPDFs, PDFFile } from "@/data/pdfData";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
