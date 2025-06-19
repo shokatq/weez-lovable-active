@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -32,6 +31,12 @@ const ChatInterface = () => {
 
   const analyzeUserIntent = (message: string) => {
     const lowerMessage = message.toLowerCase();
+    
+    // Platform-specific summary patterns - NEW ENHANCEMENT! ✨
+    if (lowerMessage.match(/(summarize|summary|give me.+summary|insights from|show me summaries).+(from|in|on).+(google drive|drive|dropbox|slack|notion|onedrive)/i) ||
+        lowerMessage.match(/(google drive|drive|dropbox|slack|notion|onedrive).+(summarize|summary|summaries|insights)/i)) {
+      return 'platform-summary';
+    }
     
     // Summarization patterns
     if (lowerMessage.match(/(summarize|summarise|summary|give me.+summary|explain.+detail|overview).+(file|document|pdf)/i) ||
@@ -477,6 +482,58 @@ ${file.tags.map(tag => `\`${tag}\``).join(' • ')}
 **💡 The file has been successfully updated and is ready for use in your ${updatedFile.platform} workspace.**`;
   };
 
+  const handlePlatformSummaryOperation = async (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Extract platform from message
+    const platforms = ['google drive', 'drive', 'dropbox', 'slack', 'notion', 'onedrive'];
+    const targetPlatform = platforms.find(platform => lowerMessage.includes(platform));
+    
+    if (!targetPlatform) {
+      return "Please specify which platform you'd like me to summarize files from (Google Drive, Dropbox, Slack, Notion, or OneDrive).";
+    }
+    
+    // Normalize platform name
+    const normalizedPlatform = targetPlatform === 'drive' ? 'Google Drive' : 
+                              targetPlatform.charAt(0).toUpperCase() + targetPlatform.slice(1);
+    
+    // Get files from the specific platform
+    const platformFiles = demoPDFs.filter(pdf => 
+      pdf.platform.toLowerCase() === normalizedPlatform.toLowerCase()
+    );
+    
+    if (platformFiles.length === 0) {
+      return `No files found in your ${normalizedPlatform}. Please check your connection or try another platform.`;
+    }
+    
+    // Generate beautiful platform-specific summary
+    return `## ✨ ${normalizedPlatform} Files Summary
+
+📊 **Platform Overview:** Found ${platformFiles.length} documents in your ${normalizedPlatform}
+
+### 📄 Document Summaries:
+
+${platformFiles.map((file, index) => 
+  `**${index + 1}. ${file.name}**
+📅 Last Modified: ${file.lastModified} | 📊 Size: ${file.size} | 👤 Author: ${file.author || 'Unknown'}
+📋 **Summary:** ${file.summary}
+🏷️ **Tags:** ${file.tags.join(', ')}
+📂 **Location:** ${file.location}
+
+---`
+).join('\n')}
+
+### 🧠 **AI Insights:**
+• **Document Types:** ${[...new Set(platformFiles.map(f => f.type))].join(', ')}
+• **Most Recent:** ${platformFiles.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())[0].name}
+• **Total Storage:** ${platformFiles.reduce((total, file) => {
+  const size = parseFloat(file.size.replace(/[^\d.]/g, ''));
+  return total + size;
+}, 0).toFixed(1)} MB
+
+**💡 Quick Actions:** Ask me to locate, update, or get detailed summaries of any specific file!`;
+  };
+
   const simulateAIResponse = async (userMessage: string) => {
     const intent = analyzeUserIntent(userMessage);
     let response = "";
@@ -489,6 +546,22 @@ ${file.tags.map(tag => `\`${tag}\``).join(' • ')}
 
     try {
       switch (intent) {
+        case 'platform-summary':
+          thinkingTime = 2800;
+          response = await handlePlatformSummaryOperation(userMessage);
+          // Get files from the mentioned platform for attachment
+          const lowerMessage = userMessage.toLowerCase();
+          const platforms = ['google drive', 'drive', 'dropbox', 'slack', 'notion', 'onedrive'];
+          const targetPlatform = platforms.find(platform => lowerMessage.includes(platform));
+          if (targetPlatform) {
+            const normalizedPlatform = targetPlatform === 'drive' ? 'Google Drive' : 
+                                    targetPlatform.charAt(0).toUpperCase() + targetPlatform.slice(1);
+            files = demoPDFs.filter(pdf => 
+              pdf.platform.toLowerCase() === normalizedPlatform.toLowerCase()
+            );
+          }
+          break;
+          
         case 'search':
           thinkingTime = 1500;
           response = await handleSearchOperation(userMessage);
@@ -566,7 +639,7 @@ ${file.tags.map(tag => `\`${tag}\``).join(' • ')}
           
         default:
           thinkingTime = 1800;
-          response = "I'm here to help you with file operations! You can ask me to:\n\n• **Search** for files: 'Find my deep learning papers'\n• **Find PDFs**: 'Show me all PDFs from Google Drive and Slack'\n• **Summarize** documents: 'Give me a summary of the project proposal'\n• **Answer questions** about your files: 'What is ResNet architecture?'\n• **Upload** files: 'Save this to Google Drive'\n• **Delete** files: 'Remove the old report from Dropbox'\n\nWhat would you like to do?";
+          response = "I'm here to help you with file operations! You can ask me to:\n\n• **Search** for files: 'Find my deep learning papers'\n• **Find PDFs**: 'Show me all PDFs from Google Drive and Slack'\n• **Summarize** documents: 'Give me a summary of the project proposal'\n• **Platform summaries**: 'Summarize my files from Dropbox'\n• **Answer questions** about your files: 'What is ResNet architecture?'\n• **Upload** files: 'Save this to Google Drive'\n• **Delete** files: 'Remove the old report from Dropbox'\n\nWhat would you like to do?";
       }
     } catch (error) {
       console.error('Error in AI response:', error);
