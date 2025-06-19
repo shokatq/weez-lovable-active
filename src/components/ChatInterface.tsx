@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -280,7 +281,7 @@ ${pdfs.map((pdf, index) =>
     } else if (lowerMessage.match(/(onedrive|notion).*only/i)) {
       // Specific platform query
       const platform = lowerMessage.includes('onedrive') ? 'OneDrive' : 'Notion';
-      pdfs = demopdfs.filter(pdf => pdf.platform === platform);
+      pdfs = demoPDFs.filter(pdf => pdf.platform === platform);
       
       responseText = `## 📂 PDFs in ${platform}
 
