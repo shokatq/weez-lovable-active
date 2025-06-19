@@ -31,6 +31,11 @@ const ChatInterface = () => {
   const analyzeUserIntent = (message: string) => {
     const lowerMessage = message.toLowerCase();
     
+    // Weez knowledge management patterns
+    if (lowerMessage.match(/(why weez|weez.*better|weez.*competitive|weez.*differentiates|weez.*scalable|weez.*intelligent|knowledge management|km platform)/i)) {
+      return 'rag';
+    }
+    
     // Search patterns
     if (lowerMessage.match(/(find|search|look for|locate|show me).+file/i) ||
         lowerMessage.match(/files? (about|related to|containing)/i)) {
@@ -60,6 +65,54 @@ const ChatInterface = () => {
     }
     
     return 'general';
+  };
+
+  const handleWeezKnowledgeManagement = async () => {
+    return `# 🚀 Why Weez is Better Than Any Other Knowledge Management Platform
+
+## 📌 The Big Problem with Existing Tools:
+• Enterprise knowledge is scattered across Drive, Notion, Slack, emails, and more.
+• Employees spend **25% of their time** just looking for internal files.
+• Traditional tools offer basic keyword search, not true understanding.
+• No unified access or smart insights — just links.
+
+⸻
+
+## 🧠 Why Weez.AI Is a Game Changer
+
+| Feature | Weez.AI | Traditional Tools |
+|---------|---------|-------------------|
+| **AI-Powered Search (RAG)** | ✅ Uses Retrieval-Augmented Generation for deep context understanding | ❌ Basic keyword/indexed search |
+| **Natural Language Interface** | ✅ Ask anything like you chat with a teammate | ❌ Rigid commands and filters |
+| **Unified File Access** | ✅ Works across Google Drive, Slack, Notion, OneDrive, Dropbox, etc. | ❌ Locked within single platforms |
+| **Smart Summarization & Q&A** | ✅ Instant document insights without opening them | ❌ Manual reading & copy-paste |
+| **Contextual Memory** | ✅ Remembers past queries for better answers | ❌ Each search is isolated |
+| **ChatGPT-like UI for Files** | ✅ Intuitive and familiar | ❌ Outdated interfaces |
+| **Enterprise-Grade Intelligence** | ✅ Tailored for security, scalability, and integration | ❌ Limited customization |
+
+⸻
+
+## 🌟 Where Others Fail — and Weez Wins
+• **❌ Others:** No deep understanding. Just keyword matching.
+• **❌ Others:** Work in silos. No cross-platform capabilities.
+• **❌ Others:** No conversation interface. No memory. No RAG.
+• **✅ Weez:** Brings AI superpowers to your files. Finds, summarizes, and answers — instantly.
+
+⸻
+
+## 🔥 Why Now?
+• Over **80% of enterprise data** is unstructured — growing daily.
+• Enterprises are embracing GenAI tools rapidly.
+• Expectations have shifted — teams want **answers, not just files**.
+• Weez delivers the **AI Knowledge Agent** modern teams demand.
+
+⸻
+
+## 🏁 Final Verdict:
+
+**Weez isn't just a search tool — it's your AI teammate.**
+
+From instant document answers to deep enterprise-wide intelligence, Weez solves the knowledge chaos that other tools overlook.`;
   };
 
   const handleSearchOperation = async (message: string) => {
@@ -93,6 +146,14 @@ const ChatInterface = () => {
   };
 
   const handleRAGOperation = async (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Check if it's a Weez knowledge management question
+    if (lowerMessage.match(/(why weez|weez.*better|weez.*competitive|weez.*differentiates|weez.*scalable|weez.*intelligent|knowledge management|km platform)/i)) {
+      const response = await handleWeezKnowledgeManagement();
+      return response;
+    }
+    
     const topic = extractTopicFromQuery(message);
     const relevantFiles = semanticSearch(topic);
     
@@ -174,8 +235,20 @@ const ChatInterface = () => {
         case 'rag':
           thinkingTime = 2800;
           response = await handleRAGOperation(userMessage);
-          const topic = extractTopicFromQuery(userMessage);
-          files = semanticSearch(topic).slice(0, 2);
+          const lowerMessage = userMessage.toLowerCase();
+          
+          // If it's a Weez knowledge management question, attach the WeezInfo.pdf
+          if (lowerMessage.match(/(why weez|weez.*better|weez.*competitive|weez.*differentiates|weez.*scalable|weez.*intelligent|knowledge management|km platform)/i)) {
+            files = [{
+              id: 'weez-info-pdf',
+              name: 'WeezInfo.pdf',
+              platform: 'Knowledge Base',
+              size: '2.4 MB'
+            }];
+          } else {
+            const topic = extractTopicFromQuery(userMessage);
+            files = semanticSearch(topic).slice(0, 2);
+          }
           break;
           
         case 'upload':

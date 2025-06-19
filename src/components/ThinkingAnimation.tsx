@@ -1,5 +1,5 @@
 
-import { Bot, Search, FileText, Upload, Building2, Brain, Trash2 } from 'lucide-react';
+import { Bot, Search, FileText, Upload, Building2, Brain, Trash2, BookOpen } from 'lucide-react';
 
 export interface ThinkingAnimationProps {
   type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
@@ -22,8 +22,8 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
         };
       case 'rag':
         return {
-          icon: <Brain className="w-4 h-4 text-purple-400" />,
-          text: "Processing information...",
+          icon: <BookOpen className="w-4 h-4 text-purple-400" />,
+          text: "Analyzing knowledge base and generating insights...",
           dots: "bg-purple-400"
         };
       case 'upload':
