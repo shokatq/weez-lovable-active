@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -8,7 +9,7 @@ import ChatInput from "@/components/ChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import { Message, Conversation } from "@/types/chat";
 import { demoFiles, semanticSearch, findFileByDescription, extractTopicFromQuery } from "@/data/demoData";
-import { demoPDFs, searchPDFs, getPDFsByPlatform, getAllPDFs, getRecentPDFs, PDFFile } from "@/data/pdfData";
+import { demoPDFs, searchPDFs, getPDFsByPlatform, getAllPDFs, getRecentPDFs, PDFFile, findPDFByNameAndPlatform, locatePDF, updatePDFVersion } from "@/data/pdfData";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -497,8 +498,8 @@ ${file.tags.map(tag => `\`${tag}\``).join(' • ')}
         case 'summary':
           thinkingTime = 2500;
           response = await handleSummaryOperation(userMessage);
-          const summaryFile = findFileByDescription(userMessage);
-          if (summaryFile) files = [summaryFile];
+          const regularSummaryFile = findFileByDescription(userMessage);
+          if (regularSummaryFile) files = [regularSummaryFile];
           break;
           
         case 'rag':
@@ -535,8 +536,8 @@ ${file.tags.map(tag => `\`${tag}\``).join(' • ')}
         case 'file-summary':
           thinkingTime = 2800;
           response = await handleFileSummaryOperation(userMessage);
-          const summaryFile = findPDFByNameAndPlatform(userMessage);
-          if (summaryFile) files = [summaryFile];
+          const pdfSummaryFile = findPDFByNameAndPlatform(userMessage);
+          if (pdfSummaryFile) files = [pdfSummaryFile];
           break;
           
         case 'locate':
