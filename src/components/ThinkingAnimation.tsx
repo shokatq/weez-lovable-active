@@ -1,78 +1,70 @@
-import { Bot, Search, FileText, Upload, Building2, Brain, Trash2, BookOpen } from 'lucide-react';
 
-export interface ThinkingAnimationProps {
-  type?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete' | 'pdf-search';
+import { Search, FileText, Brain, Upload, Building2, MessageSquare, Trash2 } from "lucide-react";
+
+interface ThinkingAnimationProps {
+  type: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
 }
 
-const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
-  const getThinkingConfig = () => {
+const ThinkingAnimation = ({ type }: ThinkingAnimationProps) => {
+  const getTypeConfig = () => {
     switch (type) {
-      case 'pdf-search':
-        return {
-          icon: <FileText className="w-4 h-4 text-red-400" />,
-          text: "Searching for PDFs across all platforms...",
-          dots: "bg-red-400"
-        };
       case 'search':
         return {
-          icon: <Search className="w-4 h-4 text-blue-400" />,
+          icon: Search,
           text: "Searching across your files...",
-          dots: "bg-blue-400"
+          dots: "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
         };
       case 'summary':
         return {
-          icon: <FileText className="w-4 h-4 text-green-400" />,
+          icon: FileText,
           text: "Analyzing document content...",
-          dots: "bg-green-400"
+          dots: "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
         };
       case 'rag':
         return {
-          icon: <BookOpen className="w-4 h-4 text-purple-400" />,
-          text: "Analyzing knowledge base and generating insights...",
-          dots: "bg-purple-400"
+          icon: Brain,
+          text: "Processing knowledge base...",
+          dots: "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
         };
       case 'upload':
         return {
-          icon: <Upload className="w-4 h-4 text-orange-400" />,
-          text: "Uploading to cloud storage...",
-          dots: "bg-orange-400"
-        };
-      case 'delete':
-        return {
-          icon: <Trash2 className="w-4 h-4 text-red-400" />,
-          text: "Processing file deletion...",
-          dots: "bg-red-400"
+          icon: Upload,
+          text: "Uploading to cloud platform...",
+          dots: "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
         };
       case 'workspace':
         return {
-          icon: <Building2 className="w-4 h-4 text-emerald-400" />,
-          text: "Accessing workspace data...",
-          dots: "bg-emerald-400"
+          icon: Building2,
+          text: "Preparing workspace data...",
+          dots: "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+        };
+      case 'delete':
+        return {
+          icon: Trash2,
+          text: "Processing file deletion...",
+          dots: "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
         };
       default:
         return {
-          icon: <Bot className="w-4 h-4 text-gray-400" />,
-          text: "Weezy is thinking...",
-          dots: "bg-gray-400"
+          icon: MessageSquare,
+          text: "Thinking...",
+          dots: "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
         };
     }
   };
 
-  const config = getThinkingConfig();
+  const config = getTypeConfig();
+  const Icon = config.icon;
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
-      <div className="animate-pulse">
-        {config.icon}
+    <div className="flex items-center gap-3 py-2">
+      <Icon className="w-4 h-4 text-gray-600 animate-pulse" />
+      <span className="text-gray-600">{config.text}</span>
+      <div className="flex gap-1">
+        <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+        <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+        <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
       </div>
-      <div className="flex items-center gap-1.5">
-        <span className={`h-1.5 w-1.5 rounded-full ${config.dots} animate-pulse [animation-delay:-0.3s]`}></span>
-        <span className={`h-1.5 w-1.5 rounded-full ${config.dots} animate-pulse [animation-delay:-0.15s]`}></span>
-        <span className={`h-1.5 w-1.5 rounded-full ${config.dots} animate-pulse`}></span>
-      </div>
-      <span className="text-sm font-medium text-gray-300 animate-pulse">
-        {config.text}
-      </span>
     </div>
   );
 };
