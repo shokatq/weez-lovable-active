@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Workspace from "./pages/Workspace";
 import WorkspaceNew from "./pages/WorkspaceNew";
+import NotionInterface from "./pages/NotionInterface";
 import ChatInterface from "./components/ChatInterface";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/chat" element={<ChatInterface />} />
           <Route path="/workspace" element={<Workspace />} />
           <Route path="/workspace-new" element={<WorkspaceNew />} />
+          <Route path="/notion" element={<NotionInterface />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
