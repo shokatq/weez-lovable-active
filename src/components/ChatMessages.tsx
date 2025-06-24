@@ -1,15 +1,30 @@
 
 import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
-import { Button } from "@/components/ui/button";
-import { MessageSquare, Download, ExternalLink, Copy } from "lucide-react";
 import ThinkingAnimation from "./ThinkingAnimation";
 import SuggestionBubbles from "./SuggestionBubbles";
+import { FileText, User, Upload } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+// Helper function to render text with markdown-style bold formatting
+const renderFormattedText = (text: string) => {
+  // Split text by **text** pattern and render bold parts
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      // Remove the ** markers and make bold
+      const boldText = part.slice(2, -2);
+      return <strong key={index} className="font-bold">{boldText}</strong>;
+    }
+    return part;
+  });
+};
 
 interface ChatMessagesProps {
   messages: Message[];
   isThinking: boolean;
-  thinkingType: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
+  thinkingType?: 'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete';
   onSendMessage: (message: string) => void;
 }
 
@@ -17,134 +32,116 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Small delay to ensure DOM is updated
+    const timer = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [messages, isThinking]);
 
-  const formatMessageContent = (content: string) => {
-    // Convert markdown-style formatting to HTML
-    let formatted = content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>')
-      .replace(/#{3}\s(.*?)$/gm, '<h3 class="text-lg font-semibold mt-4 mb-2 text-gray-900">$1</h3>')
-      .replace(/#{2}\s(.*?)$/gm, '<h2 class="text-xl font-semibold mt-6 mb-3 text-gray-900">$1</h2>')
-      .replace(/#{1}\s(.*?)$/gm, '<h1 class="text-2xl font-bold mt-6 mb-4 text-gray-900">$1</h1>')
-      .replace(/^• (.*?)$/gm, '<li class="ml-4">$1</li>')
-      .replace(/^\* (.*?)$/gm, '<li class="ml-4">$1</li>')
-      .replace(/\n\n/g, '</p><p class="mb-3">')
-      .replace(/\n/g, '<br>');
+  const suggestions = [
+    "Find my deep learning papers from last year",
+    "Give me a detailed summary of the project proposal document", 
+    "What is ResNet architecture and how does it work?",
+    "Upload this quarterly report to Google Drive",
+    "Remove the old marketing presentation from Dropbox",
+    "Show me the API integration documentation"
+  ];
 
-    // Wrap in paragraph tags
-    if (!formatted.includes('<h1>') && !formatted.includes('<h2>') && !formatted.includes('<h3>')) {
-      formatted = `<p class="mb-3">${formatted}</p>`;
-    }
-
-    return formatted;
-  };
-
-  if (messages.length === 0 && !isThinking) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white">
-        <div className="text-center max-w-2xl">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-4">Weezy AI</h1>
-          <p className="text-lg text-gray-600 mb-8">How can I help you today?</p>
-          
-          <div className="space-y-4">
-            <h2 className="text-lg font-medium text-gray-900 mb-6">Try these suggestions:</h2>
-            <SuggestionBubbles onSuggestionClick={onSendMessage} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // The extra wrapper below gives the chat window a fixed min/max height and makes sure the ScrollArea actually scrolls!
+  // On desktop: height is 100% of available area; on mobile, min-h-64 and max-h-[80vh].
   return (
-    <div className="flex-1 overflow-y-auto bg-white">
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {messages.map((message) => (
-          <div key={message.id} className={`flex gap-4 ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-            {!message.isUser && (
-              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 mt-1">
-                <MessageSquare className="w-4 h-4 text-white" />
-              </div>
-            )}
+    <div className="flex-1 w-full h-full max-h-[80vh] min-h-64 flex flex-col bg-[#191d23] border border-gray-800 rounded-xl overflow-hidden">
+      {
+        (messages.length === 0 && !isThinking) ? (
+          <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto p-4">
+            <h2 className="text-3xl font-bold text-white mb-2">Weezy AI</h2>
+            <p className="text-gray-400 text-lg mb-8">How can I help you today?</p>
             
-            <div className={`max-w-3xl ${message.isUser ? 'order-first' : ''}`}>
-              <div className={`rounded-2xl px-4 py-3 ${
-                message.isUser 
-                  ? 'bg-gray-900 text-white ml-auto' 
-                  : 'bg-gray-50 text-gray-900'
-              }`}>
-                <div 
-                  className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: formatMessageContent(message.content) }}
-                />
-              </div>
-              
-              {message.files && message.files.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  {message.files.map((file, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors duration-200"
-                    >
-                      <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                        <p className="text-xs text-gray-500">{file.platform} • {file.size}</p>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100">
-                          <Copy className="w-3 h-3" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100">
-                          <Download className="w-3 h-3" />
-                        </Button>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100">
-                          <ExternalLink className="w-3 h-3" />
-                        </Button>
+            <div className="w-full max-w-md mb-4">
+              <h3 className="text-lg font-semibold text-white mb-4">Try these suggestions:</h3>
+              <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
+            </div>
+          </div>
+        ) : (
+          <ScrollArea className="flex-1 w-full h-full">
+            <div className="px-6 py-8">
+              <div className="space-y-8 max-w-3xl mx-auto w-full">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex gap-4 items-start ${
+                      message.isUser ? "" : ""
+                    }`}
+                  >
+                    <div className={`flex flex-col gap-2 w-full ${message.isUser ? 'items-end' : 'items-start'}`}>
+                      <div
+                        className={`max-w-[90%] rounded-2xl px-5 py-3 text-left ${
+                          message.isUser
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-800 text-gray-200"
+                        } ${message.isUploading ? 'animate-pulse' : ''}`}
+                      >
+                        {message.isUploading && (
+                          <div className="flex items-center gap-3 mb-3">
+                            <Upload className="w-5 h-5 text-blue-400 animate-bounce" />
+                            <div className="flex gap-1">
+                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="text-sm font-medium whitespace-pre-wrap">
+                          {renderFormattedText(message.content)}
+                        </div>
+                        
+                        {message.files && message.files.length > 0 && (
+                          <div className="mt-4 space-y-2 border-t border-gray-700 pt-3">
+                            {message.files.map((file) => (
+                              <div key={file.id} className={`bg-gray-700/50 rounded-lg p-3 flex items-center gap-3 border border-gray-600/50 ${message.isUploading ? 'animate-pulse' : ''}`}>
+                                <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                                <div className="flex-1 overflow-hidden">
+                                  <p className="text-sm font-medium text-white truncate">{file.name}</p>
+                                  <span className="text-xs text-gray-400">{file.platform} - {file.size}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-              
-              {!message.isUser && (
-                <div className="text-xs text-gray-400 mt-2">
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              )}
-            </div>
-            
-            {message.isUser && (
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 mt-1">
-                <span className="text-sm font-medium text-gray-700">U</span>
-              </div>
-            )}
-          </div>
-        ))}
-        
-        {isThinking && (
-          <div className="flex gap-4 justify-start">
-            <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 mt-1">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <div className="max-w-3xl">
-              <div className="rounded-2xl px-4 py-3 bg-gray-50">
-                <ThinkingAnimation type={thinkingType} />
+      
+                    {message.isUser && (
+                      <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                        <User className="w-5 h-5 text-gray-300" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+      
+                {isThinking && (
+                  <div className="flex gap-4 items-start">
+                    <div className="bg-gray-800 rounded-2xl">
+                      <ThinkingAnimation type={thinkingType} />
+                    </div>
+                  </div>
+                )}
+      
+                <div ref={messagesEndRef} />
               </div>
             </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </div>
+          </ScrollArea>
+        )
+      }
     </div>
   );
 };

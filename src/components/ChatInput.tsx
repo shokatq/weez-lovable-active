@@ -1,8 +1,9 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip } from "lucide-react";
+import FileUpload from "./FileUpload";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -10,82 +11,96 @@ interface ChatInputProps {
 
 const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   const [message, setMessage] = useState("");
+  const [uploadingFiles, setUploadingFiles] = useState<File[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSend = () => {
     if (message.trim()) {
-      onSendMessage(message.trim());
+      onSendMessage(message);
       setMessage("");
       if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = "auto";
       }
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSend();
     }
   };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
     
-    // Auto-resize textarea
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 128) + 'px';
-    }
+    const textarea = e.target;
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 128)}px`; // max height of 128px
   };
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, []);
+  const handleFileSelect = async (files: FileList) => {
+    const fileArray = Array.from(files);
+    setUploadingFiles(fileArray);
+    
+    // Simulate file upload process
+    const uploadMessage = `Uploading ${fileArray.length} file(s): ${fileArray.map(f => f.name).join(', ')}`;
+    onSendMessage(uploadMessage);
+    
+    // Clear uploading state after a delay
+    setTimeout(() => {
+      setUploadingFiles([]);
+    }, 2000);
+  };
 
   return (
-    <div className="border-t border-gray-100 bg-white/80 backdrop-blur-sm">
-      <div className="max-w-4xl mx-auto p-6">
-        <form onSubmit={handleSubmit} className="relative">
-          <div className="flex items-end gap-3 p-4 border border-gray-200 rounded-2xl bg-white hover:border-gray-300 focus-within:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="flex-shrink-0 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-xl p-2 h-auto transition-colors duration-200"
-            >
-              <Paperclip className="w-4 h-4" />
-            </Button>
-            
-            <Textarea
-              ref={textareaRef}
-              value={message}
-              onChange={handleTextareaChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask Weezy to search, summarize, or analyze your files..."
-              className="flex-1 min-h-[24px] max-h-32 resize-none border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-gray-500 text-gray-900 leading-relaxed"
-              style={{ height: 'auto' }}
-            />
-            
-            <Button
-              type="submit"
-              disabled={!message.trim()}
-              className="flex-shrink-0 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl p-2 h-auto transition-all duration-200 hover:shadow-md disabled:shadow-none"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+    <div className="p-4">
+      {uploadingFiles.length > 0 && (
+        <div className="mb-3 p-3 bg-blue-900/30 border border-blue-600/50 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <span className="text-sm text-blue-300">Uploading files...</span>
           </div>
-        </form>
-        
-        <div className="mt-3 text-center">
-          <p className="text-xs text-gray-500 font-medium">
-            Try: "Find my financial reports", "Summarize project roadmap", "Upload this to Google Drive"
-          </p>
+          {uploadingFiles.map((file, index) => (
+            <div key={index} className="text-xs text-gray-400 ml-4">
+              📄 {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+            </div>
+          ))}
+        </div>
+      )}
+      
+      <div className="relative flex items-end w-full p-2 bg-gray-800 rounded-2xl border border-gray-700/80 shadow-lg">
+        <div className="pl-2 pb-1.5">
+          <FileUpload onFileSelect={handleFileSelect} />
+        </div>
+
+        <div className="flex-1 mx-2">
+          <Textarea
+            ref={textareaRef}
+            value={message}
+            onChange={handleTextareaChange}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask Weezy to search, summarize, or analyze your files..."
+            className="w-full min-h-[28px] max-h-[128px] bg-transparent border-none resize-none text-white placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-base p-0 leading-relaxed focus-visible:ring-0 focus-visible:ring-offset-0"
+            rows={1}
+          />
+        </div>
+
+        <div className="flex items-center gap-2 pr-1 pb-1.5">
+          <Button
+            onClick={handleSend}
+            size="icon"
+            className="bg-blue-600 text-white hover:bg-blue-700 rounded-lg h-9 w-9 flex-shrink-0 disabled:bg-gray-600 disabled:cursor-not-allowed"
+            disabled={!message.trim()}
+          >
+            <Send className="w-4 h-4" />
+          </Button>
         </div>
       </div>
+
+      <p className="text-center text-xs text-gray-500 mt-3">
+        Try: "Find my financial reports", "Summarize project roadmap", "Upload this to Google Drive"
+      </p>
     </div>
   );
 };

@@ -1,28 +1,58 @@
 
-import { Settings } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Menu, Settings } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import ConnectivityPanel from "./ConnectivityPanel";
 
 const ChatHeader = () => {
+  const [showConnectivity, setShowConnectivity] = useState(false);
+  const navigate = useNavigate();
+
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
+    <header className="flex items-center justify-between p-4 bg-transparent border-b border-gray-800/50">
+      <div className="flex items-center gap-4">
+        <SidebarTrigger className="text-gray-400 hover:text-white hover:bg-gray-800 h-10 w-10 p-0 rounded-lg transition-colors flex items-center justify-center">
+          <Menu className="w-5 h-5" />
+        </SidebarTrigger>
+
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-gray-900">Weezy</h1>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">Online</span>
+          <div>
+            <h1 className="font-semibold text-lg bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              Weezy
+            </h1>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              <p className="text-xs text-gray-400">
+                Online
+              </p>
             </div>
           </div>
         </div>
-        
-        <Button 
-          variant="outline" 
-          className="border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300 rounded-lg transition-all duration-200"
-        >
-          <Settings className="w-4 h-4 mr-2" />
-          Connect Services
-        </Button>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Popover open={showConnectivity} onOpenChange={setShowConnectivity}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-gray-300 border-gray-700 hover:bg-gray-800 hover:text-white bg-gray-900 hover:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Connect Services
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-96 p-0" align="end">
+            <ConnectivityPanel />
+          </PopoverContent>
+        </Popover>
       </div>
     </header>
   );
