@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
 import SuggestionBubbles from "./SuggestionBubbles";
-import { FileText, User, Upload, Bot } from "lucide-react";
+import { FileText, User, Upload } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const renderFormattedText = (text: string) => {
@@ -12,7 +12,7 @@ const renderFormattedText = (text: string) => {
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       const boldText = part.slice(2, -2);
-      return <strong key={index} className="font-bold text-slate-900">{boldText}</strong>;
+      return <strong key={index} className="font-bold text-gray-900">{boldText}</strong>;
     }
     return part;
   });
@@ -52,82 +52,90 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   ];
 
   return (
-    <div className="flex-1 w-full h-full max-h-[80vh] min-h-64 flex flex-col bg-white/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl mx-4 my-2 shadow-sm overflow-hidden">
+    <div className="flex-1 w-full h-full max-h-[calc(100vh-200px)] min-h-64 flex flex-col bg-white">
       {
         (messages.length === 0 && !isThinking) ? (
-          <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto p-8">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-6 shadow-lg pulse-glow">
-              <Bot className="w-10 h-10 text-white" />
+          <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
+            <div className="w-24 h-24 rounded-full bg-white shadow-2xl flex items-center justify-center mb-8 animate-pulse-glow border border-gray-100">
+              <img 
+                src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
+                alt="Weezy AI Logo" 
+                className="w-12 h-12 object-contain"
+              />
             </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-3 fade-in">Hey there! 👋</h2>
-            <p className="text-slate-600 text-lg mb-8 fade-in" style={{ animationDelay: '0.2s' }}>I'm Weezy, your AI assistant. How can I help you today?</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4 animate-fade-in">Hey there! 👋</h2>
+            <p className="text-gray-600 text-xl mb-12 font-medium animate-fade-in" style={{ animationDelay: '0.2s' }}>I'm Weezy, your AI assistant. How can I help you today?</p>
             
-            <div className="w-full max-w-2xl mb-4">
-              <h3 className="text-lg font-semibold text-slate-900 mb-6 fade-in" style={{ animationDelay: '0.4s' }}>Try these suggestions:</h3>
+            <div className="w-full max-w-4xl mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>Try these suggestions:</h3>
               <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
             </div>
           </div>
         ) : (
           <ScrollArea className="flex-1 w-full h-full">
-            <div className="px-6 py-8">
-              <div className="space-y-6 max-w-4xl mx-auto w-full">
+            <div className="px-8 py-8">
+              <div className="space-y-8 max-w-4xl mx-auto w-full">
                 {messages.map((message, index) => (
                   <div
                     key={message.id}
-                    className={`flex gap-4 items-start message-bubble ${
+                    className={`flex gap-6 items-start animate-fade-in ${
                       message.isUser ? "flex-row-reverse" : ""
                     }`}
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ${
                       message.isUser 
-                        ? "bg-gradient-to-br from-blue-500 to-indigo-600" 
-                        : "bg-gradient-to-br from-slate-100 to-slate-200"
+                        ? "bg-gray-900" 
+                        : "bg-white border-2 border-gray-100"
                     }`}>
                       {message.isUser ? (
-                        <User className="w-5 h-5 text-white" />
+                        <User className="w-6 h-6 text-white" />
                       ) : (
-                        <Bot className="w-5 h-5 text-slate-600" />
+                        <img 
+                          src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
+                          alt="Weezy AI" 
+                          className="w-6 h-6 object-contain"
+                        />
                       )}
                     </div>
 
-                    <div className={`flex flex-col gap-2 max-w-[75%] ${message.isUser ? 'items-end' : 'items-start'}`}>
-                      <div className={`text-xs font-medium ${message.isUser ? 'text-blue-600' : 'text-slate-500'} mb-1`}>
+                    <div className={`flex flex-col gap-2 max-w-[80%] ${message.isUser ? 'items-end' : 'items-start'}`}>
+                      <div className={`text-xs font-semibold ${message.isUser ? 'text-gray-900' : 'text-gray-600'} mb-2`}>
                         {message.isUser ? 'You' : 'Weezy'}
                       </div>
                       
                       <div
-                        className={`rounded-2xl px-6 py-4 text-left shadow-sm border transition-all duration-300 hover:shadow-md ${
+                        className={`rounded-2xl px-6 py-4 text-left shadow-lg border transition-all duration-300 hover:shadow-xl ${
                           message.isUser
-                            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-200"
-                            : "bg-white/80 backdrop-blur-sm text-slate-800 border-slate-200/80"
-                        } ${message.isUploading ? 'shimmer' : ''}`}
+                            ? "bg-gray-900 text-white border-gray-800"
+                            : "bg-white text-gray-800 border-gray-200"
+                        } ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (
-                          <div className="flex items-center gap-3 mb-3">
-                            <Upload className="w-5 h-5 text-blue-400 animate-bounce" />
+                          <div className="flex items-center gap-3 mb-4">
+                            <Upload className="w-5 h-5 text-blue-500 animate-bounce" />
                             <div className="flex gap-1">
-                              <div className="w-2 h-2 bg-blue-400 rounded-full typing-indicator"></div>
-                              <div className="w-2 h-2 bg-blue-400 rounded-full typing-indicator" style={{animationDelay: '0.2s'}}></div>
-                              <div className="w-2 h-2 bg-blue-400 rounded-full typing-indicator" style={{animationDelay: '0.4s'}}></div>
+                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
                             </div>
                           </div>
                         )}
                         
-                        <div className="text-sm font-medium whitespace-pre-wrap leading-relaxed">
+                        <div className="text-base font-medium whitespace-pre-wrap leading-relaxed">
                           {renderFormattedText(message.content)}
                         </div>
                         
                         {message.files && message.files.length > 0 && (
-                          <div className="mt-4 space-y-2 border-t border-slate-200/50 pt-3">
+                          <div className="mt-4 space-y-3 border-t border-gray-200 pt-4">
                             {message.files.map((file) => (
-                              <div key={file.id} className={`bg-slate-50/80 backdrop-blur-sm rounded-xl p-4 flex items-center gap-3 border border-slate-200/60 transition-all duration-300 hover:bg-slate-100/80 hover:shadow-sm ${message.isUploading ? 'shimmer' : ''}`}>
-                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
-                                  <FileText className="w-5 h-5 text-blue-600" />
+                              <div key={file.id} className="bg-gray-50 rounded-xl p-4 flex items-center gap-4 border border-gray-200 hover:bg-gray-100 transition-colors duration-200">
+                                <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                                  <FileText className="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div className="flex-1 overflow-hidden">
-                                  <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
-                                  <span className="text-xs text-slate-500">{file.platform} • {file.size}</span>
+                                  <p className="font-semibold text-gray-900 truncate">{file.name}</p>
+                                  <span className="text-sm text-gray-600 font-medium">{file.platform} • {file.size}</span>
                                 </div>
                               </div>
                             ))}
@@ -135,7 +143,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                         )}
                       </div>
                       
-                      <div className="text-xs text-slate-400">
+                      <div className="text-xs text-gray-500 font-medium">
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
@@ -143,11 +151,15 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                 ))}
       
                 {isThinking && (
-                  <div className="flex gap-4 items-start message-bubble">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 shadow-md">
-                      <Bot className="w-5 h-5 text-slate-600" />
+                  <div className="flex gap-6 items-start animate-fade-in">
+                    <div className="w-12 h-12 rounded-full bg-white border-2 border-gray-100 flex items-center justify-center flex-shrink-0 shadow-lg">
+                      <img 
+                        src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
+                        alt="Weezy AI" 
+                        className="w-6 h-6 object-contain"
+                      />
                     </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-sm">
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-lg">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
                   </div>

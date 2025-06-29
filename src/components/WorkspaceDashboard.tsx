@@ -1,252 +1,236 @@
+
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, TrendingUp, Activity, BarChart2, PieChart as PieChartIcon, History } from "lucide-react";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { demoWorkspace } from "@/data/workspaceData";
-import { Employee } from "@/types/workspace";
-import EmployeeManagement from "./EmployeeManagement";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  Users, 
+  FileText, 
+  Upload, 
+  Search, 
+  Settings, 
+  Plus,
+  TrendingUp,
+  Clock,
+  Star,
+  Filter,
+  MoreHorizontal,
+  Folder,
+  Download
+} from "lucide-react";
+import { workspaceStats, recentFiles, teamMembers } from "@/data/workspaceData";
+import AddMemberDialog from "./AddMemberDialog";
 
 const WorkspaceDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'employees'>('dashboard');
-  const [workspace, setWorkspace] = useState(demoWorkspace);
+  const [showAddMember, setShowAddMember] = useState(false);
 
-  const chartConfig = {
-    files: {
-      label: "Files",
-      color: "hsl(221.2 83.2% 53.3%)",
-    },
-  };
-
-  const pieChartData = workspace.stats.filesByPlatform.map((platform, index) => ({
-    name: platform.platform,
-    value: platform.totalFiles,
-    fill: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5],
-    color: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]
-  }));
-
-  const fileTypeData = workspace.stats.filesByPlatform.flatMap(platform =>
-    Object.entries(platform.fileTypes).map(([type, count]) => ({
-      type,
-      count,
-      platform: platform.platform
-    }))
-  ).reduce((acc, curr) => {
-    const existing = acc.find(item => item.type === curr.type);
-    if (existing) {
-      existing.count += curr.count;
-    } else {
-      acc.push({ type: curr.type, count: curr.count });
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Active': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Processing': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
-    return acc;
-  }, [] as { type: string; count: number }[]);
-
-  const handleEmployeeUpdate = (updatedEmployees: Employee[]) => {
-    setWorkspace(prev => ({
-      ...prev,
-      employees: updatedEmployees,
-      stats: {
-        ...prev.stats,
-        totalEmployees: updatedEmployees.length
-      }
-    }));
   };
 
-  const quickStats = [
-    { label: 'Total Employees', value: workspace.stats.totalEmployees, icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', change: '+2 from last month' },
-    { label: 'Total Files', value: workspace.stats.totalFiles.toLocaleString(), icon: FileText, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', change: '+12% from last month' },
-    { label: 'Active Platforms', value: workspace.stats.filesByPlatform.length, icon: TrendingUp, color: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/20', change: 'All platforms connected' },
-    { label: 'Avg Files/Employee', value: Math.round(workspace.stats.totalFiles / workspace.stats.totalEmployees), icon: Activity, color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', change: '+8% efficiency' }
-  ];
+  const getPlatformColor = (platform: string) => {
+    switch (platform) {
+      case 'Google Drive': return 'text-blue-600';
+      case 'Slack': return 'text-purple-600';
+      case 'Notion': return 'text-gray-800';
+      case 'Dropbox': return 'text-blue-500';
+      default: return 'text-gray-600';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white p-8">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.1),transparent_50%)] pointer-events-none"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.03),transparent_50%)] pointer-events-none"></div>
-      
-      <div className="relative z-10 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-12">
-          <div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-gray-300 bg-clip-text text-transparent mb-3">
-              {workspace.name}
-            </h1>
-            <p className="text-gray-400 text-xl font-medium">Your command center for analytics and team management.</p>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-8 py-6">
+        <div className="flex items-center justify-between">
+          <div className="animate-fade-in">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Workspace Dashboard</h1>
+            <p className="text-gray-600 font-medium">Manage your team's files and integrations</p>
+          </div>
+          <div className="flex items-center gap-3 animate-slide-in-right">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
+            <Button 
+              onClick={() => setShowAddMember(true)}
+              className="bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Member
+            </Button>
           </div>
         </div>
-
-        <div className="flex gap-3 mb-10 bg-gray-900/30 p-3 rounded-2xl backdrop-blur-md border border-gray-800/50 shadow-xl">
-          <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
-              activeTab === 'dashboard'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 transform scale-105'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-              }`}
-          >
-              <Activity className="w-5 h-5" />
-              Dashboard
-          </button>
-          <button
-              onClick={() => setActiveTab('employees')}
-              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
-              activeTab === 'employees'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 transform scale-105'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-              }`}
-          >
-              <Users className="w-5 h-5" />
-              Employees
-          </button>
-        </div>
-        
-        {activeTab === 'dashboard' && (
-          <>
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-              {quickStats.map((stat, index) => (
-                  <Card key={index} className={`bg-gray-900/40 ${stat.border} border backdrop-blur-md hover:bg-gray-800/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl shadow-lg`}>
-                      <CardContent className="p-6">
-                          <div className="flex items-center justify-between">
-                              <div>
-                                  <p className="text-gray-400 text-sm font-semibold mb-2 uppercase tracking-wide">{stat.label}</p>
-                                  <p className="text-3xl font-bold text-white">{stat.value}</p>
-                                  <p className="text-xs text-gray-400 mt-1">{stat.change}</p>
-                              </div>
-                              <div className={`w-14 h-14 rounded-2xl ${stat.bg} border ${stat.border} flex items-center justify-center`}>
-                                  <stat.icon className={`w-7 h-7 ${stat.color}`} />
-                              </div>
-                          </div>
-                      </CardContent>
-                  </Card>
-              ))}
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                          <BarChart2 className="w-6 h-6 text-white" />
-                      </div>
-                      Files by Platform
-                  </CardTitle>
-                  <CardDescription className="text-gray-400 text-lg">
-                      Distribution of files across connected services.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={workspace.stats.filesByPlatform} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                        <XAxis dataKey="platform" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false}/>
-                        <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
-                        <ChartTooltip cursor={{fill: 'rgba(120, 119, 198, 0.1)'}} content={<ChartTooltipContent indicator="dot" />} />
-                        <Bar dataKey="totalFiles" fill="var(--color-files)" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                          <PieChartIcon className="w-6 h-6 text-white" />
-                      </div>
-                      Platform Distribution
-                  </CardTitle>
-                  <CardDescription className="text-gray-400 text-lg">
-                      Percentage of files from each platform.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} labelLine={false}>
-                          {pieChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} stroke={entry.color} />
-                          ))}
-                        </Pie>
-                        <ChartTooltip cursor={{fill: 'rgba(120, 119, 198, 0.1)'}} content={<ChartTooltipContent indicator="dot" />} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* File Types and Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                          <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      File Types Distribution
-                  </CardTitle>
-                   <CardDescription className="text-gray-400 text-lg">
-                      Breakdown of file types across all platforms.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 pt-0">
-                  {fileTypeData.map((fileType) => (
-                    <div key={fileType.type} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl border border-gray-700/30">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 bg-violet-400 rounded-full"></div>
-                        <span className="text-gray-300 font-medium">{fileType.type.toUpperCase()}</span>
-                      </div>
-                      <div className="text-white font-bold">{fileType.count.toLocaleString()}</div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
-                <CardHeader className="pb-6">
-                   <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                          <History className="w-6 h-6 text-white" />
-                      </div>
-                      Recent Activity
-                  </CardTitle>
-                   <CardDescription className="text-gray-400 text-lg">
-                      Latest activities in the workspace.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 pt-0">
-                  {workspace.stats.recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-center gap-4 p-4 bg-gray-800/30 rounded-xl border border-gray-700/30">
-                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 animate-pulse shadow-lg shadow-blue-400/50"></div>
-                      <div className="flex-1">
-                        <p className="text-white text-sm">
-                          <span className="font-bold">{activity.user}</span> {activity.action}
-                          {activity.file && <Badge variant="secondary" className="ml-2 bg-blue-500/10 text-blue-400 border border-blue-500/20">{activity.file}</Badge>}
-                        </p>
-                      </div>
-                      <span className="text-gray-500 text-sm font-medium">
-                        {activity.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </>
-        )}
-
-        {activeTab === 'employees' && (
-          <EmployeeManagement 
-            employees={workspace.employees} 
-            onEmployeesUpdate={handleEmployeeUpdate}
-          />
-        )}
       </div>
+
+      <div className="p-8">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {workspaceStats.map((stat, index) => (
+            <Card 
+              key={stat.title} 
+              className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium mb-1">{stat.title}</p>
+                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <TrendingUp className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-green-600 font-medium">{stat.change}</span>
+                    </div>
+                  </div>
+                  <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center shadow-sm`}>
+                    <stat.icon className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recent Files */}
+          <div className="lg:col-span-2">
+            <Card className="bg-white border-gray-200 shadow-sm animate-fade-in" style={{ animationDelay: '400ms' }}>
+              <CardHeader className="pb-4 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-gray-900">Recent Files</CardTitle>
+                    <CardDescription className="text-gray-600 font-medium">Latest documents across all platforms</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium">
+                      <Filter className="w-4 h-4 mr-2" />
+                      Filter
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium">
+                      <Search className="w-4 h-4 mr-2" />
+                      Search
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ScrollArea className="h-96">
+                  <div className="p-6 space-y-4">
+                    {recentFiles.map((file, index) => (
+                      <div 
+                        key={file.name} 
+                        className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-all duration-200 border border-gray-100 hover:border-gray-200 group animate-fade-in"
+                        style={{ animationDelay: `${500 + index * 50}ms` }}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200">
+                            <FileText className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900 mb-1">{file.name}</h4>
+                            <div className="flex items-center gap-3 text-sm">
+                              <span className={`font-medium ${getPlatformColor(file.platform)}`}>
+                                {file.platform}
+                              </span>
+                              <span className="text-gray-500">•</span>
+                              <span className="text-gray-600 font-medium">{file.size}</span>
+                              <span className="text-gray-500">•</span>
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-gray-500" />
+                                <span className="text-gray-600 font-medium">{file.lastModified}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`${getStatusColor(file.status)} font-medium`}>
+                            {file.status}
+                          </Badge>
+                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Team Members */}
+          <div className="space-y-6">
+            <Card className="bg-white border-gray-200 shadow-sm animate-fade-in" style={{ animationDelay: '600ms' }}>
+              <CardHeader className="pb-4 border-b border-gray-100">
+                <CardTitle className="text-lg font-semibold text-gray-900">Team Members</CardTitle>
+                <CardDescription className="text-gray-600 font-medium">Active workspace users</CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {teamMembers.map((member, index) => (
+                    <div 
+                      key={member.name} 
+                      className="flex items-center gap-3 animate-fade-in"
+                      style={{ animationDelay: `${700 + index * 100}ms` }}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold shadow-sm">
+                        {member.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900">{member.name}</p>
+                        <p className="text-sm text-gray-600 font-medium">{member.role}</p>
+                      </div>
+                      <Badge className={`${getStatusColor(member.status)} text-xs font-medium`}>
+                        {member.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Storage Usage */}
+            <Card className="bg-white border-gray-200 shadow-sm animate-fade-in" style={{ animationDelay: '800ms' }}>
+              <CardHeader className="pb-4 border-b border-gray-100">
+                <CardTitle className="text-lg font-semibold text-gray-900">Storage Usage</CardTitle>
+                <CardDescription className="text-gray-600 font-medium">Across all platforms</CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Used Storage</span>
+                    <span className="text-sm font-semibold text-gray-900">847 GB / 2 TB</span>
+                  </div>
+                  <Progress value={42} className="h-2" />
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <p className="text-2xl font-bold text-gray-900">1,247</p>
+                      <p className="text-sm text-gray-600 font-medium">Total Files</p>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <p className="text-2xl font-bold text-gray-900">5</p>
+                      <p className="text-sm text-gray-600 font-medium">Platforms</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      <AddMemberDialog open={showAddMember} onOpenChange={setShowAddMember} />
     </div>
   );
 };

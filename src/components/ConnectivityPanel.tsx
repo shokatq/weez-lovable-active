@@ -80,7 +80,7 @@ const ConnectivityPanel = () => {
       description: "Need a specific integration? Let us know!",
       icon: "",
       connected: false,
-      color: "bg-gradient-to-br from-purple-500 to-purple-600",
+      color: "bg-gradient-to-br from-blue-500 to-indigo-600",
       isCustomRequest: true,
       isConnecting: false
     }
@@ -144,53 +144,57 @@ const ConnectivityPanel = () => {
   };
 
   return (
-    <Card className="w-full bg-black border-gray-800">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold text-white">Connected Services</CardTitle>
-        <CardDescription className="text-sm text-gray-400">
+    <Card className="w-full bg-white border-gray-200 shadow-lg backdrop-blur-sm">
+      <CardHeader className="pb-4 border-b border-gray-100">
+        <CardTitle className="text-xl font-semibold text-gray-900">Connected Services</CardTitle>
+        <CardDescription className="text-gray-600 font-medium">
           Connect your favorite platforms to enhance Weezy's capabilities
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2">
-        {integrations.map((integration) => (
-          <div key={integration.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-900 hover:bg-gray-800 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-lg ${integration.color} p-1 flex items-center justify-center relative`}>
+      <CardContent className="space-y-3 p-6">
+        {integrations.map((integration, index) => (
+          <div 
+            key={integration.id} 
+            className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 hover:bg-gray-100/50 transition-all duration-300 hover:shadow-md border border-gray-100 hover:border-gray-200 group animate-fade-in"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl ${integration.color} p-2 flex items-center justify-center relative shadow-sm group-hover:shadow-md transition-all duration-300`}>
                 {integration.isCustomRequest ? (
-                  <Plus className="w-5 h-5 text-white" />
+                  <Plus className="w-6 h-6 text-white" />
                 ) : (
                   <>
                     <img 
                       src={integration.icon} 
                       alt={integration.name}
-                      className="w-6 h-6 object-contain"
+                      className="w-8 h-8 object-contain"
                     />
                     {integration.connected && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full flex items-center justify-center">
-                        <Check className="w-2 h-2 text-white" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+                        <Check className="w-2.5 h-2.5 text-white" />
                       </div>
                     )}
                   </>
                 )}
                 {integration.isConnecting && (
-                  <div className="absolute inset-0 bg-blue-500/20 rounded-lg animate-pulse"></div>
+                  <div className="absolute inset-0 bg-blue-500/20 rounded-xl animate-pulse"></div>
                 )}
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-white text-sm">{integration.name}</h3>
+                <div className="flex items-center gap-3">
+                  <h3 className="font-semibold text-gray-900 text-base">{integration.name}</h3>
                   {integration.connected && !integration.isCustomRequest && (
-                    <Badge variant="secondary" className="bg-green-500/20 text-green-400 text-xs border-green-500/30 animate-pulse">
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs border-green-200 animate-pulse font-medium">
                       Connected
                     </Badge>
                   )}
                   {integration.isConnecting && (
-                    <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 text-xs border-blue-500/30 animate-pulse">
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-xs border-blue-200 animate-pulse font-medium">
                       Connecting...
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-gray-400">{integration.description}</p>
+                <p className="text-sm text-gray-600 font-medium mt-1">{integration.description}</p>
               </div>
             </div>
             <Button
@@ -200,12 +204,12 @@ const ConnectivityPanel = () => {
               size="sm"
               className={
                 integration.isCustomRequest 
-                  ? "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-xs h-7 px-2"
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200" 
                   : integration.connected 
-                    ? "text-gray-400 border-gray-700 hover:bg-gray-800 text-xs h-7 px-2 bg-black" 
+                    ? "text-gray-700 border-gray-300 hover:bg-gray-50 font-medium px-4 py-2 rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200" 
                     : integration.isConnecting
-                      ? "bg-blue-500 text-white text-xs h-7 px-2 animate-pulse"
-                      : "bg-white hover:bg-gray-200 text-black text-xs h-7 px-2"
+                      ? "bg-blue-500 text-white font-medium px-4 py-2 rounded-lg animate-pulse shadow-sm"
+                      : "bg-gray-900 hover:bg-gray-800 text-white font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
               }
             >
               {integration.isCustomRequest ? "Request" : 
