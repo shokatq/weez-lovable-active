@@ -3,19 +3,16 @@ import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
 import SuggestionBubbles from "./SuggestionBubbles";
-import { FileText, User, Upload } from "lucide-react";
+import { FileText, User, Upload, Bot } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// Helper function to render text with markdown-style bold formatting
 const renderFormattedText = (text: string) => {
-  // Split text by **text** pattern and render bold parts
   const parts = text.split(/(\*\*.*?\*\*)/g);
   
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      // Remove the ** markers and make bold
       const boldText = part.slice(2, -2);
-      return <strong key={index} className="font-bold">{boldText}</strong>;
+      return <strong key={index} className="font-bold text-slate-900">{boldText}</strong>;
     }
     return part;
   });
@@ -38,7 +35,6 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   };
 
   useEffect(() => {
-    // Small delay to ensure DOM is updated
     const timer = setTimeout(() => {
       scrollToBottom();
     }, 100);
@@ -47,90 +43,111 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }, [messages, isThinking]);
 
   const suggestions = [
-    "Find my deep learning papers from last year",
-    "Give me a detailed summary of the project proposal document", 
-    "What is ResNet architecture and how does it work?",
-    "Upload this quarterly report to Google Drive",
-    "Remove the old marketing presentation from Dropbox",
-    "Show me the API integration documentation"
+    "Find my strategic reports from Q4",
+    "Summarize the latest project proposal", 
+    "What's our APAC expansion strategy?",
+    "Upload client brief to Google Drive",
+    "Show me blockchain KYC documentation",
+    "Locate the compliance readiness plan"
   ];
 
-  // The extra wrapper below gives the chat window a fixed min/max height and makes sure the ScrollArea actually scrolls!
-  // On desktop: height is 100% of available area; on mobile, min-h-64 and max-h-[80vh].
   return (
-    <div className="flex-1 w-full h-full max-h-[80vh] min-h-64 flex flex-col bg-[#191d23] border border-gray-800 rounded-xl overflow-hidden">
+    <div className="flex-1 w-full h-full max-h-[80vh] min-h-64 flex flex-col bg-white/50 backdrop-blur-sm border border-slate-200/60 rounded-2xl mx-4 my-2 shadow-sm overflow-hidden">
       {
         (messages.length === 0 && !isThinking) ? (
-          <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto p-4">
-            <h2 className="text-3xl font-bold text-white mb-2">Weezy AI</h2>
-            <p className="text-gray-400 text-lg mb-8">How can I help you today?</p>
+          <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto p-8">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-6 shadow-lg pulse-glow">
+              <Bot className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3 fade-in">Hey there! 👋</h2>
+            <p className="text-slate-600 text-lg mb-8 fade-in" style={{ animationDelay: '0.2s' }}>I'm Weezy, your AI assistant. How can I help you today?</p>
             
-            <div className="w-full max-w-md mb-4">
-              <h3 className="text-lg font-semibold text-white mb-4">Try these suggestions:</h3>
+            <div className="w-full max-w-2xl mb-4">
+              <h3 className="text-lg font-semibold text-slate-900 mb-6 fade-in" style={{ animationDelay: '0.4s' }}>Try these suggestions:</h3>
               <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
             </div>
           </div>
         ) : (
           <ScrollArea className="flex-1 w-full h-full">
             <div className="px-6 py-8">
-              <div className="space-y-8 max-w-3xl mx-auto w-full">
-                {messages.map((message) => (
+              <div className="space-y-6 max-w-4xl mx-auto w-full">
+                {messages.map((message, index) => (
                   <div
                     key={message.id}
-                    className={`flex gap-4 items-start ${
-                      message.isUser ? "" : ""
+                    className={`flex gap-4 items-start message-bubble ${
+                      message.isUser ? "flex-row-reverse" : ""
                     }`}
+                    style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className={`flex flex-col gap-2 w-full ${message.isUser ? 'items-end' : 'items-start'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
+                      message.isUser 
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600" 
+                        : "bg-gradient-to-br from-slate-100 to-slate-200"
+                    }`}>
+                      {message.isUser ? (
+                        <User className="w-5 h-5 text-white" />
+                      ) : (
+                        <Bot className="w-5 h-5 text-slate-600" />
+                      )}
+                    </div>
+
+                    <div className={`flex flex-col gap-2 max-w-[75%] ${message.isUser ? 'items-end' : 'items-start'}`}>
+                      <div className={`text-xs font-medium ${message.isUser ? 'text-blue-600' : 'text-slate-500'} mb-1`}>
+                        {message.isUser ? 'You' : 'Weezy'}
+                      </div>
+                      
                       <div
-                        className={`max-w-[90%] rounded-2xl px-5 py-3 text-left ${
+                        className={`rounded-2xl px-6 py-4 text-left shadow-sm border transition-all duration-300 hover:shadow-md ${
                           message.isUser
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-800 text-gray-200"
-                        } ${message.isUploading ? 'animate-pulse' : ''}`}
+                            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-200"
+                            : "bg-white/80 backdrop-blur-sm text-slate-800 border-slate-200/80"
+                        } ${message.isUploading ? 'shimmer' : ''}`}
                       >
                         {message.isUploading && (
                           <div className="flex items-center gap-3 mb-3">
                             <Upload className="w-5 h-5 text-blue-400 animate-bounce" />
                             <div className="flex gap-1">
-                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full typing-indicator"></div>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full typing-indicator" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full typing-indicator" style={{animationDelay: '0.4s'}}></div>
                             </div>
                           </div>
                         )}
                         
-                        <div className="text-sm font-medium whitespace-pre-wrap">
+                        <div className="text-sm font-medium whitespace-pre-wrap leading-relaxed">
                           {renderFormattedText(message.content)}
                         </div>
                         
                         {message.files && message.files.length > 0 && (
-                          <div className="mt-4 space-y-2 border-t border-gray-700 pt-3">
+                          <div className="mt-4 space-y-2 border-t border-slate-200/50 pt-3">
                             {message.files.map((file) => (
-                              <div key={file.id} className={`bg-gray-700/50 rounded-lg p-3 flex items-center gap-3 border border-gray-600/50 ${message.isUploading ? 'animate-pulse' : ''}`}>
-                                <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                              <div key={file.id} className={`bg-slate-50/80 backdrop-blur-sm rounded-xl p-4 flex items-center gap-3 border border-slate-200/60 transition-all duration-300 hover:bg-slate-100/80 hover:shadow-sm ${message.isUploading ? 'shimmer' : ''}`}>
+                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                                  <FileText className="w-5 h-5 text-blue-600" />
+                                </div>
                                 <div className="flex-1 overflow-hidden">
-                                  <p className="text-sm font-medium text-white truncate">{file.name}</p>
-                                  <span className="text-xs text-gray-400">{file.platform} - {file.size}</span>
+                                  <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
+                                  <span className="text-xs text-slate-500">{file.platform} • {file.size}</span>
                                 </div>
                               </div>
                             ))}
                           </div>
                         )}
                       </div>
-                    </div>
-      
-                    {message.isUser && (
-                      <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                        <User className="w-5 h-5 text-gray-300" />
+                      
+                      <div className="text-xs text-slate-400">
+                        {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
-                    )}
+                    </div>
                   </div>
                 ))}
       
                 {isThinking && (
-                  <div className="flex gap-4 items-start">
-                    <div className="bg-gray-800 rounded-2xl">
+                  <div className="flex gap-4 items-start message-bubble">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <Bot className="w-5 h-5 text-slate-600" />
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-sm">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
                   </div>

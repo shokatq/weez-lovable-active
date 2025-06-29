@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -727,10 +728,10 @@ ${platformFiles.map((file, index) =>
 
   return (
     <SidebarProvider>
-      <div className="h-screen flex bg-gradient-to-br from-gray-950 via-black to-gray-900 text-white overflow-hidden w-full">
-        {/* Background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.15),transparent_50%)] pointer-events-none"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.1),transparent_50%)] pointer-events-none"></div>
+      <div className="h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50/20 text-slate-900 overflow-hidden w-full relative">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.05),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.03),transparent_50%)] pointer-events-none"></div>
         
         <div className="relative z-10 flex w-full">
           <ChatSidebar 

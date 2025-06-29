@@ -5,44 +5,26 @@
 
 @layer base {
   :root {
-    --background: 0 0 0;
-    --foreground: 255 255 255;
-
-    --card: 16 16 16;
-    --card-foreground: 255 255 255;
-
-    --popover: 16 16 16;
-    --popover-foreground: 255 255 255;
-
-    --primary: 255 255 255;
-    --primary-foreground: 0 0 0;
-
-    --secondary: 32 32 32;
-    --secondary-foreground: 255 255 255;
-
-    --muted: 64 64 64;
-    --muted-foreground: 163 163 163;
-
-    --accent: 64 64 64;
-    --accent-foreground: 255 255 255;
-
+    --background: 255 255 255;
+    --foreground: 15 23 42;
+    --card: 255 255 255;
+    --card-foreground: 15 23 42;
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
+    --primary: 59 130 246;
+    --primary-foreground: 255 255 255;
+    --secondary: 248 250 252;
+    --secondary-foreground: 51 65 85;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
+    --accent: 241 245 249;
+    --accent-foreground: 15 23 42;
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
-
-    --border: 64 64 64;
-    --input: 32 32 32;
-    --ring: 255 255 255;
-
+    --border: 226 232 240;
+    --input: 248 250 252;
+    --ring: 59 130 246;
     --radius: 0.75rem;
-
-    --sidebar-background: 0 0 0;
-    --sidebar-foreground: 255 255 255;
-    --sidebar-primary: 255 255 255;
-    --sidebar-primary-foreground: 0 0 0;
-    --sidebar-accent: 32 32 32;
-    --sidebar-accent-foreground: 255 255 255;
-    --sidebar-border: 64 64 64;
-    --sidebar-ring: 255 255 255;
   }
 }
 
@@ -50,186 +32,158 @@
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply bg-black text-white font-inter;
+    @apply bg-background text-foreground font-inter antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
-  /* Enhanced scrollbar design */
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-gray-900 rounded-full;
+    @apply bg-transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-gray-700 to-gray-600 rounded-full;
-    transition: all 0.3s ease;
+    @apply bg-border rounded-full;
+    transition: background-color 0.2s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gradient-to-b from-gray-600 to-gray-500;
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
-  }
-
-  /* Enhanced text selection */
-  ::selection {
-    @apply bg-blue-500 bg-opacity-30 text-white;
-  }
-
-  /* Smooth focus states */
-  button:focus,
-  input:focus,
-  textarea:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    @apply bg-muted-foreground/30;
   }
 }
 
 @layer components {
-  /* Enhanced message animations */
-  .message-enter {
-    animation: messageSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .message-content {
-    animation: contentFadeIn 0.8s ease-out 0.2s both;
-  }
-
-  .thinking-pulse {
-    animation: thinkingPulse 2s ease-in-out infinite;
-  }
-
-  .gradient-text {
-    @apply bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent;
-    background-size: 200% 100%;
-    animation: gradientShift 3s ease-in-out infinite;
-  }
-
   .glass-effect {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(226, 232, 240, 0.3);
   }
 
-  .hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
   }
 
-  .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  .card-hover:hover {
+    @apply shadow-lg -translate-y-1 scale-[1.02];
   }
 
-  .ai-message {
-    animation: aiMessageSlide 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .typing-effect {
-    overflow: hidden;
-    border-right: 2px solid rgba(59, 130, 246, 0.7);
-    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-  }
-
-  /* Notion-style animations */
-  .notion-card-hover {
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .notion-card-hover:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  }
-
-  .notion-bounce {
-    animation: notionBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  }
-
-  .notion-slide-up {
-    animation: notionSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .notion-fade-in-delayed {
-    animation: notionFadeIn 0.6s ease-out forwards;
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
     opacity: 0;
   }
 
-  .notion-scale-in {
-    animation: notionScaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  .slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
   }
 
-  .notion-glow {
-    animation: notionGlow 2s ease-in-out infinite alternate;
+  .slide-in-right {
+    animation: slideInRight 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateX(20px);
   }
 
-  .notion-float-gentle {
-    animation: notionFloatGentle 4s ease-in-out infinite;
+  .bounce-gentle {
+    animation: bounceGentle 0.6s ease-out forwards;
   }
 
-  .notion-shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  .typing-indicator {
+    animation: typing 1.5s ease-in-out infinite;
+  }
+
+  .message-bubble {
+    animation: messageBubble 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
     background-size: 200% 100%;
-    animation: notionShimmer 2s infinite;
-  }
-
-  .notion-pulse-subtle {
-    animation: notionPulseSubtle 3s ease-in-out infinite;
+    animation: shimmer 2s infinite;
   }
 }
 
-@keyframes messageSlideIn {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-  }
-  100% {
+@keyframes fadeIn {
+  to {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
-@keyframes contentFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
+@keyframes slideUp {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@keyframes thinkingPulse {
-  0%, 100% {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-  50% {
+@keyframes slideInRight {
+  to {
     opacity: 1;
-    transform: scale(1.03);
+    transform: translateX(0);
   }
 }
 
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes aiMessageSlide {
+@keyframes bounceGentle {
   0% {
     opacity: 0;
-    transform: translateX(-20px) scale(0.99);
+    transform: scale(0.9) translateY(20px);
+  }
+  50% {
+    transform: scale(1.02) translateY(-5px);
   }
   100% {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes messageBubble {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
   }
 }
 
@@ -242,233 +196,45 @@
   }
 }
 
-@keyframes float {
-  0%, 100% { 
-    transform: translateY(0px); 
-  }
-  50% { 
-    transform: translateY(-8px); 
-  }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { 
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
-    transform: scale(1);
-  }
-  50% { 
-    box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
-    transform: scale(1.02);
-  }
-}
-
-@keyframes thinking-dot {
-  0%, 80%, 100% { 
-    transform: scale(0.8);
-    opacity: 0.6;
-  }
-  40% { 
-    transform: scale(1.1);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-up {
-  0% {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Notion-specific keyframes */
-@keyframes notionBounce {
-  0% {
-    opacity: 0;
-    transform: translateY(30px) scale(0.9);
-  }
-  50% {
-    transform: translateY(-5px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes notionSlideUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes notionFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes notionScaleIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes notionGlow {
-  0% {
-    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 30px rgba(147, 51, 234, 0.5);
-  }
-}
-
-@keyframes notionFloatGentle {
-  0%, 100% { 
-    transform: translateY(0px); 
-  }
-  50% { 
-    transform: translateY(-6px); 
-  }
-}
-
-@keyframes notionShimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-@keyframes notionPulseSubtle {
-  0%, 100% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.9;
-    transform: scale(1.01);
-  }
-}
-
-/* Enhanced loading states */
-.loading-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-/* Advanced button animations */
+/* Button animations */
 .btn-primary {
-  @apply relative overflow-hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply relative overflow-hidden transition-all duration-300 ease-out;
 }
 
 .btn-primary::before {
   content: '';
-  @apply absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0;
-  transition: opacity 0.4s ease;
+  @apply absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/30 opacity-0 transition-opacity duration-300;
 }
 
 .btn-primary:hover::before {
-  @apply opacity-25;
+  @apply opacity-100;
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.3);
+  @apply shadow-lg -translate-y-0.5 scale-105;
 }
 
-/* Enhanced animations */
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+/* Input focus animations */
+.input-focus {
+  @apply transition-all duration-300 ease-out;
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2.5s ease-in-out infinite;
+.input-focus:focus {
+  @apply ring-2 ring-primary/20 border-primary shadow-lg;
 }
 
-.animate-thinking-dot {
-  animation: thinking-dot 1.2s ease-in-out infinite;
+/* Notification styles */
+.notification-enter {
+  animation: notificationEnter 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
-.animate-slide-up {
-  animation: slide-up 0.4s ease-out;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out;
-}
-
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  background-size: 200% 100%;
-  animation: shimmer 1.8s infinite;
-}
-
-.animate-gradient-shift {
-  animation: gradientShift 3s ease-in-out infinite;
-}
-
-/* Notion-specific animation classes */
-.animate-notion-bounce {
-  animation: notionBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.animate-notion-slide-up {
-  animation: notionSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-notion-fade-in {
-  animation: notionFadeIn 0.6s ease-out forwards;
-}
-
-.animate-notion-scale-in {
-  animation: notionScaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-notion-glow {
-  animation: notionGlow 2s ease-in-out infinite alternate;
-}
-
-.animate-notion-float {
-  animation: notionFloatGentle 4s ease-in-out infinite;
-}
-
-.animate-notion-shimmer {
-  animation: notionShimmer 2s infinite;
-}
-
-.animate-notion-pulse {
-  animation: notionPulseSubtle 3s ease-in-out infinite;
+@keyframes notificationEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(100%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }

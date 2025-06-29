@@ -1,3 +1,4 @@
+
 import { Bot, Search, FileText, Upload, Building2, Brain, Trash2, BookOpen } from 'lucide-react';
 
 export interface ThinkingAnimationProps {
@@ -9,51 +10,51 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
     switch (type) {
       case 'pdf-search':
         return {
-          icon: <FileText className="w-4 h-4 text-red-400" />,
+          icon: <FileText className="w-4 h-4 text-red-500" />,
           text: "Searching for PDFs across all platforms...",
-          dots: "bg-red-400"
+          dots: "bg-red-500"
         };
       case 'search':
         return {
-          icon: <Search className="w-4 h-4 text-blue-400" />,
+          icon: <Search className="w-4 h-4 text-blue-500" />,
           text: "Searching across your files...",
-          dots: "bg-blue-400"
+          dots: "bg-blue-500"
         };
       case 'summary':
         return {
-          icon: <FileText className="w-4 h-4 text-green-400" />,
+          icon: <FileText className="w-4 h-4 text-emerald-500" />,
           text: "Analyzing document content...",
-          dots: "bg-green-400"
+          dots: "bg-emerald-500"
         };
       case 'rag':
         return {
-          icon: <BookOpen className="w-4 h-4 text-purple-400" />,
+          icon: <BookOpen className="w-4 h-4 text-purple-500" />,
           text: "Analyzing knowledge base and generating insights...",
-          dots: "bg-purple-400"
+          dots: "bg-purple-500"
         };
       case 'upload':
         return {
-          icon: <Upload className="w-4 h-4 text-orange-400" />,
+          icon: <Upload className="w-4 h-4 text-orange-500" />,
           text: "Uploading to cloud storage...",
-          dots: "bg-orange-400"
+          dots: "bg-orange-500"
         };
       case 'delete':
         return {
-          icon: <Trash2 className="w-4 h-4 text-red-400" />,
+          icon: <Trash2 className="w-4 h-4 text-red-500" />,
           text: "Processing file deletion...",
-          dots: "bg-red-400"
+          dots: "bg-red-500"
         };
       case 'workspace':
         return {
-          icon: <Building2 className="w-4 h-4 text-emerald-400" />,
+          icon: <Building2 className="w-4 h-4 text-emerald-500" />,
           text: "Accessing workspace data...",
-          dots: "bg-emerald-400"
+          dots: "bg-emerald-500"
         };
       default:
         return {
-          icon: <Bot className="w-4 h-4 text-gray-400" />,
+          icon: <Bot className="w-4 h-4 text-slate-500" />,
           text: "Weezy is thinking...",
-          dots: "bg-gray-400"
+          dots: "bg-slate-500"
         };
     }
   };
@@ -61,16 +62,16 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
   const config = getThinkingConfig();
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
+    <div className="flex items-center gap-4 px-6 py-4">
       <div className="animate-pulse">
         {config.icon}
       </div>
-      <div className="flex items-center gap-1.5">
-        <span className={`h-1.5 w-1.5 rounded-full ${config.dots} animate-pulse [animation-delay:-0.3s]`}></span>
-        <span className={`h-1.5 w-1.5 rounded-full ${config.dots} animate-pulse [animation-delay:-0.15s]`}></span>
-        <span className={`h-1.5 w-1.5 rounded-full ${config.dots} animate-pulse`}></span>
+      <div className="flex items-center gap-2">
+        <span className={`h-2 w-2 rounded-full ${config.dots} typing-indicator`}></span>
+        <span className={`h-2 w-2 rounded-full ${config.dots} typing-indicator`} style={{ animationDelay: '0.2s' }}></span>
+        <span className={`h-2 w-2 rounded-full ${config.dots} typing-indicator`} style={{ animationDelay: '0.4s' }}></span>
       </div>
-      <span className="text-sm font-medium text-gray-300 animate-pulse">
+      <span className="text-sm font-medium text-slate-600 animate-pulse">
         {config.text}
       </span>
     </div>
