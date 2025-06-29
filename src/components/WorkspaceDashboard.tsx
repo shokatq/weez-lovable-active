@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +24,12 @@ import AddMemberDialog from "./AddMemberDialog";
 
 const WorkspaceDashboard = () => {
   const [showAddMember, setShowAddMember] = useState(false);
+
+  const handleAddMember = (member: { name: string; email: string; role: string; department: string }) => {
+    console.log('Adding new member:', member);
+    // Here you would typically add the member to your data store
+    // For now, we'll just log it
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -230,7 +235,11 @@ const WorkspaceDashboard = () => {
         </div>
       </div>
 
-      <AddMemberDialog open={showAddMember} onOpenChange={setShowAddMember} />
+      <AddMemberDialog 
+        open={showAddMember} 
+        onOpenChange={setShowAddMember} 
+        onAddMember={handleAddMember}
+      />
     </div>
   );
 };

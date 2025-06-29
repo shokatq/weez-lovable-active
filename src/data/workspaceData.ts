@@ -40,6 +40,98 @@ export const demoEmployees: Employee[] = [
   }
 ];
 
+export const workspaceStats = [
+  {
+    title: "Total Files",
+    value: "7,774",
+    change: "+12.5%",
+    color: "bg-blue-500",
+    icon: require("lucide-react").FileText
+  },
+  {
+    title: "Team Members",
+    value: "24",
+    change: "+8.2%",
+    color: "bg-emerald-500",
+    icon: require("lucide-react").Users
+  },
+  {
+    title: "Storage Used",
+    value: "847 GB",
+    change: "+5.1%",
+    color: "bg-purple-500",
+    icon: require("lucide-react").HardDrive
+  },
+  {
+    title: "Active Today",
+    value: "18",
+    change: "+15.3%",
+    color: "bg-orange-500",
+    icon: require("lucide-react").Activity
+  }
+];
+
+export const recentFiles = [
+  {
+    name: "Project_Proposal_2024.pdf",
+    platform: "Google Drive",
+    size: "2.4 MB",
+    lastModified: "2 hours ago",
+    status: "Active"
+  },
+  {
+    name: "Marketing_Strategy.docx",
+    platform: "OneDrive",
+    size: "1.8 MB",
+    lastModified: "5 hours ago",
+    status: "Processing"
+  },
+  {
+    name: "Sales_Report_Q2.xlsx",
+    platform: "Google Drive",
+    size: "956 KB",
+    lastModified: "1 day ago",
+    status: "Active"
+  },
+  {
+    name: "Team_Meeting_Notes.md",
+    platform: "Notion",
+    size: "124 KB",
+    lastModified: "3 days ago",
+    status: "Active"
+  },
+  {
+    name: "Budget_Analysis.xlsx",
+    platform: "OneDrive",
+    size: "2.1 MB",
+    lastModified: "5 days ago",
+    status: "Pending"
+  }
+];
+
+export const teamMembers = [
+  {
+    name: "John Smith",
+    role: "Administrator",
+    status: "Active"
+  },
+  {
+    name: "Sarah Johnson",
+    role: "Marketing Manager",
+    status: "Active"
+  },
+  {
+    name: "Mike Davis",
+    role: "Sales Rep",
+    status: "Active"
+  },
+  {
+    name: "Emily Chen",
+    role: "Operations Lead",
+    status: "Processing"
+  }
+];
+
 export const demoFileStats: FileStats[] = [
   {
     platform: "Google Drive",
