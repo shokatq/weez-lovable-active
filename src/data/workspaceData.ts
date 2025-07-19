@@ -1,5 +1,6 @@
 
 import { Workspace, Employee, FileStats } from "@/types/workspace";
+import { FileText, Users, HardDrive, Activity } from "lucide-react";
 
 export const demoEmployees: Employee[] = [
   {
@@ -46,28 +47,28 @@ export const workspaceStats = [
     value: "7,774",
     change: "+12.5%",
     color: "bg-blue-500",
-    icon: require("lucide-react").FileText
+    icon: FileText
   },
   {
     title: "Team Members",
     value: "24",
     change: "+8.2%",
     color: "bg-emerald-500",
-    icon: require("lucide-react").Users
+    icon: Users
   },
   {
     title: "Storage Used",
     value: "847 GB",
     change: "+5.1%",
     color: "bg-purple-500",
-    icon: require("lucide-react").HardDrive
+    icon: HardDrive
   },
   {
     title: "Active Today",
     value: "18",
     change: "+15.3%",
     color: "bg-orange-500",
-    icon: require("lucide-react").Activity
+    icon: Activity
   }
 ];
 
