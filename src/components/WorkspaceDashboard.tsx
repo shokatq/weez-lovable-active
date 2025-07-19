@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,13 +24,6 @@ import AddMemberDialog from "./AddMemberDialog";
 
 const WorkspaceDashboard = () => {
   const [showAddMember, setShowAddMember] = useState(false);
-
-  useEffect(() => {
-    console.log('WorkspaceDashboard mounted');
-    console.log('workspaceStats:', workspaceStats);
-    console.log('recentFiles:', recentFiles);
-    console.log('teamMembers:', teamMembers);
-  }, []);
 
   const handleAddMember = (member: { name: string; email: string; role: string; department: string }) => {
     console.log('Adding new member:', member);
