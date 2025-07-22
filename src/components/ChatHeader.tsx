@@ -16,15 +16,19 @@ const ChatHeader = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="flex items-center justify-between p-6 bg-white/60 backdrop-blur-sm border-b border-slate-200/60">
+    <header className="flex items-center justify-between p-6 bg-white border-b border-slate-200 shadow-sm">
       <div className="flex items-center gap-4">
         <SidebarTrigger className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 h-10 w-10 p-0 rounded-xl transition-all duration-200 flex items-center justify-center">
           <Menu className="w-5 h-5" />
         </SidebarTrigger>
 
         <div className="flex items-center gap-3 fade-in">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
-            <MessageSquare className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-full bg-white shadow-lg border-2 border-gray-100 flex items-center justify-center">
+            <img 
+              src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
+              alt="Weezy AI Logo" 
+              className="w-6 h-6 object-contain"
+            />
           </div>
           <div>
             <h1 className="font-bold text-lg text-slate-900">

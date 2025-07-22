@@ -43,12 +43,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }, [messages, isThinking]);
 
   const suggestions = [
-    "Find my strategic reports from Q4",
-    "Summarize the latest project proposal", 
-    "What's our APAC expansion strategy?",
-    "Upload client brief to Google Drive",
-    "Show me blockchain KYC documentation",
-    "Locate the compliance readiness plan"
+    "Search for project files in Notion",
+    "Find contract documents from Slack", 
+    "Summarize quarterly reports from Google Drive",
+    "Show me design files from Dropbox",
+    "Locate meeting notes from OneDrive",
+    "Search financial documents across platforms"
   ];
 
   return (
@@ -60,7 +60,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
               <img 
                 src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
                 alt="Weezy AI Logo" 
-                className="w-12 h-12 object-contain"
+                className="w-16 h-16 object-contain p-2"
               />
             </div>
             <h2 className="text-4xl font-bold text-gray-900 mb-4 animate-fade-in">Hey there! 👋</h2>
@@ -94,7 +94,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                         <img 
                           src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
                           alt="Weezy AI" 
-                          className="w-6 h-6 object-contain"
+                          className="w-6 h-6 object-contain p-1"
                         />
                       )}
                     </div>
@@ -156,7 +156,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                       <img 
                         src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
                         alt="Weezy AI" 
-                        className="w-6 h-6 object-contain"
+                        className="w-6 h-6 object-contain p-1"
                       />
                     </div>
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-lg">

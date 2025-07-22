@@ -40,7 +40,7 @@ const ChatSidebar = ({
   };
 
   return (
-    <Sidebar className="w-72 bg-white/90 backdrop-blur-sm border-r border-slate-200/60 shadow-sm">
+    <Sidebar className="w-72 bg-gradient-to-b from-slate-50 to-white border-r border-slate-200 shadow-lg">
       <SidebarHeader className="p-4 border-b border-slate-100">
         <div className="flex items-center gap-3 mb-4 fade-in">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">

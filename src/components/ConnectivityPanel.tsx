@@ -151,7 +151,7 @@ const ConnectivityPanel = () => {
           Connect your favorite platforms to enhance Weezy's capabilities
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3 p-6">
+      <CardContent className="space-y-3 p-6 max-h-80 overflow-y-auto">
         {integrations.map((integration, index) => (
           <div 
             key={integration.id} 

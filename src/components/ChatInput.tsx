@@ -70,7 +70,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
       
       {/* ChatGPT-style Input Container */}
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-end w-full bg-white rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-gray-300 focus-within:border-blue-500 focus-within:shadow-xl">
+        <div className="relative flex items-center w-full bg-white rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-gray-300 focus-within:border-blue-500 focus-within:shadow-xl">
           {/* Left side icons */}
           <div className="flex items-center gap-2 px-4 py-3">
             <FileUpload onFileSelect={handleFileSelect} />

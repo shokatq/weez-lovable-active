@@ -728,12 +728,12 @@ ${platformFiles.map((file, index) =>
 
   return (
     <SidebarProvider>
-      <div className="h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50/20 text-slate-900 overflow-hidden w-full relative">
+      <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50/20 text-slate-900 w-full relative">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.05),transparent_50%)] pointer-events-none"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.03),transparent_50%)] pointer-events-none"></div>
         
-        <div className="relative z-10 flex w-full">
+        <div className="relative z-10 flex w-full min-h-screen">
           <ChatSidebar 
             conversations={conversations}
             currentConversationId={currentConversationId}
@@ -742,10 +742,10 @@ ${platformFiles.map((file, index) =>
             onNavigateToWorkspace={handleNavigateToWorkspace}
           />
           
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-screen">
             <ChatHeader />
             
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col overflow-hidden">
               <ChatMessages 
                 messages={messages} 
                 isThinking={isThinking}
