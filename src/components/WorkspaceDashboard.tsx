@@ -51,9 +51,9 @@ const WorkspaceDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 text-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-8 py-6">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-8 py-6 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="animate-fade-in">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Workspace Dashboard</h1>
@@ -85,7 +85,7 @@ const WorkspaceDashboard = () => {
           {workspaceStats.map((stat, index) => (
             <Card 
               key={stat.title} 
-              className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in"
+              className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2 animate-fade-in card-hover"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <CardContent className="p-6">
@@ -110,7 +110,7 @@ const WorkspaceDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Files */}
           <div className="lg:col-span-2">
-            <Card className="bg-white border-gray-200 shadow-sm animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '400ms' }}>
               <CardHeader className="pb-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <div>
@@ -176,7 +176,7 @@ const WorkspaceDashboard = () => {
 
           {/* Team Members */}
           <div className="space-y-6">
-            <Card className="bg-white border-gray-200 shadow-sm animate-fade-in" style={{ animationDelay: '600ms' }}>
+            <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '600ms' }}>
               <CardHeader className="pb-4 border-b border-gray-100">
                 <CardTitle className="text-lg font-semibold text-gray-900">Team Members</CardTitle>
                 <CardDescription className="text-gray-600 font-medium">Active workspace users</CardDescription>
@@ -206,7 +206,7 @@ const WorkspaceDashboard = () => {
             </Card>
 
             {/* Storage Usage */}
-            <Card className="bg-white border-gray-200 shadow-sm animate-fade-in" style={{ animationDelay: '800ms' }}>
+            <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '800ms' }}>
               <CardHeader className="pb-4 border-b border-gray-100">
                 <CardTitle className="text-lg font-semibold text-gray-900">Storage Usage</CardTitle>
                 <CardDescription className="text-gray-600 font-medium">Across all platforms</CardDescription>

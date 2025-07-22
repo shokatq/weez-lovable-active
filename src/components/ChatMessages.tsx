@@ -43,12 +43,14 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }, [messages, isThinking]);
 
   const suggestions = [
-    "Search for project files in Notion",
-    "Find contract documents from Slack", 
-    "Summarize quarterly reports from Google Drive",
-    "Show me design files from Dropbox",
-    "Locate meeting notes from OneDrive",
-    "Search financial documents across platforms"
+    "📄 Search meeting notes from Notion workspace",
+    "💬 Find customer feedback from Slack channels", 
+    "📊 Analyze quarterly reports from Google Drive",
+    "🎨 Locate design assets from Dropbox folders",
+    "📝 Extract action items from OneDrive documents",
+    "💰 Search financial data across all platforms",
+    "🔍 Find specific file by keywords",
+    "📋 Generate summary from uploaded documents"
   ];
 
   return (
@@ -56,11 +58,11 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       {
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
-            <div className="w-24 h-24 rounded-full bg-white shadow-2xl flex items-center justify-center mb-8 animate-pulse-glow border border-gray-100">
+            <div className="w-24 h-24 rounded-full bg-white shadow-2xl flex items-center justify-center mb-8 animate-pulse-glow border-4 border-black overflow-hidden">
               <img 
-                src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
+                src="/lovable-uploads/6dfc27d3-6abc-48b6-80b1-1fa680fb6013.png" 
                 alt="Weezy AI Logo" 
-                className="w-16 h-16 object-contain p-2"
+                className="w-20 h-20 object-cover rounded-full"
               />
             </div>
             <h2 className="text-4xl font-bold text-gray-900 mb-4 animate-fade-in">Hey there! 👋</h2>
@@ -86,15 +88,15 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ${
                       message.isUser 
                         ? "bg-gray-900" 
-                        : "bg-white border-2 border-gray-100"
+                        : "bg-white border-2 border-black overflow-hidden"
                     }`}>
                       {message.isUser ? (
                         <User className="w-6 h-6 text-white" />
                       ) : (
                         <img 
-                          src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
+                          src="/lovable-uploads/6dfc27d3-6abc-48b6-80b1-1fa680fb6013.png" 
                           alt="Weezy AI" 
-                          className="w-6 h-6 object-contain p-1"
+                          className="w-10 h-10 object-cover rounded-full"
                         />
                       )}
                     </div>
@@ -152,11 +154,11 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       
                 {isThinking && (
                   <div className="flex gap-6 items-start animate-fade-in">
-                    <div className="w-12 h-12 rounded-full bg-white border-2 border-gray-100 flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <div className="w-12 h-12 rounded-full bg-white border-2 border-black flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
                       <img 
-                        src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" 
+                        src="/lovable-uploads/6dfc27d3-6abc-48b6-80b1-1fa680fb6013.png" 
                         alt="Weezy AI" 
-                        className="w-6 h-6 object-contain p-1"
+                        className="w-10 h-10 object-cover rounded-full"
                       />
                     </div>
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-lg">

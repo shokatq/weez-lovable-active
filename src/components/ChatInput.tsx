@@ -70,41 +70,41 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
       
       {/* ChatGPT-style Input Container */}
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-center w-full bg-white rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-gray-300 focus-within:border-blue-500 focus-within:shadow-xl">
+        <div className="relative flex items-center w-full bg-white rounded-3xl border border-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-gray-400 focus-within:border-black focus-within:shadow-xl focus-within:ring-0">
           {/* Left side icons */}
-          <div className="flex items-center gap-2 px-4 py-3">
+          <div className="flex items-center gap-1 pl-4 pr-2 py-3">
             <FileUpload onFileSelect={handleFileSelect} />
             <Button
               variant="ghost"
               size="icon"
-              className="w-9 h-9 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+              className="w-8 h-8 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
             >
               <Plus className="w-4 h-4" />
             </Button>
           </div>
 
           {/* Message input area */}
-          <div className="flex-1 min-w-0 py-3">
+          <div className="flex-1 min-w-0 py-4 px-2">
             <Textarea
               ref={textareaRef}
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
               placeholder="Message Weezy AI..."
-              className="w-full min-h-[20px] max-h-[120px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-base leading-6 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="w-full min-h-[24px] max-h-[120px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:ring-offset-0 text-base leading-6 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
               rows={1}
             />
           </div>
 
           {/* Send button */}
-          <div className="flex items-center px-4 py-3">
+          <div className="flex items-center pr-3 py-3">
             <Button
               onClick={handleSend}
               size="icon"
-              className={`w-10 h-10 rounded-xl transition-all duration-300 ${
+              className={`w-8 h-8 rounded-lg transition-all duration-200 ${
                 message.trim() 
-                  ? 'bg-gray-900 hover:bg-gray-800 text-white shadow-md hover:shadow-lg hover:scale-105' 
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-black hover:bg-gray-800 text-white shadow-sm hover:shadow-md' 
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
               disabled={!message.trim()}
             >
