@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Plus, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface Integration {
   id: string;
@@ -158,8 +159,8 @@ const ConnectivityPanel = () => {
             className="flex items-center justify-between p-4 rounded-xl bg-gray-50/50 hover:bg-gray-100/50 transition-all duration-300 hover:shadow-md border border-gray-100 hover:border-gray-200 group animate-fade-in"
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl ${integration.color} p-2 flex items-center justify-center relative shadow-sm group-hover:shadow-md transition-all duration-300`}>
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className={`w-12 h-12 rounded-xl ${integration.color} p-2 flex items-center justify-center relative shadow-sm group-hover:shadow-md transition-all duration-300 flex-shrink-0`}>
                 {integration.isCustomRequest ? (
                   <Plus className="w-6 h-6 text-white" />
                 ) : (
@@ -180,42 +181,46 @@ const ConnectivityPanel = () => {
                   <div className="absolute inset-0 bg-blue-500/20 rounded-xl animate-pulse"></div>
                 )}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-3">
-                  <h3 className="font-semibold text-gray-900 text-base">{integration.name}</h3>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-1">
+                  <h3 className="font-semibold text-gray-900 text-base truncate">{integration.name}</h3>
                   {integration.connected && !integration.isCustomRequest && (
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs border-green-200 animate-pulse font-medium">
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs border-green-200 font-medium flex-shrink-0">
                       Connected
                     </Badge>
                   )}
                   {integration.isConnecting && (
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-xs border-blue-200 animate-pulse font-medium">
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-xs border-blue-200 animate-pulse font-medium flex-shrink-0">
                       Connecting...
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-gray-600 font-medium mt-1">{integration.description}</p>
+                <p className="text-sm text-gray-600 font-medium">{integration.description}</p>
               </div>
             </div>
-            <Button
-              onClick={() => handleConnect(integration.id)}
-              disabled={integration.isConnecting}
-              variant={integration.connected && !integration.isCustomRequest ? "outline" : "default"}
-              size="sm"
-              className={
-                integration.isCustomRequest 
-                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200" 
-                  : integration.connected 
-                    ? "text-gray-700 border-gray-300 hover:bg-gray-50 font-medium px-4 py-2 rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200" 
-                    : integration.isConnecting
-                      ? "bg-blue-500 text-white font-medium px-4 py-2 rounded-lg animate-pulse shadow-sm"
-                      : "bg-gray-900 hover:bg-gray-800 text-white font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-              }
-            >
-              {integration.isCustomRequest ? "Request" : 
-               integration.isConnecting ? "Connecting..." :
-               integration.connected ? "Disconnect" : "Connect"}
-            </Button>
+            
+            <div className="flex-shrink-0 ml-4">
+              <Button
+                onClick={() => handleConnect(integration.id)}
+                disabled={integration.isConnecting}
+                variant={integration.connected && !integration.isCustomRequest ? "outline" : "default"}
+                size="sm"
+                className={cn(
+                  "transition-all duration-200 font-medium px-4 py-2 rounded-lg shadow-sm hover:shadow-md",
+                  integration.isCustomRequest 
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white" 
+                    : integration.connected 
+                      ? "text-gray-700 border-gray-300 hover:bg-gray-50 bg-white" 
+                      : integration.isConnecting
+                        ? "bg-blue-500 text-white animate-pulse"
+                        : "bg-gray-900 hover:bg-gray-800 text-white"
+                )}
+              >
+                {integration.isCustomRequest ? "Request" : 
+                 integration.isConnecting ? "Connecting..." :
+                 integration.connected ? "Disconnect" : "Connect"}
+              </Button>
+            </div>
           </div>
         ))}
       </CardContent>
