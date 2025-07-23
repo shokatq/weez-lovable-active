@@ -30,114 +30,106 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
       scrollToBottom();
-    }, 100);
+    }, 50);
     
     return () => clearTimeout(timer);
   }, [messages, isThinking]);
 
   const suggestions = [
-    "📄 Search meeting notes from Notion workspace",
-    "💬 Find customer feedback from Slack channels", 
-    "📊 Analyze quarterly reports from Google Drive",
-    "🎨 Locate design assets from Dropbox folders",
-    "📝 Extract action items from OneDrive documents",
-    "💰 Search financial data across all platforms",
-    "🔍 Find specific file by keywords",
-    "📋 Generate summary from uploaded documents"
+    "📄 Search files from my Notion workspace",
+    "💬 Find conversations in Slack channels", 
+    "📊 Show me reports from Google Drive",
+    "🎨 Locate assets from Dropbox",
+    "📝 Find documents in OneDrive",
+    "💰 Search financial data across platforms",
+    "🔍 Help me find specific files",
+    "📋 Summarize my uploaded documents"
   ];
 
   return (
-    <div className="flex-1 w-full h-full max-h-[calc(100vh-200px)] min-h-64 flex flex-col bg-white">
+    <div className="flex-1 w-full h-full flex flex-col bg-white relative overflow-hidden">
       {
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
-            <div className="w-24 h-24 rounded-full bg-white shadow-2xl flex items-center justify-center mb-8 animate-pulse-glow border-4 border-black overflow-hidden">
+            <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center mb-6 border border-gray-200 overflow-hidden">
               <img 
-                src="/lovable-uploads/6dfc27d3-6abc-48b6-80b1-1fa680fb6013.png" 
+                src="/lovable-uploads/weezy-logo.png" 
                 alt="Weezy AI Logo" 
-                className="w-20 h-20 object-cover rounded-full"
+                className="w-16 h-16 object-cover rounded-full"
               />
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 animate-fade-in">Hey there! 👋</h2>
-            <p className="text-gray-600 text-xl mb-12 font-medium animate-fade-in" style={{ animationDelay: '0.2s' }}>I'm Weezy, your AI assistant. How can I help you today?</p>
+            <h1 className="text-3xl font-semibold text-gray-900 mb-3 animate-fade-in">How can I help you today?</h1>
             
-            <div className="w-full max-w-4xl mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>Try these suggestions:</h3>
+            <div className="w-full max-w-3xl mt-8">
               <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
             </div>
           </div>
         ) : (
           <ScrollArea className="flex-1 w-full h-full">
-            <div className="px-8 py-8">
-              <div className="space-y-8 max-w-4xl mx-auto w-full">
+            <div className="max-w-3xl mx-auto px-4 py-6">
+              <div className="space-y-6">
                 {messages.map((message, index) => (
                   <div
                     key={message.id}
-                    className={`flex gap-6 items-start animate-fade-in ${
-                      message.isUser ? "flex-row-reverse" : ""
-                    }`}
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    className={`group flex gap-4 ${
+                      message.isUser ? "justify-end" : "justify-start"
+                    } animate-slide-up opacity-0`}
+                    style={{ 
+                      animationDelay: `${index * 50}ms`,
+                      animationFillMode: 'forwards'
+                    }}
                   >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ${
-                      message.isUser 
-                        ? "bg-gray-900" 
-                        : "bg-white border-2 border-black overflow-hidden"
-                    }`}>
-                      {message.isUser ? (
-                        <User className="w-6 h-6 text-white" />
-                      ) : (
+                    {!message.isUser && (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-white border border-gray-200 overflow-hidden">
                         <img 
-                          src="/lovable-uploads/6dfc27d3-6abc-48b6-80b1-1fa680fb6013.png" 
+                          src="/lovable-uploads/weezy-logo.png" 
                           alt="Weezy AI" 
-                          className="w-10 h-10 object-cover rounded-full"
+                          className="w-6 h-6 object-cover rounded-full"
                         />
-                      )}
-                    </div>
-
-                    <div className={`flex flex-col gap-2 max-w-[80%] ${message.isUser ? 'items-end' : 'items-start'}`}>
-                      <div className={`text-xs font-semibold ${message.isUser ? 'text-gray-900' : 'text-gray-600'} mb-2`}>
-                        {message.isUser ? 'You' : 'Weezy'}
                       </div>
-                      
+                    )}
+
+                    <div className={`max-w-[85%] md:max-w-[70%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
                       <div
-                        className={`rounded-2xl px-6 py-4 text-left shadow-lg border transition-all duration-300 hover:shadow-xl ${
+                        className={`px-4 py-3 rounded-2xl transition-all duration-200 ${
                           message.isUser
-                            ? "bg-gray-900 text-white border-gray-800"
-                            : "bg-white text-gray-800 border-gray-200"
+                            ? "bg-gray-900 text-white ml-12"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-50"
                         } ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (
-                          <div className="flex items-center gap-3 mb-4">
-                            <Upload className="w-5 h-5 text-blue-500 animate-bounce" />
+                          <div className="flex items-center gap-2 mb-3">
+                            <Upload className="w-4 h-4 text-blue-500 animate-bounce" />
                             <div className="flex gap-1">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
                             </div>
+                            <span className="text-sm text-blue-600">Uploading...</span>
                           </div>
                         )}
                         
-                        <div className="text-base font-medium whitespace-pre-wrap leading-relaxed">
+                        <div className="text-[15px] leading-6 whitespace-pre-wrap">
                           {renderFormattedText(message.content)}
                         </div>
                         
                         {message.files && message.files.length > 0 && (
-                          <div className="mt-4 space-y-3 border-t border-gray-200 pt-4">
+                          <div className="mt-3 space-y-2 border-t border-gray-200 pt-3">
                             {message.files.map((file) => (
-                              <div key={file.id} className="bg-gray-50 rounded-xl p-4 flex items-center gap-4 border border-gray-200 hover:bg-gray-100 transition-colors duration-200">
-                                <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                                  <FileText className="w-6 h-6 text-blue-600" />
+                              <div key={file.id} className="bg-gray-50 rounded-lg p-3 flex items-center gap-3 border border-gray-200 hover:bg-gray-100 transition-colors duration-200">
+                                <div className="w-8 h-8 rounded-md bg-blue-100 flex items-center justify-center">
+                                  <FileText className="w-4 h-4 text-blue-600" />
                                 </div>
                                 <div className="flex-1 overflow-hidden">
-                                  <p className="font-semibold text-gray-900 truncate">{file.name}</p>
-                                  <span className="text-sm text-gray-600 font-medium">{file.platform} • {file.size}</span>
+                                  <p className="font-medium text-gray-900 text-sm truncate">{file.name}</p>
+                                  <span className="text-xs text-gray-600">{file.platform} • {file.size}</span>
                                 </div>
                               </div>
                             ))}
@@ -145,23 +137,31 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                         )}
                       </div>
                       
-                      <div className="text-xs text-gray-500 font-medium">
+                      <div className={`text-xs text-gray-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity ${
+                        message.isUser ? 'text-right' : 'text-left'
+                      }`}>
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
+
+                    {message.isUser && (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-900">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                    )}
                   </div>
                 ))}
       
                 {isThinking && (
-                  <div className="flex gap-6 items-start animate-fade-in">
-                    <div className="w-12 h-12 rounded-full bg-white border-2 border-black flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
+                  <div className="flex gap-4 animate-fade-in">
+                    <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       <img 
-                        src="/lovable-uploads/6dfc27d3-6abc-48b6-80b1-1fa680fb6013.png" 
+                        src="/lovable-uploads/weezy-logo.png" 
                         alt="Weezy AI" 
-                        className="w-10 h-10 object-cover rounded-full"
+                        className="w-6 h-6 object-cover rounded-full"
                       />
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-200 shadow-lg">
+                    <div className="bg-gray-100 rounded-2xl px-4 py-3 max-w-[85%] md:max-w-[70%]">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
                   </div>
