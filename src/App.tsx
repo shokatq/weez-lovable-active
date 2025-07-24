@@ -11,6 +11,8 @@ import Workspace from "./pages/Workspace";
 import WorkspaceNew from "./pages/WorkspaceNew";
 import NotionInterface from "./pages/NotionInterface";
 import ChatInterface from "./components/ChatInterface";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/workspace" element={<Workspace />} />
           <Route path="/workspace-new" element={<WorkspaceNew />} />
           <Route path="/notion" element={<NotionInterface />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

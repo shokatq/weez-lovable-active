@@ -73,9 +73,21 @@ const Index = () => {
               <Star className="w-3 h-3 mr-1" />
               Premium
             </Badge>
-            <Button variant="outline" className="border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300">
-              Sign In
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/login")}
+                className="border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300"
+              >
+                Login
+              </Button>
+              <Button 
+                onClick={() => navigate("/signup")}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              >
+                Sign Up
+              </Button>
+            </div>
           </div>
         </div>
       </header>
