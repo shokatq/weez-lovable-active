@@ -81,25 +81,25 @@ const WorkspaceDashboard = () => {
 
       <div className="p-8">
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {workspaceStats.map((stat, index) => (
             <Card 
               key={stat.title} 
               className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2 animate-fade-in card-hover"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-600 text-sm font-medium mb-1">{stat.title}</p>
-                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <TrendingUp className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-green-600 font-medium">{stat.change}</span>
+                    <p className="text-gray-600 text-xs font-medium mb-1">{stat.title}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <TrendingUp className="w-3 h-3 text-green-600" />
+                      <span className="text-xs text-green-600 font-medium">{stat.change}</span>
                     </div>
                   </div>
-                  <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center shadow-sm`}>
-                    <stat.icon className="w-6 h-6 text-white" />
+                  <div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center shadow-sm`}>
+                    <stat.icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
               </CardContent>

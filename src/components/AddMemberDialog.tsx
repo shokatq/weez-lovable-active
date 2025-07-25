@@ -33,53 +33,53 @@ const AddMemberDialog = ({ open, onOpenChange, onAddMember }: AddMemberDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-gray-900 border-gray-700">
+      <DialogContent className="sm:max-w-[500px] bg-white border-gray-200">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl font-bold">Add New Team Member</DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogTitle className="text-gray-900 text-xl font-bold">Add New Team Member</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Invite a new member to join your workspace
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-white font-medium">Full Name</Label>
+              <Label htmlFor="name" className="text-gray-700 font-medium">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter full name"
-                  className="pl-10 bg-gray-800 border-gray-600 text-white"
+                  className="pl-10 bg-white border-gray-300 text-gray-900"
                   required
                 />
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white font-medium">Email Address</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium">Email Address</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter email address"
-                  className="pl-10 bg-gray-800 border-gray-600 text-white"
+                  className="pl-10 bg-white border-gray-300 text-gray-900"
                   required
                 />
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="role" className="text-white font-medium">Role</Label>
+              <Label htmlFor="role" className="text-gray-700 font-medium">Role</Label>
               <Select value={role} onValueChange={setRole} required>
-                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-600">
+                <SelectContent className="bg-white border-gray-200">
                   <SelectItem value="admin">Administrator</SelectItem>
                   <SelectItem value="employee">Employee</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
@@ -89,15 +89,15 @@ const AddMemberDialog = ({ open, onOpenChange, onAddMember }: AddMemberDialogPro
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="department" className="text-white font-medium">Department</Label>
+              <Label htmlFor="department" className="text-gray-700 font-medium">Department</Label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
                 <Input
                   id="department"
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                   placeholder="Enter department"
-                  className="pl-10 bg-gray-800 border-gray-600 text-white"
+                  className="pl-10 bg-white border-gray-300 text-gray-900"
                   required
                 />
               </div>
@@ -105,7 +105,7 @@ const AddMemberDialog = ({ open, onOpenChange, onAddMember }: AddMemberDialogPro
           </div>
           
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-gray-600 text-gray-300">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-gray-300 text-gray-700 hover:bg-gray-50">
               Cancel
             </Button>
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700">

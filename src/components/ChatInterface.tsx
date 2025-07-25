@@ -15,7 +15,9 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingType, setThinkingType] = useState<'search' | 'summary' | 'rag' | 'upload' | 'workspace' | 'general' | 'delete'>('general');
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(() => {
+    return !localStorage.getItem('weez-welcome-shown');
+  });
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState("default");
   const navigate = useNavigate();
@@ -757,10 +759,15 @@ ${platformFiles.map((file, index) =>
           </div>
         </div>
 
-        <ChatWelcomeDialog 
-          open={showWelcome} 
-          onOpenChange={setShowWelcome} 
-        />
+      <ChatWelcomeDialog 
+        open={showWelcome} 
+        onOpenChange={(open) => {
+          setShowWelcome(open);
+          if (!open) {
+            localStorage.setItem('weez-welcome-shown', 'true');
+          }
+        }} 
+      />
       </div>
     </SidebarProvider>
   );

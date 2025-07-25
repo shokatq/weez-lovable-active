@@ -17,7 +17,9 @@ const WorkspaceInterface = () => {
   const [teamMembers, setTeamMembers] = useState(demoWorkspace.employees);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(() => {
+    return !localStorage.getItem('weez-workspace-welcome-shown');
+  });
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
@@ -271,10 +273,10 @@ const WorkspaceInterface = () => {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
                       <Database className="w-6 h-6 text-white" />
                     </div>
-                    Files Stored with Weezy
+                    Files Stored with Weez
                   </CardTitle>
                   <CardDescription className="text-slate-600 text-lg">
-                    Manage and search through all files stored in Weezy's intelligent storage system
+                    Manage and search through all files stored in Weez's intelligent storage system
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -340,7 +342,7 @@ const WorkspaceInterface = () => {
                                       Original: {file.platform}
                                     </Badge>
                                     <Badge className="bg-purple-50 text-purple-600 border-purple-200 font-semibold">
-                                      Stored with Weezy
+                                      Stored with Weez
                                     </Badge>
                                   </div>
                                 </div>
@@ -559,9 +561,9 @@ const WorkspaceInterface = () => {
 
           {activeTab === 'analytics' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
+              <Card className="bg-white/80 border-slate-200/50 backdrop-blur-md shadow-xl">
                 <CardHeader>
-                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
+                  <CardTitle className="text-slate-900 font-bold text-2xl flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                       <Activity className="w-6 h-6 text-white" />
                     </div>
@@ -570,25 +572,25 @@ const WorkspaceInterface = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
-                      <span className="text-gray-300">File Access Rate</span>
-                      <span className="text-emerald-400 font-bold">87.3%</span>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="text-slate-700">File Access Rate</span>
+                      <span className="text-emerald-600 font-bold">87.3%</span>
                     </div>
-                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
-                      <span className="text-gray-300">Team Productivity</span>
-                      <span className="text-blue-400 font-bold">94.1%</span>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="text-slate-700">Team Productivity</span>
+                      <span className="text-blue-600 font-bold">94.1%</span>
                     </div>
-                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
-                      <span className="text-gray-300">Storage Efficiency</span>
-                      <span className="text-violet-400 font-bold">91.8%</span>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="text-slate-700">Storage Efficiency</span>
+                      <span className="text-violet-600 font-bold">91.8%</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-900/40 border-gray-800/50 backdrop-blur-md shadow-xl">
+              <Card className="bg-white/80 border-slate-200/50 backdrop-blur-md shadow-xl">
                 <CardHeader>
-                  <CardTitle className="text-white font-bold text-2xl flex items-center gap-4">
+                  <CardTitle className="text-slate-900 font-bold text-2xl flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
                       <Shield className="w-6 h-6 text-white" />
                     </div>
@@ -597,17 +599,17 @@ const WorkspaceInterface = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
-                      <span className="text-gray-300">Security Score</span>
-                      <span className="text-emerald-400 font-bold">98.5%</span>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="text-slate-700">Security Score</span>
+                      <span className="text-emerald-600 font-bold">98.5%</span>
                     </div>
-                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
-                      <span className="text-gray-300">Active Sessions</span>
-                      <span className="text-blue-400 font-bold">24</span>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="text-slate-700">Active Sessions</span>
+                      <span className="text-blue-600 font-bold">24</span>
                     </div>
-                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
-                      <span className="text-gray-300">Last Backup</span>
-                      <span className="text-violet-400 font-bold">2 hrs ago</span>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="text-slate-700">Last Backup</span>
+                      <span className="text-violet-600 font-bold">2 hrs ago</span>
                     </div>
                   </div>
                 </CardContent>
@@ -625,7 +627,12 @@ const WorkspaceInterface = () => {
 
       <WorkspaceWelcomeDialog 
         open={showWelcome} 
-        onOpenChange={setShowWelcome} 
+        onOpenChange={(open) => {
+          setShowWelcome(open);
+          if (!open) {
+            localStorage.setItem('weez-workspace-welcome-shown', 'true');
+          }
+        }} 
       />
     </div>
   );

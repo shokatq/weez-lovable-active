@@ -295,7 +295,7 @@
 
 .btn-primary::before {
   content: '';
-  @apply absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/30 opacity-0 transition-opacity duration-300;
+  @apply absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/30 opacity-0 transition-opacity duration-300;
 }
 
 .btn-primary:hover::before {

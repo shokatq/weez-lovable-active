@@ -72,15 +72,8 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
       <div className="max-w-3xl mx-auto">
         <div className="relative flex items-end w-full bg-white rounded-3xl border border-gray-300 shadow-sm hover:shadow-md transition-all duration-200 focus-within:border-gray-400 focus-within:shadow-md">
           {/* Left side icons */}
-          <div className="flex items-center gap-1 pl-4 pb-3 pt-3">
+          <div className="flex items-center pl-4 pb-3 pt-3">
             <FileUpload onFileSelect={handleFileSelect} />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-8 h-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
           </div>
 
           {/* Message input area */}
@@ -90,7 +83,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
-              placeholder="Message Weezy AI..."
+              placeholder="Message Weez AI..."
               className="w-full min-h-[24px] max-h-[200px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-[16px] leading-6 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
               rows={1}
             />
@@ -115,7 +108,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
 
         {/* Helper text */}
         <p className="text-center text-xs text-gray-500 mt-3">
-          Weezy AI can make mistakes. Consider checking important information.
+          Weez AI can make mistakes. Consider checking important information.
         </p>
       </div>
     </div>

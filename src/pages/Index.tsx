@@ -63,7 +63,7 @@ const Index = () => {
               <MessageSquare className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">Weezy AI</h1>
+              <h1 className="text-xl font-bold text-slate-900">Weez AI</h1>
               <p className="text-xs text-slate-500">Enterprise Assistant</p>
             </div>
           </div>
@@ -109,27 +109,27 @@ const Index = () => {
           </h1>
           
           <p className="text-xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed slide-up" style={{ animationDelay: '0.2s' }}>
-            Transform how you work with documents. Weezy AI understands, analyzes, and organizes your files with unprecedented intelligence.
+            Transform how you work with documents. Weez AI understands, analyzes, and organizes your files with unprecedented intelligence.
           </p>
           
           <div className="flex items-center justify-center gap-6 mb-16 slide-up" style={{ animationDelay: '0.4s' }}>
-            <Button 
-              onClick={() => navigate("/chat")}
-              size="lg"
-              className="btn-primary bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-12 py-6 rounded-2xl text-lg shadow-lg shadow-blue-500/25"
-            >
-              <MessageSquare className="w-6 h-6 mr-3" />
-              Start Chatting
-            </Button>
-            <Button 
-              onClick={() => navigate("/workspace-new")}
-              variant="outline"
-              size="lg"
-              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-12 py-6 rounded-2xl text-lg transition-all duration-300 hover:shadow-lg"
-            >
-              <Building2 className="w-6 h-6 mr-3" />
-              Enterprise Workspace
-            </Button>
+              <Button 
+                onClick={() => navigate("/chat")}
+                size="lg"
+                className="btn-primary bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-12 py-6 rounded-2xl text-lg shadow-lg shadow-blue-500/25"
+              >
+                <MessageSquare className="w-6 h-6 mr-3" />
+                Start Chatting
+              </Button>
+              <Button 
+                onClick={() => navigate("/workspace-new")}
+                variant="outline"
+                size="lg"
+                className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-semibold px-12 py-6 rounded-2xl text-lg transition-all duration-300 hover:shadow-lg"
+              >
+                <Building2 className="w-6 h-6 mr-3" />
+                Enterprise Workspace
+              </Button>
           </div>
         </div>
       </section>
@@ -196,13 +196,6 @@ const Index = () => {
                 >
                   Get Started Free
                 </Button>
-                <Button 
-                  variant="outline"
-                  size="lg"
-                  className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-10 py-4 rounded-xl text-lg transition-all duration-300"
-                >
-                  Schedule Demo
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -213,7 +206,7 @@ const Index = () => {
       <footer className="relative z-10 px-6 py-8 border-t border-slate-200/50 glass-effect">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-slate-500">
-            © 2024 Weezy AI. All rights reserved. Built with cutting-edge AI technology.
+            © 2024 Weez AI. All rights reserved. Built with cutting-edge AI technology.
           </p>
         </div>
       </footer>
