@@ -39,7 +39,7 @@ const Intro = () => {
     return () => observer.disconnect();
   }, []);
 
-  const handleTryWeezy = () => {
+  const handleTryWeez = () => {
     navigate("/home");
   };
 
@@ -66,7 +66,7 @@ const Intro = () => {
       <AnimatedSection index={0} className="min-h-screen flex items-center justify-center px-6">
         <div className="text-center space-y-8 max-w-4xl">
           <h1 className="text-6xl md:text-7xl font-bold text-white leading-tight">
-            Introducing Weezy AI
+            Introducing Weez AI
           </h1>
           
           <h2 className="text-2xl md:text-3xl text-gray-400 font-light leading-relaxed">
@@ -74,25 +74,25 @@ const Intro = () => {
           </h2>
           
           <Button
-            onClick={handleTryWeezy}
+            onClick={handleTryWeez}
             variant="outline"
             className="bg-transparent border-white text-white hover:bg-white hover:text-black transition-all duration-300 px-12 py-4 text-lg rounded-lg mt-12 group"
           >
-            Try Weezy
+            Try Weez
             <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </AnimatedSection>
 
-      {/* Section 1: What is Weezy AI? */}
+      {/* Section 1: What is Weez AI? */}
       <AnimatedSection index={1} className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <h2 className="text-4xl md:text-5xl font-bold text-white">
             Meet Your AI-Powered Organizer
           </h2>
           <p className="text-xl text-gray-400 leading-relaxed max-w-3xl mx-auto">
-            Weezy AI helps you manage your files, notes, tasks, and conversations — all in one place. 
-            Whether it's a PDF, a task sheet, a note, or an image, Weezy automatically organizes and 
+            Weez AI helps you manage your files, notes, tasks, and conversations — all in one place. 
+            Whether it's a PDF, a task sheet, a note, or an image, Weez automatically organizes and 
             makes it easy to find.
           </p>
           <div className="flex justify-center items-center space-x-6 mt-12">
@@ -115,7 +115,7 @@ const Intro = () => {
       <AnimatedSection index={2} className="py-24 px-6 bg-gray-950">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16">
-            Why Choose Weezy?
+            Why Choose Weez?
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -135,7 +135,7 @@ const Intro = () => {
                 <h3 className="text-xl font-semibold text-white">AI Search</h3>
               </div>
               <p className="text-gray-400 leading-relaxed">
-                Search documents using natural language, and Weezy uses NER + vector AI to fetch the best match.
+                Search documents using natural language, and Weez uses NER + vector AI to fetch the best match.
               </p>
             </div>
 
@@ -165,7 +165,7 @@ const Intro = () => {
                 <h3 className="text-xl font-semibold text-white">Group Sharing & Chat</h3>
               </div>
               <p className="text-gray-400 leading-relaxed">
-                Collaborate via groups, share files, and chat inside Weezy without switching apps.
+                Collaborate via groups, share files, and chat inside Weez without switching apps.
               </p>
             </div>
           </div>
@@ -179,7 +179,7 @@ const Intro = () => {
             For Students, Professionals, and Teams
           </h2>
           <p className="text-xl text-gray-400 text-center mb-16 max-w-3xl mx-auto">
-            Weezy is designed to work across needs
+            Weez is designed to work across needs
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -214,13 +214,13 @@ const Intro = () => {
       <AnimatedSection index={4} className="py-24 px-6 bg-gray-950">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16">
-            How Weezy Works
+            How Weez Works
           </h2>
           
           <div className="space-y-12">
             {[
-              { step: 1, title: "Allow storage access", description: "Grant Weezy permission to access your files" },
-              { step: 2, title: "Weezy scans and tags files automatically", description: "Our AI analyzes and categorizes your documents" },
+              { step: 1, title: "Allow storage access", description: "Grant Weez permission to access your files" },
+              { step: 2, title: "Weez scans and tags files automatically", description: "Our AI analyzes and categorizes your documents" },
               { step: 3, title: "Use AI-powered search", description: "Find, summarize, and manage with natural language" },
               { step: 4, title: "Organize or share as needed", description: "Collaborate and share right from the app" }
             ].map((item, index) => (
@@ -248,7 +248,7 @@ const Intro = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-gray-900 p-8 rounded-xl border border-gray-800">
               <p className="text-gray-300 mb-6 italic">
-                "Weezy helped me find documents I forgot I had. It's like magic!"
+                "Weez helped me find documents I forgot I had. It's like magic!"
               </p>
               <div className="flex items-center space-x-3">
                 <UserCheck className="w-6 h-6 text-blue-400" />
@@ -283,7 +283,7 @@ const Intro = () => {
       <AnimatedSection index={6} className="py-24 px-6 bg-gradient-to-b from-black to-gray-950">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <h2 className="text-4xl md:text-5xl font-bold text-white">
-            Start Using Weezy Today
+            Start Using Weez Today
           </h2>
           <p className="text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto">
             Try the smart way to manage your files and tasks.<br />
@@ -291,11 +291,11 @@ const Intro = () => {
           </p>
           
           <Button
-            onClick={handleTryWeezy}
+            onClick={handleTryWeez}
             variant="outline"
             className="bg-transparent border-white text-white hover:bg-white hover:text-black transition-all duration-300 px-12 py-4 text-lg rounded-lg mt-12 group"
           >
-            Try Weezy
+            Try Weez
             <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

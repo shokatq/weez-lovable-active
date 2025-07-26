@@ -41,7 +41,7 @@ const Signup = () => {
       setIsLoading(false);
       toast({
         title: "Account Created Successfully",
-        description: "Welcome to Weezy AI! You can now sign in.",
+        description: "Welcome to Weez AI! You can now sign in.",
       });
       navigate("/login");
     }, 1500);
@@ -83,7 +83,7 @@ const Signup = () => {
                 Create Account
               </CardTitle>
               <CardDescription className="text-lg text-slate-600">
-                Join Weezy AI and transform your workflow
+                Join Weez AI and transform your workflow
               </CardDescription>
             </CardHeader>
 

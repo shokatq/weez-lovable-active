@@ -52,8 +52,8 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
         };
       default:
         return {
-          icon: <img src="/lovable-uploads/68bbde77-894e-4452-af90-9524035d0b7a.png" alt="Weezy AI" className="w-5 h-5" />,
-          text: "Weezy is thinking...",
+          icon: <div className="w-5 h-5 bg-blue-500 rounded text-white text-xs flex items-center justify-center">AI</div>,
+          text: "Weez is thinking...",
           dots: "bg-gray-500"
         };
     }

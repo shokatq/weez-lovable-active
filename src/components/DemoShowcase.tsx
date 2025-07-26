@@ -55,9 +55,9 @@ const DemoShowcase = () => {
     <div className="min-h-screen bg-black text-white p-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Weezy AI Demo</h1>
+          <h1 className="text-4xl font-bold mb-4">Weez AI Demo</h1>
           <p className="text-gray-400 text-lg">
-            See how Weezy transforms file management with AI-powered capabilities
+            See how Weez transforms file management with AI-powered capabilities
           </p>
         </div>
 
@@ -91,7 +91,7 @@ const DemoShowcase = () => {
             <CardContent className="flex items-center justify-center py-8">
               <div className="flex items-center gap-3">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                <span className="text-white">Weezy AI is processing your request...</span>
+                <span className="text-white">Weez AI is processing your request...</span>
               </div>
             </CardContent>
           </Card>
@@ -118,7 +118,7 @@ const DemoShowcase = () => {
                 <div className="bg-black rounded-lg p-4 border border-gray-700">
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span className="text-white font-medium">Weezy Response:</span>
+                    <span className="text-white font-medium">Weez Response:</span>
                   </div>
                   <p className="text-gray-300 whitespace-pre-line leading-relaxed">
                     {demoResponses[activeDemo].response}
@@ -156,7 +156,7 @@ const DemoShowcase = () => {
 
         <div className="mt-8 text-center">
           <p className="text-gray-400 mb-4">
-            This is a demonstration of Weezy's AI capabilities with sample data
+            This is a demonstration of Weez's AI capabilities with sample data
           </p>
           <Button 
             onClick={() => setActiveDemo(null)}

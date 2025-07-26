@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
-import { Plus, MessageSquare, Building2, Clock, MoreHorizontal, User } from "lucide-react";
+import { Plus, MessageSquare, Building2, Clock, MoreHorizontal, User, LogOut, UserPlus } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Conversation } from "@/types/chat";
 
 interface ChatSidebarProps {
@@ -28,6 +29,7 @@ const ChatSidebar = ({
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
+    if (minutes < 1) return "now";
     if (minutes < 60) return `${minutes}m`;
     if (hours < 24) return `${hours}h`;
     return `${days}d`;
@@ -50,7 +52,7 @@ const ChatSidebar = ({
             <MessageSquare className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Weezy AI</h2>
+            <h2 className="text-sm font-bold text-slate-900">Weez AI</h2>
             <p className="text-xs text-slate-500">File Assistant</p>
           </div>
         </div>
@@ -78,11 +80,11 @@ const ChatSidebar = ({
                 key={conversation.id}
                 variant="ghost"
                 onClick={() => onConversationSelect(conversation.id)}
-                className={`w-full justify-start text-left p-3 h-auto rounded-xl text-sm transition-all duration-300 slide-in-right ${
-                  currentConversationId === conversation.id 
-                    ? 'bg-blue-50 border border-blue-200 text-blue-900 shadow-sm' 
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
-                }`}
+        className={`w-full justify-start text-left p-3 h-auto rounded-xl text-sm transition-all duration-300 slide-in-right ${
+          currentConversationId === conversation.id 
+            ? 'bg-blue-50 border border-blue-200 text-blue-900 shadow-sm' 
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
+        }`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex-1 min-w-0 overflow-hidden">
@@ -104,6 +106,14 @@ const ChatSidebar = ({
 
       <SidebarFooter className="p-4 border-t border-slate-100 space-y-3">
         <Button
+          onClick={() => window.location.href = '/enterprise'}
+          className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 mb-2"
+        >
+          <Building2 className="w-4 h-4 mr-2" />
+          Enterprise
+        </Button>
+        
+        <Button
           onClick={onNavigateToWorkspace}
           className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
         >
@@ -119,13 +129,27 @@ const ChatSidebar = ({
             <p className="text-sm font-medium text-slate-900 truncate">User</p>
             <p className="text-xs text-slate-500 truncate">Premium Plan</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-7 h-7 p-0 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg flex-shrink-0 transition-colors duration-200"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-7 h-7 p-0 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg flex-shrink-0 transition-colors duration-200"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem className="cursor-pointer">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Sign in with other account
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer text-red-600">
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </SidebarFooter>
     </Sidebar>

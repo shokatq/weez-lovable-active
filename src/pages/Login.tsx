@@ -24,7 +24,7 @@ const Login = () => {
       setIsLoading(false);
       toast({
         title: "Login Successful",
-        description: "Welcome back to Weezy AI!",
+        description: "Welcome back to Weez AI!",
       });
       navigate("/home");
     }, 1500);
@@ -59,7 +59,7 @@ const Login = () => {
                 Welcome Back
               </CardTitle>
               <CardDescription className="text-lg text-slate-600">
-                Sign in to continue to Weezy AI
+                Sign in to continue to Weez AI
               </CardDescription>
             </CardHeader>
 

@@ -23,7 +23,7 @@ const WorkspaceInterface = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
-    { id: 'files-weezy', label: 'Files Stored with Weezy', icon: Database },
+    { id: 'files-weez', label: 'Files Stored with Weez', icon: Database },
     { id: 'files', label: 'File Management', icon: FileText },
     { id: 'team', label: 'Team Management', icon: Users },
     { id: 'analytics', label: 'Analytics', icon: Activity },
@@ -99,7 +99,7 @@ const WorkspaceInterface = () => {
       case 'delete':
         toast({
           title: "File Deleted",
-          description: `${fileName} has been deleted from Weezy storage.`,
+          description: `${fileName} has been deleted from Weez storage.`,
         });
         break;
       case 'rename':
@@ -265,7 +265,7 @@ const WorkspaceInterface = () => {
             </div>
           )}
 
-          {activeTab === 'files-weezy' && (
+          {activeTab === 'files-weez' && (
             <div className="space-y-8">
               <Card className="bg-white/80 border-slate-200/50 backdrop-blur-md shadow-xl">
                 <CardHeader className="pb-6">

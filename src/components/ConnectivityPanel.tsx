@@ -140,7 +140,7 @@ const ConnectivityPanel = () => {
 
     toast({
       title: `${integration.name} Connected Successfully!`,
-      description: "Your files are now accessible through Weezy AI.",
+      description: "Your files are now accessible through Weez AI.",
     });
   };
 
@@ -149,7 +149,7 @@ const ConnectivityPanel = () => {
       <CardHeader className="pb-4 border-b border-gray-100">
         <CardTitle className="text-xl font-semibold text-gray-900">Connected Services</CardTitle>
         <CardDescription className="text-gray-600 font-medium">
-          Connect your favorite platforms to enhance Weezy's capabilities
+          Connect your favorite platforms to enhance Weez's capabilities
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 p-6 max-h-80 overflow-y-auto">

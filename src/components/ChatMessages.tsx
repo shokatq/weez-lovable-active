@@ -58,13 +58,6 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       {
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
-            <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center mb-6 border border-gray-200 overflow-hidden">
-              <img 
-                src="/lovable-uploads/weezy-logo.png" 
-                alt="Weezy AI Logo" 
-                className="w-16 h-16 object-cover rounded-full"
-              />
-            </div>
             <h1 className="text-3xl font-semibold text-gray-900 mb-3 animate-fade-in">How can I help you today?</h1>
             
             <div className="w-full max-w-3xl mt-8">
@@ -87,12 +80,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                     }}
                   >
                     {!message.isUser && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-white border border-gray-200 overflow-hidden">
-                        <img 
-                          src="/lovable-uploads/weezy-logo.png" 
-                          alt="Weezy AI" 
-                          className="w-6 h-6 object-cover rounded-full"
-                        />
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-blue-500 text-white">
+                        AI
                       </div>
                     )}
 
@@ -154,12 +143,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       
                 {isThinking && (
                   <div className="flex gap-4 animate-fade-in">
-                    <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      <img 
-                        src="/lovable-uploads/weezy-logo.png" 
-                        alt="Weezy AI" 
-                        className="w-6 h-6 object-cover rounded-full"
-                      />
+                    <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
+                      AI
                     </div>
                     <div className="bg-gray-100 rounded-2xl px-4 py-3 max-w-[85%] md:max-w-[70%]">
                       <ThinkingAnimation type={thinkingType} />
