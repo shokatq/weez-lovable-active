@@ -24,15 +24,17 @@ const ChatSidebar = ({
 }: ChatSidebarProps) => {
   const formatTime = (date: Date) => {
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today.getTime() - 86400000);
+    const chatDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-    if (minutes < 1) return "now";
-    if (minutes < 60) return `${minutes}m`;
-    if (hours < 24) return `${hours}h`;
-    return `${days}d`;
+    if (chatDate.getTime() === today.getTime()) {
+      return "Today";
+    } else if (chatDate.getTime() === yesterday.getTime()) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
   };
 
   const getConversationPreview = (conversation: Conversation) => {
@@ -83,7 +85,7 @@ const ChatSidebar = ({
         className={`w-full justify-start text-left p-3 h-auto rounded-xl text-sm transition-all duration-300 slide-in-right ${
           currentConversationId === conversation.id 
             ? 'bg-blue-50 border border-blue-200 text-blue-900 shadow-sm' 
-            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 hover:border-slate-200 border border-transparent'
         }`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -106,15 +108,7 @@ const ChatSidebar = ({
 
       <SidebarFooter className="p-4 border-t border-slate-100 space-y-3">
         <Button
-          onClick={() => window.location.href = '/enterprise'}
-          className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 mb-2"
-        >
-          <Building2 className="w-4 h-4 mr-2" />
-          Enterprise
-        </Button>
-        
-        <Button
-          onClick={onNavigateToWorkspace}
+          onClick={() => window.location.href = '/workspace-new'}
           className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
         >
           <Building2 className="w-4 h-4 mr-2" />

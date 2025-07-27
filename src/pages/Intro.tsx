@@ -151,7 +151,7 @@ const Intro = () => {
 
             <div className="bg-black p-8 rounded-xl border border-gray-800 hover:border-gray-600 transition-all duration-300 group">
               <div className="flex items-center space-x-3 mb-6">
-                <Calendar className="w-8 h-8 text-yellow-400 group-hover:scale-110 transition-transform" />
+                <Calendar className="w-8 h-8 text-orange-400 group-hover:scale-110 transition-transform" />
                 <h3 className="text-xl font-semibold text-white">Task Manager</h3>
               </div>
               <p className="text-gray-400 leading-relaxed">

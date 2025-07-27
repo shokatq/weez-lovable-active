@@ -139,7 +139,7 @@ const WorkspaceInterface = () => {
             <div className="flex items-center gap-6">
               <Button
                 variant="ghost"
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/chat")}
                 className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 p-3 rounded-xl transition-all duration-300"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -152,6 +152,13 @@ const WorkspaceInterface = () => {
               </div>
             </div>
             <div className="flex gap-4">
+              <Button 
+                onClick={() => navigate("/chat")}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-indigo-500/20"
+              >
+                <MessageSquare className="w-5 h-5 mr-3" />
+                Chat Interface
+              </Button>
               <Button 
                 onClick={() => navigate("/workspace")}
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-emerald-500/20"
@@ -286,10 +293,10 @@ const WorkspaceInterface = () => {
                         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                         <input
                           type="text"
-                          placeholder="Semantic search across all your files..."
+                          placeholder="Search files, owners, or content..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-all duration-300"
+                          className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all duration-300"
                         />
                       </div>
                     </div>
@@ -375,7 +382,7 @@ const WorkspaceInterface = () => {
                                   variant="ghost" 
                                   size="sm" 
                                   onClick={() => handleFileAction('rename', file.id, file.name)}
-                                  className="text-slate-600 hover:text-yellow-600 hover:bg-yellow-50 p-3 rounded-xl transition-all duration-300" 
+                                  className="text-slate-600 hover:text-orange-600 hover:bg-orange-50 p-3 rounded-xl transition-all duration-300" 
                                   title="Rename"
                                 >
                                   <Edit3 className="w-5 h-5" />
@@ -571,18 +578,26 @@ const WorkspaceInterface = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-                      <span className="text-slate-700">File Access Rate</span>
-                      <span className="text-emerald-600 font-bold">87.3%</span>
+                  <div className="space-y-8">
+                    <div className="bg-gradient-to-r from-emerald-50 to-blue-50 p-6 rounded-xl border border-emerald-200">
+                      <h4 className="text-slate-800 font-semibold mb-4">Team Performance Graph</h4>
+                      <div className="h-32 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
+                        <p className="text-slate-500 font-medium">Interactive Chart - 94.1% Productivity</p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-                      <span className="text-slate-700">Team Productivity</span>
-                      <span className="text-blue-600 font-bold">94.1%</span>
-                    </div>
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-                      <span className="text-slate-700">Storage Efficiency</span>
-                      <span className="text-violet-600 font-bold">91.8%</span>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <span className="text-slate-700">File Access Rate</span>
+                        <span className="text-emerald-600 font-bold">87.3%</span>
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <span className="text-slate-700">Team Productivity</span>
+                        <span className="text-blue-600 font-bold">94.1%</span>
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <span className="text-slate-700">Storage Efficiency</span>
+                        <span className="text-violet-600 font-bold">91.8%</span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -610,6 +625,72 @@ const WorkspaceInterface = () => {
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
                       <span className="text-slate-700">Last Backup</span>
                       <span className="text-violet-600 font-bold">2 hrs ago</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <Card className="bg-white/80 border-slate-200/50 backdrop-blur-md shadow-xl">
+                <CardHeader>
+                  <CardTitle className="text-slate-900 font-bold text-2xl flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-500 to-slate-600 flex items-center justify-center">
+                      <Settings className="w-6 h-6 text-white" />
+                    </div>
+                    Workspace Essentials
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">General Settings</h4>
+                      <p className="text-slate-600 text-sm">Configure workspace preferences and defaults</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">Team Permissions</h4>
+                      <p className="text-slate-600 text-sm">Manage access levels and user roles</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">Data Backup</h4>
+                      <p className="text-slate-600 text-sm">Automated backup and recovery settings</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">Integration Settings</h4>
+                      <p className="text-slate-600 text-sm">Configure platform connections and APIs</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/80 border-slate-200/50 backdrop-blur-md shadow-xl">
+                <CardHeader>
+                  <CardTitle className="text-slate-900 font-bold text-2xl flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                      <Shield className="w-6 h-6 text-white" />
+                    </div>
+                    Security & Privacy
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">Two-Factor Authentication</h4>
+                      <p className="text-slate-600 text-sm">Enhanced security for your workspace</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">Data Encryption</h4>
+                      <p className="text-slate-600 text-sm">End-to-end encryption for sensitive files</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">Access Logs</h4>
+                      <p className="text-slate-600 text-sm">Monitor workspace access and activities</p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <h4 className="text-slate-800 font-semibold mb-2">Privacy Controls</h4>
+                      <p className="text-slate-600 text-sm">Manage data sharing and visibility settings</p>
                     </div>
                   </div>
                 </CardContent>
