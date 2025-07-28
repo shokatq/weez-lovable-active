@@ -35,6 +35,11 @@ const ChatInterface = () => {
   const analyzeUserIntent = (message: string) => {
     const lowerMessage = message.toLowerCase();
     
+    // Deep learning files summary pattern - NEW SPECIFIC PROMPT! 🤖
+    if (lowerMessage.match(/(summarise|summarize)\s+my\s+deep\s+learning\s+files/i)) {
+      return 'deep-learning-summary';
+    }
+    
     // Platform-specific summary patterns - NEW ENHANCEMENT! ✨
     if (lowerMessage.match(/(summarize|summary|give me.+summary|insights from|show me summaries).+(from|in|on).+(google drive|drive|dropbox|slack|notion|onedrive)/i) ||
         lowerMessage.match(/(google drive|drive|dropbox|slack|notion|onedrive).+(summarize|summary|summaries|insights)/i)) {
@@ -77,6 +82,11 @@ const ChatInterface = () => {
     // Summary patterns
     if (lowerMessage.match(/(summarize|summary|give me.+summary|explain.+detail|overview)/i)) {
       return 'summary';
+    }
+    
+    // Advanced RAG patterns for specific technical queries
+    if (lowerMessage.match(/(explain the implementation of|how to implement|best practices for|compare and contrast|detailed analysis of)/i)) {
+      return 'advanced-rag';
     }
     
     // RAG/Question patterns
@@ -175,6 +185,222 @@ From instant document answers to deep enterprise-wide intelligence, Weez solves 
     } else {
       return `## Quick Summary: ${file.name}\n\n${file.summary.split('.')[0]}.\n\n**Key highlights:** ${file.tags.slice(0, 3).join(', ')}`;
     }
+  };
+
+  const handleDeepLearningSummary = async () => {
+    return `## 🤖 Deep Learning Files Summary
+
+📊 **Your Deep Learning Collection Overview**
+
+I've analyzed your deep learning related files across all platforms. Here's a comprehensive summary:
+
+### 🧠 **Core Deep Learning Documents:**
+
+**1. Deep Learning Architecture Guide**
+📅 Last Modified: Jan 15, 2024 | 📊 Size: 3.2 MB | 👤 Author: Dr. Sarah Chen
+📋 **Summary:** Comprehensive guide covering neural network architectures including CNNs, RNNs, and Transformers. Includes implementation examples and best practices for model design.
+🏷️ **Key Topics:** Neural Networks, CNN, RNN, Transformer, Architecture Design
+📂 **Platform:** Google Drive
+
+**2. ResNet Implementation Tutorial**
+📅 Last Modified: Jan 12, 2024 | 📊 Size: 2.8 MB | 👤 Author: Michael Rodriguez
+📋 **Summary:** Step-by-step implementation of ResNet architecture with skip connections. Covers vanishing gradient problem solutions and performance optimization techniques.
+🏷️ **Key Topics:** ResNet, Skip Connections, Gradient Flow, Image Classification
+📂 **Platform:** Slack
+
+**3. Computer Vision with Deep Learning**
+📅 Last Modified: Jan 10, 2024 | 📊 Size: 4.1 MB | 👤 Author: AI Research Team
+📋 **Summary:** Advanced computer vision techniques using deep learning. Covers object detection, image segmentation, and feature extraction methods.
+🏷️ **Key Topics:** Computer Vision, Object Detection, Image Segmentation, Feature Extraction
+📂 **Platform:** Dropbox
+
+### 🧠 **AI Insights:**
+• **Total Files:** 6 deep learning documents
+• **Combined Size:** 15.7 MB
+• **Most Recent:** Deep Learning Architecture Guide (Jan 15, 2024)
+• **Primary Focus Areas:** Neural Networks, Computer Vision, Model Architecture
+• **Platforms Distribution:** 3 Google Drive, 2 Slack, 1 Dropbox
+
+### 📈 **Key Concepts Covered:**
+• Neural Network Fundamentals
+• Convolutional Neural Networks (CNNs)
+• Recurrent Neural Networks (RNNs)
+• Transformer Architecture
+• ResNet and Skip Connections
+• Computer Vision Applications
+• Model Optimization Techniques
+
+**💡 Ready to dive deeper? Ask me specific questions about any architecture or concept!**`;
+  };
+
+  const handleAdvancedRAGOperation = async (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    const topic = extractTopicFromQuery(message);
+    const relevantFiles = semanticSearch(topic);
+    
+    if (relevantFiles.length === 0) {
+      return `I don't have specific technical information about "${topic}" in your current files. Would you like me to search for related technical documents or implementation guides?`;
+    }
+    
+    const primaryFile = relevantFiles[0];
+    const secondaryFile = relevantFiles[1];
+    
+    // Advanced technical responses with implementation details
+    const advancedAnswers = {
+      'resnet implementation': `## 🛠️ ResNet Implementation Guide
+
+**Architecture Overview:**
+ResNet solves the vanishing gradient problem through identity shortcut connections that skip one or more layers.
+
+### 🔧 **Implementation Steps:**
+
+1. **Basic Building Block:**
+\`\`\`python
+def residual_block(x, filters, stride=1):
+    shortcut = x
+    
+    # First conv layer
+    x = Conv2D(filters, 3, strides=stride, padding='same')(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+    
+    # Second conv layer
+    x = Conv2D(filters, 3, padding='same')(x)
+    x = BatchNormalization()(x)
+    
+    # Adjust shortcut if needed
+    if stride != 1 or shortcut.shape[-1] != filters:
+        shortcut = Conv2D(filters, 1, strides=stride)(shortcut)
+        shortcut = BatchNormalization()(shortcut)
+    
+    # Add shortcut (skip connection)
+    x = Add()([x, shortcut])
+    x = ReLU()(x)
+    return x
+\`\`\`
+
+2. **Best Practices:**
+• Use batch normalization after each convolutional layer
+• Initialize weights with He initialization
+• Apply data augmentation for better generalization
+• Use learning rate scheduling
+
+**📈 Performance Optimization:**
+• Bottleneck design for deeper networks (ResNet-50+)
+• Pre-activation variant for improved gradient flow
+• Proper weight decay regularization
+
+*Implementation details from: ${primaryFile.name}*
+*Additional context: ${secondaryFile ? secondaryFile.name : 'Related documentation'}*`,
+
+      'transformer architecture': `## 🧠 Transformer Architecture Deep Dive
+
+**Core Innovation:** Self-attention mechanism that processes all positions simultaneously.
+
+### 🔧 **Implementation Components:**
+
+1. **Multi-Head Attention:**
+\`\`\`python
+class MultiHeadAttention(nn.Module):
+    def __init__(self, d_model, num_heads):
+        super().__init__()
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_k = d_model // num_heads
+        
+        self.W_q = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
+        self.W_v = nn.Linear(d_model, d_model)
+        self.W_o = nn.Linear(d_model, d_model)
+    
+    def forward(self, query, key, value, mask=None):
+        # Implementation details...
+        return output, attention_weights
+\`\`\`
+
+2. **Key Design Principles:**
+• Positional encoding for sequence order
+• Layer normalization for stable training
+• Residual connections around each sub-layer
+• Feed-forward networks with ReLU activation
+
+**🚀 Optimization Strategies:**
+• Gradient clipping to prevent explosion
+• Warmup learning rate schedule
+• Label smoothing for regularization
+• Mixed precision training for efficiency
+
+*Technical reference: ${primaryFile.name}*`,
+
+      'cnn best practices': `## 📸 CNN Implementation Best Practices
+
+**Architecture Design Principles:**
+
+### 🏗️ **Layer Configuration:**
+1. **Convolutional Layers:**
+   • Start with smaller filters (3x3, 5x5)
+   • Increase depth gradually
+   • Use padding to maintain spatial dimensions
+   
+2. **Pooling Strategy:**
+   • Max pooling for feature selection
+   • Average pooling for global features
+   • Adaptive pooling for variable input sizes
+
+### 🎯 **Implementation Guidelines:**
+
+\`\`\`python
+# Modern CNN Block
+def conv_block(x, filters, kernel_size=3, stride=1):
+    x = Conv2D(filters, kernel_size, strides=stride, 
+               padding='same', use_bias=False)(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+    x = Dropout(0.1)(x)  # Light regularization
+    return x
+\`\`\`
+
+**🔧 Optimization Techniques:**
+• Data augmentation: rotation, scaling, flipping
+• Transfer learning from pre-trained models
+• Progressive resizing during training
+• Test-time augmentation for inference
+
+*Practical guide from: ${primaryFile.name}*`
+    };
+    
+    // Check for specific advanced topics
+    if (lowerMessage.includes('implementation') && lowerMessage.includes('resnet')) {
+      return advancedAnswers['resnet implementation'];
+    } else if (lowerMessage.includes('transformer') && lowerMessage.includes('architecture')) {
+      return advancedAnswers['transformer architecture'];
+    } else if (lowerMessage.includes('best practices') && lowerMessage.includes('cnn')) {
+      return advancedAnswers['cnn best practices'];
+    }
+    
+    // Generic advanced response
+    return `## 🔬 Advanced Technical Analysis: ${topic}
+
+Based on your files, here's a comprehensive technical breakdown:
+
+### 📋 **Implementation Details:**
+${primaryFile.summary}
+
+### 🛠️ **Technical Specifications:**
+• **Platform:** ${primaryFile.platform}
+• **Document Type:** ${primaryFile.type}
+• **Key Technologies:** ${primaryFile.tags.join(', ')}
+
+### 🚀 **Best Practices & Optimization:**
+${secondaryFile ? `Additional insights from ${secondaryFile.name}: ${secondaryFile.summary.substring(0, 150)}...` : 'Refer to implementation guidelines in the primary document.'}
+
+### 💡 **Recommended Next Steps:**
+• Review the implementation code examples
+• Test with your specific use case
+• Consider performance benchmarking
+• Implement monitoring and logging
+
+*Technical analysis based on: ${primaryFile.name}${secondaryFile ? ` and ${secondaryFile.name}` : ''}*`;
   };
 
   const handleRAGOperation = async (message: string) => {
@@ -549,6 +775,17 @@ ${platformFiles.map((file, index) =>
 
     try {
       switch (intent) {
+        case 'deep-learning-summary':
+          thinkingTime = 3500;
+          response = await handleDeepLearningSummary();
+          // Attach sample deep learning files
+          files = [
+            { id: 'dl-1', name: 'Deep_Learning_Architecture_Guide.pdf', platform: 'Google Drive', size: '3.2 MB' },
+            { id: 'dl-2', name: 'ResNet_Implementation_Tutorial.pdf', platform: 'Slack', size: '2.8 MB' },
+            { id: 'dl-3', name: 'Computer_Vision_Deep_Learning.pdf', platform: 'Dropbox', size: '4.1 MB' }
+          ];
+          break;
+          
         case 'platform-summary':
           thinkingTime = 2800;
           response = await handlePlatformSummaryOperation(userMessage);
@@ -576,6 +813,13 @@ ${platformFiles.map((file, index) =>
           response = await handleSummaryOperation(userMessage);
           const regularSummaryFile = findFileByDescription(userMessage);
           if (regularSummaryFile) files = [regularSummaryFile];
+          break;
+          
+        case 'advanced-rag':
+          thinkingTime = 3500;
+          response = await handleAdvancedRAGOperation(userMessage);
+          const advancedTopic = extractTopicFromQuery(userMessage);
+          files = semanticSearch(advancedTopic).slice(0, 3);
           break;
           
         case 'rag':
