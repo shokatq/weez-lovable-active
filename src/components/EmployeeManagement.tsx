@@ -216,7 +216,9 @@ const EmployeeManagement = ({ employees, onEmployeesUpdate }: EmployeeManagement
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                     <div className="flex gap-2">
+                      {/* Role-based access control: Only show admin actions if user is admin */}
+                      {/* For demo purposes, assuming current user is admin */}
                       {employee.role === 'employee' ? (
                         <Button
                           size="sm"
@@ -225,7 +227,7 @@ const EmployeeManagement = ({ employees, onEmployeesUpdate }: EmployeeManagement
                           className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                           <Crown className="w-3 h-3 mr-1" />
-                          Promote
+                          Promote to Admin
                         </Button>
                       ) : (
                         <Button
@@ -235,18 +237,21 @@ const EmployeeManagement = ({ employees, onEmployeesUpdate }: EmployeeManagement
                           className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                           <Shield className="w-3 h-3 mr-1" />
-                          Demote
+                          Demote to Employee
                         </Button>
                       )}
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleRemoveEmployee(employee.id)}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        <UserMinus className="w-3 h-3 mr-1" />
-                        Remove
-                      </Button>
+                      {/* Admin cannot be removed by other admins for security */}
+                      {employee.role !== 'admin' && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleRemoveEmployee(employee.id)}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          <UserMinus className="w-3 h-3 mr-1" />
+                          Remove
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

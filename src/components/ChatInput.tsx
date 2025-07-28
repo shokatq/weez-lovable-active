@@ -77,14 +77,14 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
           </div>
 
           {/* Message input area */}
-          <div className="flex-1 min-w-0 py-3 px-1">
+          <div className="flex-1 min-w-0 py-3 px-1 flex items-center">
             <Textarea
               ref={textareaRef}
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
               placeholder="Message Weez AI..."
-              className="w-full min-h-[24px] max-h-[200px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-[16px] leading-6 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+              className="w-full min-h-[24px] max-h-[200px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-[16px] leading-6 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none flex items-center"
               rows={1}
             />
           </div>

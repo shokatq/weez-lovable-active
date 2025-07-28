@@ -45,7 +45,7 @@ const ChatSidebar = ({
 
   return (
     <Sidebar 
-      className="w-72 bg-gradient-to-b from-slate-50 to-white border-r border-slate-200 shadow-lg data-[state=collapsed]:w-0 transition-all duration-300 ease-in-out" 
+      className="w-72 bg-gradient-to-b from-slate-50 to-white border-r border-slate-200 shadow-lg data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=collapsed]:invisible transition-none" 
       collapsible="offcanvas"
     >
       <SidebarHeader className="p-4 border-b border-slate-100">

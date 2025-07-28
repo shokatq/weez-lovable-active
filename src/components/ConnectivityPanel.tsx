@@ -70,7 +70,7 @@ const ConnectivityPanel = () => {
       id: "confluence",
       name: "Confluence",
       description: "Access team documentation and wikis",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/0/09/Confluence_icon.svg",
+      icon: "/lovable-uploads/b3623f20-0cca-49eb-bf58-e28d521f52e1.png",
       connected: false,
       color: "bg-blue-700",
       isConnecting: false
@@ -89,9 +89,27 @@ const ConnectivityPanel = () => {
 
   const handleConnect = async (id: string) => {
     if (id === "custom-request") {
+      const subject = "Custom Integration Request - Weez AI";
+      const body = `Hello Weez AI Team,
+
+I would like to request a custom integration for my company.
+
+Company Name: [Your Company Name]
+Integration Needed: [Describe the platform/service you want to integrate]
+Use Case: [Explain how you plan to use this integration]
+Contact Information: [Your contact details]
+
+Please let me know the next steps.
+
+Best regards,
+[Your Name]`;
+      
+      const mailtoLink = `mailto:support@weezai.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(mailtoLink, '_blank');
+      
       toast({
-        title: "Custom Request Submitted",
-        description: "We'll get back to you with integration options soon!",
+        title: "Email Client Opened",
+        description: "Please complete and send the integration request email.",
       });
       return;
     }

@@ -81,40 +81,91 @@ const WorkspaceDashboard = () => {
 
       <div className="p-8">
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
           {workspaceStats.map((stat, index) => (
             <Card 
               key={stat.title} 
-              className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-2 animate-fade-in card-hover"
+              className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in card-hover"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600 text-xs font-medium mb-1">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="text-xl font-bold text-gray-900">{stat.value}</p>
                     <div className="flex items-center gap-1 mt-1">
                       <TrendingUp className="w-3 h-3 text-green-600" />
                       <span className="text-xs text-green-600 font-medium">{stat.change}</span>
                     </div>
                   </div>
-                  <div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center shadow-sm`}>
-                    <stat.icon className="w-5 h-5 text-white" />
+                  <div className={`w-8 h-8 rounded-lg ${stat.color} flex items-center justify-center shadow-sm`}>
+                    <stat.icon className="w-4 h-4 text-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+        
+        {/* Analytics Section */}
+        <div className="mb-6">
+          <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in">
+            <CardHeader className="pb-4 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900">Performance Analytics</CardTitle>
+                  <CardDescription className="text-gray-600 font-medium">Track your workspace performance</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium bg-white">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </Button>
+                  <Button 
+                    onClick={() => window.location.href = '/chat'}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    Go to Chat
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-2">File Access Rate</h4>
+                  <div className="text-2xl font-bold text-blue-700 mb-1">94%</div>
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '94%' }}></div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+                  <h4 className="font-semibold text-green-900 mb-2">Response Time</h4>
+                  <div className="text-2xl font-bold text-green-700 mb-1">0.8s</div>
+                  <div className="w-full bg-green-200 rounded-full h-2">
+                    <div className="bg-green-600 h-2 rounded-full" style={{ width: '85%' }}></div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+                  <h4 className="font-semibold text-purple-900 mb-2">Success Rate</h4>
+                  <div className="text-2xl font-bold text-purple-700 mb-1">99.2%</div>
+                  <div className="w-full bg-purple-200 rounded-full h-2">
+                    <div className="bg-purple-600 h-2 rounded-full" style={{ width: '99%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Files */}
+          {/* Files Stored */}
           <div className="lg:col-span-2">
             <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '400ms' }}>
               <CardHeader className="pb-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl font-semibold text-gray-900">Recent Files</CardTitle>
+                    <CardTitle className="text-xl font-semibold text-gray-900">Files Stored</CardTitle>
                     <CardDescription className="text-gray-600 font-medium">Latest documents across all platforms</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -122,9 +173,9 @@ const WorkspaceDashboard = () => {
                       <Filter className="w-4 h-4 mr-2" />
                       Filter
                     </Button>
-                    <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium">
+                    <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium bg-white">
                       <Search className="w-4 h-4 mr-2" />
-                      Search
+                      Search files, owners or content
                     </Button>
                   </div>
                 </div>
