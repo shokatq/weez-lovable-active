@@ -22,7 +22,7 @@ const ChatInterface = () => {
   });
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState("default");
-  const [showWorkspacePrompt, setShowWorkspacePrompt] = useState(false);
+  const [showWorkspacePrompt, setShowWorkspacePrompt] = useState(true);
   const navigate = useNavigate();
 
   // Initialize with a default conversation
@@ -1049,20 +1049,20 @@ ${platformFiles.map((file, index) =>
                      <h3 className="text-lg font-semibold mb-3">Ready to collaborate with your team?</h3>
                      <p className="text-muted-foreground mb-4">Create or join a workspace to share knowledge and work together efficiently.</p>
                      <div className="flex gap-3">
-                       <Button 
-                         onClick={() => navigate("/workspace-new")}
-                         variant="default"
-                         className="flex-1"
-                       >
-                         Create Workspace
-                       </Button>
-                       <Button 
-                         onClick={() => navigate("/dashboard")}
-                         variant="outline"
-                         className="flex-1"
-                       >
-                         View Teams
-                       </Button>
+                        <Button 
+                          onClick={() => navigate("/dashboard")}
+                          variant="default"
+                          className="flex-1"
+                        >
+                          Team Dashboard
+                        </Button>
+                        <Button 
+                          onClick={() => navigate("/workspace-new")}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          Workspace
+                        </Button>
                      </div>
                    </div>
                  </div>
