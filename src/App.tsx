@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Workspace from "./pages/Workspace";
 import WorkspaceNew from "./pages/WorkspaceNew";
+import WorkspaceSetup from "./pages/WorkspaceSetup";
 import NotionInterface from "./pages/NotionInterface";
 import ChatInterface from "./components/ChatInterface";
 import Auth from "./pages/Auth";
@@ -52,6 +53,11 @@ const App = () => {
               <Route path="/workspace-new" element={
                 <ProtectedRoute>
                   <WorkspaceNew />
+                </ProtectedRoute>
+              } />
+              <Route path="/workspace-setup" element={
+                <ProtectedRoute>
+                  <WorkspaceSetup />
                 </ProtectedRoute>
               } />
               <Route path="/notion" element={

@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
-    const redirectUrl = `${window.location.origin}/chat`;
+    const redirectUrl = `${window.location.origin}/workspace-setup`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -91,7 +91,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (error) {
       toast.error(error.message);
     } else {
+      // Clear local state
+      setUser(null);
+      setSession(null);
       toast.success('Successfully signed out!');
+      // Redirect to home page
+      window.location.href = '/';
     }
   };
 
