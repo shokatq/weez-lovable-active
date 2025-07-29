@@ -5,7 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMessages from "@/components/ChatMessages";
-import ChatInput from "@/components/ChatInput";
+import ImprovedChatInput from "@/components/ImprovedChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import { Message, Conversation } from "@/types/chat";
 import { demoFiles, semanticSearch, findFileByDescription, extractTopicFromQuery } from "@/data/demoData";
@@ -974,35 +974,27 @@ ${platformFiles.map((file, index) =>
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50/20 text-slate-900 w-full relative">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.05),transparent_50%)] pointer-events-none"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(167,139,250,0.03),transparent_50%)] pointer-events-none"></div>
-        
-        <div className="relative z-10 flex w-full min-h-screen">
-          <ChatSidebar 
-            conversations={conversations}
-            currentConversationId={currentConversationId}
-            onConversationSelect={handleConversationSelect}
-            onNewConversation={handleNewConversation}
-            onNavigateToWorkspace={handleNavigateToWorkspace}
-          />
-          
-          <div className="flex-1 flex flex-col min-h-screen">
-            <ChatHeader />
-            
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <ChatMessages 
-                messages={messages} 
-                isThinking={isThinking}
-                thinkingType={thinkingType}
-                onSendMessage={handleSendMessage}
-              />
-              <ChatInput onSendMessage={handleSendMessage} />
-            </div>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-muted/10">
+        <ChatSidebar
+          conversations={conversations}
+          currentConversationId={currentConversationId}
+          onConversationSelect={handleConversationSelect}
+          onNewConversation={handleNewConversation}
+          onNavigateToWorkspace={handleNavigateToWorkspace}
+        />
+        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+          <ChatHeader />
+          <div className="flex-1 flex flex-col min-h-0">
+            <ChatMessages 
+              messages={messages} 
+              isThinking={isThinking}
+              thinkingType={thinkingType}
+              onSendMessage={handleSendMessage}
+            />
+            <ImprovedChatInput onSendMessage={handleSendMessage} disabled={isThinking} />
           </div>
         </div>
-
+      </div>
       <ChatWelcomeDialog 
         open={showWelcome} 
         onOpenChange={(open) => {
@@ -1010,9 +1002,8 @@ ${platformFiles.map((file, index) =>
           if (!open) {
             localStorage.setItem('weez-welcome-shown', 'true');
           }
-        }} 
+        }}
       />
-      </div>
     </SidebarProvider>
   );
 };

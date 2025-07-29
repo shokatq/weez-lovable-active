@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
-import { Plus, MessageSquare, Building2, Clock, MoreHorizontal, User, LogOut, UserPlus } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Plus, MessageSquare, Building2, Clock } from "lucide-react";
 import { Conversation } from "@/types/chat";
+import UserProfile from "./UserProfile";
 
 interface ChatSidebarProps {
   conversations: Conversation[];
@@ -45,23 +45,23 @@ const ChatSidebar = ({
 
   return (
     <Sidebar 
-      className="w-72 bg-gradient-to-b from-slate-50 to-white border-r border-slate-200 shadow-lg data-[state=collapsed]:w-0 data-[state=collapsed]:opacity-0 data-[state=collapsed]:invisible transition-none" 
+      className="w-72 bg-gradient-to-b from-background to-muted/20 border-r border-border shadow-lg data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden data-[state=collapsed]:transition-all transition-all duration-300" 
       collapsible="offcanvas"
     >
-      <SidebarHeader className="p-4 border-b border-slate-100">
+      <SidebarHeader className="p-4 border-b border-border">
         <div className="flex items-center gap-3 mb-4 fade-in">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
-            <MessageSquare className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+            <MessageSquare className="w-4 h-4 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Weez AI</h2>
-            <p className="text-xs text-slate-500">File Assistant</p>
+            <h2 className="text-sm font-bold text-foreground">Weez AI</h2>
+            <p className="text-xs text-muted-foreground">File Assistant</p>
           </div>
         </div>
         
         <Button
           onClick={onNewConversation}
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Chat
@@ -70,7 +70,7 @@ const ChatSidebar = ({
 
       <SidebarContent className="flex-1 p-3">
         <div className="mb-3">
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
             Recent Conversations
           </h3>
         </div>
@@ -84,8 +84,8 @@ const ChatSidebar = ({
                 onClick={() => onConversationSelect(conversation.id)}
         className={`w-full justify-start text-left p-3 h-auto rounded-xl text-sm transition-all duration-300 slide-in-right ${
           currentConversationId === conversation.id 
-            ? 'bg-blue-50 border border-blue-200 text-blue-900 shadow-sm' 
-            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 hover:border-slate-200 border border-transparent'
+            ? 'bg-primary/10 border border-primary/20 text-primary shadow-sm' 
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-border border border-transparent'
         }`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -94,8 +94,8 @@ const ChatSidebar = ({
                     {getConversationPreview(conversation)}
                   </p>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-slate-400 flex-shrink-0" />
-                    <span className="text-xs text-slate-400 truncate">
+                    <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                    <span className="text-xs text-muted-foreground truncate">
                       {formatTime(conversation.timestamp)}
                     </span>
                   </div>
@@ -106,45 +106,16 @@ const ChatSidebar = ({
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-slate-100 space-y-3">
+      <SidebarFooter className="p-4 border-t border-border space-y-3">
         <Button
           onClick={() => window.location.href = '/workspace-new'}
-          className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
         >
           <Building2 className="w-4 h-4 mr-2" />
           Workspace
         </Button>
         
-        <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors duration-200">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-md">
-            <User className="w-4 h-4" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-900 truncate">User</p>
-            <p className="text-xs text-slate-500 truncate">Premium Plan</p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-7 h-7 p-0 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg flex-shrink-0 transition-colors duration-200"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem className="cursor-pointer">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Sign in with other account
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer text-red-600">
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <UserProfile />
       </SidebarFooter>
     </Sidebar>
   );
