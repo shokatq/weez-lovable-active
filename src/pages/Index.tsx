@@ -177,33 +177,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative z-10 px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/5 backdrop-blur-sm shadow-2xl border-white/10 slide-up">
-            <CardContent className="p-12 text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mx-auto mb-8 shadow-lg">
-                <Zap className="w-10 h-10 text-black" />
-              </div>
-              <h2 className="text-4xl font-bold text-white mb-6">
-                Ready to Scale Your Marketing?
-              </h2>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Join forward-thinking marketing teams already using AI to 10x their productivity.
-              </p>
-              <div className="flex items-center justify-center gap-6">
-                <Button 
-                  onClick={() => navigate("/auth-landing")}
-                  size="lg"
-                  className="bg-white text-black hover:bg-gray-200 font-semibold px-10 py-4 rounded-xl text-lg shadow-lg"
-                >
-                  Start Your Journey
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="relative z-10 px-6 py-8 border-t border-white/10 backdrop-blur-sm">
