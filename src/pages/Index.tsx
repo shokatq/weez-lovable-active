@@ -76,13 +76,13 @@ const Index = () => {
           <div className="flex items-center gap-4 slide-in-right">
             <Button 
               variant="outline" 
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/auth?mode=signin")}
               className="transition-all duration-300"
             >
               Sign In
             </Button>
             <Button 
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/auth?mode=signup")}
               className="font-semibold px-6 py-2 rounded-lg transition-all duration-300"
             >
               Get Started
@@ -111,7 +111,7 @@ const Index = () => {
               
               <div className="flex items-center gap-6 slide-up" style={{ animationDelay: '0.4s' }}>
                 <Button 
-                  onClick={() => navigate("/auth")}
+                  onClick={() => navigate("/auth?mode=signup")}
                   size="lg"
                   className="font-semibold px-8 py-4 rounded-full text-lg shadow-lg transition-all duration-300"
                 >

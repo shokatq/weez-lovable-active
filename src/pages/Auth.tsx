@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 
 const Auth = () => {
   const { user, signIn, signUp } = useAuth();
+  const [searchParams] = useSearchParams();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +20,16 @@ const Auth = () => {
     firstName: '',
     lastName: '',
   });
+
+  // Set initial mode based on URL parameter
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'signup') {
+      setIsSignUp(true);
+    } else if (mode === 'signin') {
+      setIsSignUp(false);
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   if (user) {
