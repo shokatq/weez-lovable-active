@@ -76,13 +76,13 @@ const Index = () => {
           <div className="flex items-center gap-4 slide-in-right">
             <Button 
               variant="outline" 
-              onClick={() => navigate("/auth-landing")}
+              onClick={() => navigate("/auth")}
               className="border-white/20 text-white hover:bg-white/10 transition-all duration-300"
             >
               Sign In
             </Button>
             <Button 
-              onClick={() => navigate("/auth-landing")}
+              onClick={() => navigate("/auth")}
               className="bg-white text-black hover:bg-gray-200 font-semibold px-6 py-2 rounded-lg transition-all duration-300"
             >
               Get Started
@@ -111,7 +111,7 @@ const Index = () => {
               
               <div className="flex items-center gap-6 slide-up" style={{ animationDelay: '0.4s' }}>
                 <Button 
-                  onClick={() => navigate("/auth-landing")}
+                  onClick={() => navigate("/auth")}
                   size="lg"
                   className="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-8 py-4 rounded-full text-lg shadow-lg transition-all duration-300"
                 >
