@@ -27,7 +27,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Intro />} />
           <Route path="/home" element={<Index />} />
-          <Route path="/chat" element={<AuthGuard><ChatInterface /></AuthGuard>} />
+          <Route path="/chat" element={<ChatInterface />} />
           <Route path="/workspace" element={<Workspace />} />
           <Route path="/workspace-new" element={<WorkspaceNew />} />
           <Route path="/notion" element={<NotionInterface />} />
