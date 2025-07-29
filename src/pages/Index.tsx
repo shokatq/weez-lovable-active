@@ -93,11 +93,6 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
-                <Sparkles className="w-4 h-4 text-yellow-400" />
-                <span className="text-yellow-400 text-sm font-medium">Artistic illustrations</span>
-              </div>
-              
               <h1 className="text-6xl md:text-7xl font-bold text-white leading-tight slide-up">
                 Futuristic ideas
                 <br />
