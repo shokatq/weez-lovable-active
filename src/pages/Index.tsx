@@ -61,8 +61,12 @@ const Index = () => {
       <header className="relative z-10 px-6 py-6 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 fade-in">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white to-gray-200 flex items-center justify-center shadow-lg">
-              <MessageSquare className="w-6 h-6 text-black" />
+            <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-lg p-1">
+              <img 
+                src="/lovable-uploads/e8250074-5471-4035-9a66-a670ed06340a.png" 
+                alt="Weez AI Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">Weez AI</h1>
