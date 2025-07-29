@@ -280,6 +280,15 @@ export type Database = {
         Args: { user_id: string; team_id: string }
         Returns: boolean
       }
+      create_team_with_setup: {
+        Args: {
+          team_name: string
+          team_description?: string
+          user_first_name?: string
+          user_last_name?: string
+        }
+        Returns: Json
+      }
       get_user_role_in_team: {
         Args: { user_id: string; team_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

@@ -40,69 +40,64 @@ const WorkspaceSetup = () => {
       return;
     }
 
-    // Verify authentication session
+    // Verify authentication session is valid
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session) {
-      toast.error('Authentication required. Please sign in again.');
+    if (sessionError || !session?.access_token) {
+      console.error('Session verification failed:', sessionError);
+      toast.error('Authentication session expired. Please sign in again.');
       navigate('/auth');
       return;
     }
 
+    console.log('Creating workspace - User authenticated:', {
+      userId: user.id,
+      email: user.email,
+      sessionValid: !!session?.access_token
+    });
+
     setLoading(true);
     try {
-      // Create the team
-      const { data: team, error: teamError } = await supabase
-        .from('teams')
-        .insert({
-          name: formData.name,
-          description: formData.description,
-          created_by: user.id,
-        })
-        .select()
-        .single();
+      // Use the secure database function for team creation
+      const { data, error } = await supabase.rpc('create_team_with_setup', {
+        team_name: formData.name,
+        team_description: formData.description || null,
+        user_first_name: user.user_metadata?.first_name || null,
+        user_last_name: user.user_metadata?.last_name || null
+      });
 
-      if (teamError) throw teamError;
+      if (error) {
+        console.error('RPC function error:', error);
+        throw new Error(`Failed to create workspace: ${error.message}`);
+      }
 
-      // Add the creator as admin
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: user.id,
-          team_id: team.id,
-          role: 'admin',
-        });
+      // Check the function result - data is JSON, so we need to parse it properly
+      const result = data as any;
+      if (!result?.success) {
+        console.error('Workspace creation failed:', result);
+        throw new Error(result?.error || 'Unknown error occurred during workspace creation');
+      }
 
-      if (roleError) throw roleError;
-
-      // Add predefined departments
-      const departmentsToInsert = predefinedDepartments.map(dept => ({
-        name: dept.name,
-        description: dept.description,
-        team_id: team.id,
-      }));
-
-      const { error: deptError } = await supabase
-        .from('departments')
-        .insert(departmentsToInsert);
-
-      if (deptError) throw deptError;
-
-      // Add creator to team_employees
-      const { error: employeeError } = await supabase
-        .from('team_employees')
-        .insert({
-          user_id: user.id,
-          team_id: team.id,
-          status: 'active',
-        });
-
-      if (employeeError) throw employeeError;
-
+      console.log('Workspace created successfully:', data);
       toast.success('Workspace created successfully!');
       navigate('/workspace');
+      
     } catch (error: any) {
-      console.error('Error creating workspace:', error);
-      toast.error(error.message || 'Failed to create workspace');
+      console.error('Workspace creation error:', {
+        error: error.message,
+        stack: error.stack,
+        user: user?.id,
+        sessionExists: !!session
+      });
+      
+      // Provide user-friendly error messages
+      if (error.message?.includes('Authentication required')) {
+        toast.error('Please sign in again to create a workspace');
+        navigate('/auth');
+      } else if (error.message?.includes('row-level security')) {
+        toast.error('Permission denied. Please refresh and try again.');
+      } else {
+        toast.error(error.message || 'Failed to create workspace. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
