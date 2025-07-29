@@ -65,7 +65,7 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
 
   return (
     <div className="border-t border-border bg-background/80 backdrop-blur-sm">
-      <div className="max-w-2xl mx-auto p-4">
+      <div className="max-w-3xl mx-auto px-4 py-6">
         {/* File upload indicator */}
         {uploadingFiles.length > 0 && (
           <div className="mb-3 p-3 bg-muted/50 rounded-lg border border-border">
@@ -78,7 +78,7 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
 
         {/* Main input area */}
         <div className="relative">
-          <div className="flex items-end gap-3 p-3 bg-background border border-border rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 transition-all duration-200">
+          <div className="flex items-end gap-3 p-4 bg-background border border-border rounded-3xl shadow-lg hover:shadow-xl transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/50">
             {/* File upload button */}
             <Button
               variant="ghost"
