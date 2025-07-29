@@ -138,12 +138,6 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
             </div>
           </div>
 
-          {/* Helper text */}
-          <div className="mt-2 px-3">
-            <p className="text-xs text-muted-foreground">
-              Press <kbd className="px-1.5 py-0.5 text-xs font-medium bg-muted border border-border rounded">Enter</kbd> to send, <kbd className="px-1.5 py-0.5 text-xs font-medium bg-muted border border-border rounded">Shift + Enter</kbd> for new line
-            </p>
-          </div>
         </div>
 
         {/* Hidden file input */}
