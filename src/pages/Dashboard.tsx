@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, Users, Settings, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import TeamCreationCard from '@/components/TeamCreationCard';
 
 interface Team {
   id: string;
@@ -218,6 +219,7 @@ const Dashboard = () => {
             </Card>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <TeamCreationCard />
               {teams.map((team) => (
                 <Card key={team.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                   <CardHeader>

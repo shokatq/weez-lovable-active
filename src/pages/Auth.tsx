@@ -22,7 +22,7 @@ const Auth = () => {
 
   // Redirect if already authenticated
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/chat" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

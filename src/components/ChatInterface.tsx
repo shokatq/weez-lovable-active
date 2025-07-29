@@ -22,6 +22,7 @@ const ChatInterface = () => {
   });
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState("default");
+  const [showWorkspacePrompt, setShowWorkspacePrompt] = useState(false);
   const navigate = useNavigate();
 
   // Initialize with a default conversation
@@ -1032,19 +1033,40 @@ ${platformFiles.map((file, index) =>
                         <p className="text-sm text-muted-foreground">Locate brand guidelines and assets</p>
                       </div>
                     </Button>
-                    <Button
-                      variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("Analyze our competitor research")}
-                    >
-                      <div>
-                        <p className="font-medium">Market Research</p>
-                        <p className="text-sm text-muted-foreground">Review competitor analysis</p>
-                      </div>
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                     <Button
+                       variant="outline"
+                       className="text-left h-auto p-4 justify-start"
+                       onClick={() => handleSendMessage("Analyze our competitor research")}
+                     >
+                       <div>
+                         <p className="font-medium">Market Research</p>
+                         <p className="text-sm text-muted-foreground">Review competitor analysis</p>
+                       </div>
+                     </Button>
+                   </div>
+                   
+                   <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
+                     <h3 className="text-lg font-semibold mb-3">Ready to collaborate with your team?</h3>
+                     <p className="text-muted-foreground mb-4">Create or join a workspace to share knowledge and work together efficiently.</p>
+                     <div className="flex gap-3">
+                       <Button 
+                         onClick={() => navigate("/workspace-new")}
+                         variant="default"
+                         className="flex-1"
+                       >
+                         Create Workspace
+                       </Button>
+                       <Button 
+                         onClick={() => navigate("/dashboard")}
+                         variant="outline"
+                         className="flex-1"
+                       >
+                         View Teams
+                       </Button>
+                     </div>
+                   </div>
+                 </div>
+               </div>
             ) : (
               <ChatMessages 
                 messages={messages} 
