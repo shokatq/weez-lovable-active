@@ -32,7 +32,21 @@ const WorkspaceSetup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    
+    // Ensure user is authenticated
+    if (!user?.id) {
+      toast.error('Please sign in to create a workspace');
+      navigate('/auth');
+      return;
+    }
+
+    // Verify authentication session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      toast.error('Authentication required. Please sign in again.');
+      navigate('/auth');
+      return;
+    }
 
     setLoading(true);
     try {
