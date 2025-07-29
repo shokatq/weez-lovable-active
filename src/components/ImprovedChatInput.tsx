@@ -99,10 +99,10 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
               onKeyDown={handleKeyPress}
               disabled={disabled}
               className={cn(
-                "min-h-[44px] max-h-[200px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-muted-foreground text-sm leading-6",
+                "min-h-[80px] max-h-[300px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-muted-foreground text-sm leading-6",
                 "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
               )}
-              style={{ height: "44px" }}
+              style={{ height: "80px" }}
             />
 
             {/* Action buttons */}
