@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, 
   FileText, 
@@ -17,19 +18,15 @@ import {
   Filter,
   MoreHorizontal,
   Folder,
-  Download
+  Download,
+  MessageSquare
 } from "lucide-react";
-import { workspaceStats, recentFiles, teamMembers } from "@/data/workspaceData";
-import AddMemberDialog from "./AddMemberDialog";
+import { workspaceStats, recentFiles, teamMembers, demoEmployees } from "@/data/workspaceData";
+import TeamManagement from "./TeamManagement";
+import { Employee } from "@/types/workspace";
 
 const WorkspaceDashboard = () => {
-  const [showAddMember, setShowAddMember] = useState(false);
-
-  const handleAddMember = (member: { name: string; email: string; role: string; department: string }) => {
-    console.log('Adding new member:', member);
-    // Here you would typically add the member to your data store
-    // For now, we'll just log it
-  };
+  const [employees, setEmployees] = useState<Employee[]>(demoEmployees);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,11 +66,11 @@ const WorkspaceDashboard = () => {
               Settings
             </Button>
             <Button 
-              onClick={() => setShowAddMember(true)}
-              className="bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+              onClick={() => window.location.href = '/chat'}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Member
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Go to Chat
             </Button>
           </div>
         </div>
@@ -158,15 +155,149 @@ const WorkspaceDashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Files Stored */}
-          <div className="lg:col-span-2">
-            <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '400ms' }}>
+        {/* Main Content */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="files">Files Stored</TabsTrigger>
+            <TabsTrigger value="team">Team Management</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Files Stored */}
+              <div className="lg:col-span-2">
+                <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in">
+                  <CardHeader className="pb-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-xl font-semibold text-gray-900">Files Stored</CardTitle>
+                        <CardDescription className="text-gray-600 font-medium">Latest documents across all platforms</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium">
+                          <Filter className="w-4 h-4 mr-2" />
+                          Filter
+                        </Button>
+                        <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium bg-white">
+                          <Search className="w-4 h-4 mr-2" />
+                          Search files, owners or content
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="h-96">
+                      <div className="p-6 space-y-4">
+                        {recentFiles.slice(0, 6).map((file, index) => (
+                          <div 
+                            key={file.name} 
+                            className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-all duration-200 border border-gray-100 hover:border-gray-200 group animate-fade-in"
+                            style={{ animationDelay: `${500 + index * 50}ms` }}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200">
+                                <FileText className="w-5 h-5 text-blue-600" />
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-1">{file.name}</h4>
+                                <div className="flex items-center gap-3 text-sm">
+                                  <span className={`font-medium ${getPlatformColor(file.platform)}`}>
+                                    {file.platform}
+                                  </span>
+                                  <span className="text-gray-500">•</span>
+                                  <span className="text-gray-600 font-medium">{file.size}</span>
+                                  <span className="text-gray-500">•</span>
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-gray-500" />
+                                    <span className="text-gray-600 font-medium">{file.lastModified}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge className={`${getStatusColor(file.status)} font-medium`}>
+                                {file.status}
+                              </Badge>
+                              <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Team Overview & Storage */}
+              <div className="space-y-6">
+                <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in">
+                  <CardHeader className="pb-4 border-b border-gray-100">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Team Overview</CardTitle>
+                    <CardDescription className="text-gray-600 font-medium">Active workspace users</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      {teamMembers.slice(0, 4).map((member, index) => (
+                        <div 
+                          key={member.name} 
+                          className="flex items-center gap-3 animate-fade-in"
+                          style={{ animationDelay: `${700 + index * 100}ms` }}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold shadow-sm">
+                            {member.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{member.name}</p>
+                            <p className="text-sm text-gray-600 font-medium">{member.role}</p>
+                          </div>
+                          <Badge className={`${getStatusColor(member.status)} text-xs font-medium`}>
+                            {member.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in">
+                  <CardHeader className="pb-4 border-b border-gray-100">
+                    <CardTitle className="text-lg font-semibold text-gray-900">Storage Usage</CardTitle>
+                    <CardDescription className="text-gray-600 font-medium">Across all platforms</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700">Used Storage</span>
+                        <span className="text-sm font-semibold text-gray-900">847 GB / 2 TB</span>
+                      </div>
+                      <Progress value={42} className="h-2" />
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-2xl font-bold text-gray-900">1,247</p>
+                          <p className="text-sm text-gray-600 font-medium">Total Files</p>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-2xl font-bold text-gray-900">5</p>
+                          <p className="text-sm text-gray-600 font-medium">Platforms</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="files" className="space-y-6 mt-6">
+            <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300">
               <CardHeader className="pb-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl font-semibold text-gray-900">Files Stored</CardTitle>
-                    <CardDescription className="text-gray-600 font-medium">Latest documents across all platforms</CardDescription>
+                    <CardTitle className="text-xl font-semibold text-gray-900">All Files Stored</CardTitle>
+                    <CardDescription className="text-gray-600 font-medium">Complete file library across all platforms</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50 font-medium">
@@ -181,13 +312,12 @@ const WorkspaceDashboard = () => {
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="h-96">
+                <ScrollArea className="h-[600px]">
                   <div className="p-6 space-y-4">
                     {recentFiles.map((file, index) => (
                       <div 
                         key={file.name} 
-                        className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-all duration-200 border border-gray-100 hover:border-gray-200 group animate-fade-in"
-                        style={{ animationDelay: `${500 + index * 50}ms` }}
+                        className="flex items-center justify-between p-4 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-all duration-200 border border-gray-100 hover:border-gray-200 group"
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200">
@@ -223,74 +353,19 @@ const WorkspaceDashboard = () => {
                 </ScrollArea>
               </CardContent>
             </Card>
-          </div>
+          </TabsContent>
 
-          {/* Team Members */}
-          <div className="space-y-6">
-            <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '600ms' }}>
-              <CardHeader className="pb-4 border-b border-gray-100">
-                <CardTitle className="text-lg font-semibold text-gray-900">Team Members</CardTitle>
-                <CardDescription className="text-gray-600 font-medium">Active workspace users</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {teamMembers.map((member, index) => (
-                    <div 
-                      key={member.name} 
-                      className="flex items-center gap-3 animate-fade-in"
-                      style={{ animationDelay: `${700 + index * 100}ms` }}
-                    >
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold shadow-sm">
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900">{member.name}</p>
-                        <p className="text-sm text-gray-600 font-medium">{member.role}</p>
-                      </div>
-                      <Badge className={`${getStatusColor(member.status)} text-xs font-medium`}>
-                        {member.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Storage Usage */}
-            <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in" style={{ animationDelay: '800ms' }}>
-              <CardHeader className="pb-4 border-b border-gray-100">
-                <CardTitle className="text-lg font-semibold text-gray-900">Storage Usage</CardTitle>
-                <CardDescription className="text-gray-600 font-medium">Across all platforms</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Used Storage</span>
-                    <span className="text-sm font-semibold text-gray-900">847 GB / 2 TB</span>
-                  </div>
-                  <Progress value={42} className="h-2" />
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <p className="text-2xl font-bold text-gray-900">1,247</p>
-                      <p className="text-sm text-gray-600 font-medium">Total Files</p>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <p className="text-2xl font-bold text-gray-900">5</p>
-                      <p className="text-sm text-gray-600 font-medium">Platforms</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+          <TabsContent value="team" className="space-y-6 mt-6">
+            <TeamManagement 
+              employees={employees} 
+              onEmployeesUpdate={setEmployees}
+              currentUserRole="admin"
+              currentUserId="current-user"
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
-      <AddMemberDialog 
-        open={showAddMember} 
-        onOpenChange={setShowAddMember} 
-        onAddMember={handleAddMember}
-      />
     </div>
   );
 };

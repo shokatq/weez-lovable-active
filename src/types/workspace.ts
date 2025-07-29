@@ -3,7 +3,7 @@ export interface Employee {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'employee';
+  role: 'admin' | 'employee' | 'team-lead' | 'contributor' | 'viewer';
   joinDate: Date;
   lastActive: Date;
   avatar?: string;
