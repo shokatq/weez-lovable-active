@@ -134,7 +134,7 @@ const Index = () => {
                 <img 
                   src="/lovable-uploads/2b0def8d-5248-407f-9292-436e182a1ed1.png" 
                   alt="Marketing Operations Illustration" 
-                  className="w-full max-w-lg h-auto object-contain filter invert"
+                  className="w-full max-w-lg h-auto object-contain filter invert rounded-3xl"
                 />
               </div>
             </div>
