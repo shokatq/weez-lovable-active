@@ -68,46 +68,47 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
         </div>
       )}
       
-      {/* ChatGPT-style Input Container */}
-      <div className="max-w-3xl mx-auto">
-        <div className="relative flex items-end w-full bg-white rounded-3xl border border-gray-300 shadow-sm hover:shadow-md transition-all duration-200 focus-within:border-gray-400 focus-within:shadow-md">
-          {/* Left side icons */}
-          <div className="flex items-center pl-4 pb-3 pt-3">
+      {/* Compact Input Container */}
+      <div className="max-w-2xl mx-auto">
+        <div className="relative flex items-center w-full bg-background rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-200 focus-within:border-primary/50 focus-within:shadow-md">
+          {/* Left side file upload */}
+          <div className="flex items-center pl-3">
             <FileUpload onFileSelect={handleFileSelect} />
           </div>
 
           {/* Message input area */}
-          <div className="flex-1 min-w-0 py-3 px-1 flex items-center">
+          <div className="flex-1 min-w-0 px-2 py-2">
             <Textarea
               ref={textareaRef}
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
               placeholder="Message Weez AI..."
-              className="w-full min-h-[24px] max-h-[200px] bg-transparent border-none resize-none text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:ring-offset-0 text-[16px] leading-6 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none flex items-center"
+              className="w-full min-h-[20px] max-h-[120px] bg-transparent border-none resize-none text-foreground placeholder:text-muted-foreground focus:ring-0 focus:ring-offset-0 text-sm leading-5 px-2 py-1 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
               rows={1}
             />
           </div>
 
           {/* Send button */}
-          <div className="flex items-center pr-3 pb-3 pt-3">
+          <div className="flex items-center pr-3">
             <Button
               onClick={handleSend}
               size="icon"
-              className={`w-8 h-8 rounded-lg transition-all duration-200 ${
+              variant="ghost"
+              className={`w-7 h-7 rounded-lg transition-all duration-200 ${
                 message.trim() 
-                  ? 'bg-gray-900 hover:bg-gray-800 text-white' 
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed hover:bg-gray-200'
+                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
+                  : 'bg-muted text-muted-foreground cursor-not-allowed hover:bg-muted'
               }`}
               disabled={!message.trim()}
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5" />
             </Button>
           </div>
         </div>
 
         {/* Helper text */}
-        <p className="text-center text-xs text-gray-500 mt-3">
+        <p className="text-center text-xs text-muted-foreground mt-2">
           Weez AI can make mistakes. Consider checking important information.
         </p>
       </div>

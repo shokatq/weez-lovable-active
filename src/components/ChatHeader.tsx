@@ -16,7 +16,6 @@ const ChatHeader = () => {
         <SidebarTrigger className="h-8 w-8" />
         <div className="flex items-center gap-2">
           <h1 className="text-lg font-semibold text-foreground">Weez AI</h1>
-          <span className="text-xs bg-muted px-2 py-1 rounded-full text-muted-foreground">Marketing</span>
         </div>
       </div>
       
