@@ -1045,26 +1045,6 @@ ${platformFiles.map((file, index) =>
                      </Button>
                    </div>
                    
-                   <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
-                     <h3 className="text-lg font-semibold mb-3">Ready to collaborate with your team?</h3>
-                     <p className="text-muted-foreground mb-4">Create or join a workspace to share knowledge and work together efficiently.</p>
-                     <div className="flex gap-3">
-                        <Button 
-                          onClick={() => navigate("/dashboard")}
-                          variant="default"
-                          className="flex-1"
-                        >
-                          Team Dashboard
-                        </Button>
-                        <Button 
-                          onClick={() => navigate("/workspace-new")}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          Workspace
-                        </Button>
-                     </div>
-                   </div>
                  </div>
                </div>
             ) : (
