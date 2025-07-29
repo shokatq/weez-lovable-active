@@ -85,7 +85,7 @@ const WorkspaceSetup = () => {
       if (employeeError) throw employeeError;
 
       toast.success('Workspace created successfully!');
-      navigate('/dashboard');
+      navigate('/workspace');
     } catch (error: any) {
       console.error('Error creating workspace:', error);
       toast.error(error.message || 'Failed to create workspace');

@@ -7,10 +7,11 @@ import { Users, FileText, TrendingUp, Settings, Plus, Search, Filter, ArrowRight
 import { demoWorkspace, sampleFiles } from "@/data/workspaceData";
 import AddMemberDialog from "./AddMemberDialog";
 import WorkspaceWelcomeDialog from "./WorkspaceWelcomeDialog";
+import WorkspaceChatInterface from "./WorkspaceChatInterface";
 import { useToast } from "@/hooks/use-toast";
 
 const WorkspaceInterface = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('chat');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
@@ -22,11 +23,11 @@ const WorkspaceInterface = () => {
   });
 
   const tabs = [
+    { id: 'chat', label: 'AI Assistant & Analytics', icon: MessageSquare },
     { id: 'overview', label: 'Overview', icon: TrendingUp },
     { id: 'files-weez', label: 'Files Stored with Weez', icon: Database },
     { id: 'files', label: 'File Management', icon: FileText },
     { id: 'team', label: 'Team Management', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: Activity },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -153,20 +154,6 @@ const WorkspaceInterface = () => {
             </div>
             <div className="flex gap-4">
               <Button 
-                onClick={() => navigate("/chat")}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-indigo-500/20"
-              >
-                <MessageSquare className="w-5 h-5 mr-3" />
-                Chat Interface
-              </Button>
-              <Button 
-                onClick={() => navigate("/workspace")}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-emerald-500/20"
-              >
-                <TrendingUp className="w-5 h-5 mr-3" />
-                Dashboard
-              </Button>
-              <Button 
                 onClick={() => setIsAddMemberOpen(true)}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-blue-500/20"
               >
@@ -210,6 +197,10 @@ const WorkspaceInterface = () => {
               </Card>
             ))}
           </div>
+
+          {activeTab === 'chat' && (
+            <WorkspaceChatInterface />
+          )}
 
           {activeTab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
