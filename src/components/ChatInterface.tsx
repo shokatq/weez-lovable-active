@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { MessageSquare } from "lucide-react";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMessages from "@/components/ChatMessages";
@@ -974,7 +976,7 @@ ${platformFiles.map((file, index) =>
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-muted/10">
+      <div className="flex h-screen w-full bg-background">
         <ChatSidebar
           conversations={conversations}
           currentConversationId={currentConversationId}
@@ -982,28 +984,96 @@ ${platformFiles.map((file, index) =>
           onNewConversation={handleNewConversation}
           onNavigateToWorkspace={handleNavigateToWorkspace}
         />
-        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        
+        <div className="flex-1 flex flex-col min-w-0">
           <ChatHeader />
+          
           <div className="flex-1 flex flex-col min-h-0">
-            <ChatMessages 
-              messages={messages} 
-              isThinking={isThinking}
-              thinkingType={thinkingType}
-              onSendMessage={handleSendMessage}
-            />
-            <ImprovedChatInput onSendMessage={handleSendMessage} disabled={isThinking} />
+            {messages.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center p-8">
+                <div className="text-center max-w-2xl mx-auto">
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <MessageSquare className="w-8 h-8 text-primary-foreground" />
+                  </div>
+                  <h2 className="text-2xl font-semibold text-foreground mb-3">
+                    How can I help you today?
+                  </h2>
+                  <p className="text-muted-foreground mb-8">
+                    Ask me anything about your marketing files, campaigns, or strategy. I'm here to help you find insights and create content.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("Summarize my latest marketing campaign files")}
+                    >
+                      <div>
+                        <p className="font-medium">Campaign Analysis</p>
+                        <p className="text-sm text-muted-foreground">Summarize my latest marketing files</p>
+                      </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("Help me create content for social media")}
+                    >
+                      <div>
+                        <p className="font-medium">Content Creation</p>
+                        <p className="text-sm text-muted-foreground">Generate social media content</p>
+                      </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("Find files about our brand guidelines")}
+                    >
+                      <div>
+                        <p className="font-medium">Brand Assets</p>
+                        <p className="text-sm text-muted-foreground">Locate brand guidelines and assets</p>
+                      </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("Analyze our competitor research")}
+                    >
+                      <div>
+                        <p className="font-medium">Market Research</p>
+                        <p className="text-sm text-muted-foreground">Review competitor analysis</p>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <ChatMessages 
+                messages={messages} 
+                isThinking={isThinking}
+                thinkingType={thinkingType}
+                onSendMessage={handleSendMessage}
+              />
+            )}
+            
+            <div className="border-t border-border bg-background p-4">
+              <div className="max-w-4xl mx-auto">
+                <ImprovedChatInput onSendMessage={handleSendMessage} disabled={isThinking} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <ChatWelcomeDialog 
-        open={showWelcome} 
-        onOpenChange={(open) => {
-          setShowWelcome(open);
-          if (!open) {
-            localStorage.setItem('weez-welcome-shown', 'true');
-          }
-        }}
-      />
+      
+      {showWelcome && (
+        <ChatWelcomeDialog
+          open={showWelcome}
+          onOpenChange={(open) => {
+            setShowWelcome(open);
+            if (!open) {
+              localStorage.setItem('weez-welcome-shown', 'true');
+            }
+          }}
+        />
+      )}
     </SidebarProvider>
   );
 };

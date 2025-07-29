@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
-import { Plus, MessageSquare, Building2, Clock } from "lucide-react";
+import { Plus, MessageSquare, Building2, Clock, Settings, Trash2 } from "lucide-react";
 import { Conversation } from "@/types/chat";
 import UserProfile from "./UserProfile";
+import ThemeToggle from "./ThemeToggle";
 
 interface ChatSidebarProps {
   conversations: Conversation[];
@@ -45,23 +46,26 @@ const ChatSidebar = ({
 
   return (
     <Sidebar 
-      className="w-72 bg-gradient-to-b from-background to-muted/20 border-r border-border shadow-lg data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden data-[state=collapsed]:transition-all transition-all duration-300" 
+      className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
       collapsible="offcanvas"
     >
-      <SidebarHeader className="p-4 border-b border-border">
-        <div className="flex items-center gap-3 mb-4 fade-in">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
-            <MessageSquare className="w-4 h-4 text-primary-foreground" />
+      <SidebarHeader className="p-4 border-b border-sidebar-border">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-sidebar-foreground">Weez AI</h2>
+              <p className="text-xs text-muted-foreground">Marketing Assistant</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-sm font-bold text-foreground">Weez AI</h2>
-            <p className="text-xs text-muted-foreground">File Assistant</p>
-          </div>
+          <ThemeToggle />
         </div>
         
         <Button
           onClick={onNewConversation}
-          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-lg text-sm h-auto shadow-sm transition-all duration-200"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Chat
@@ -69,50 +73,54 @@ const ChatSidebar = ({
       </SidebarHeader>
 
       <SidebarContent className="flex-1 p-3">
-        <div className="mb-3">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
-            Recent Conversations
-          </h3>
-        </div>
-        
         <ScrollArea className="flex-1">
           <div className="space-y-1 pb-4">
             {conversations.map((conversation, index) => (
-              <Button
-                key={conversation.id}
-                variant="ghost"
-                onClick={() => onConversationSelect(conversation.id)}
-        className={`w-full justify-start text-left p-3 h-auto rounded-xl text-sm transition-all duration-300 slide-in-right ${
-          currentConversationId === conversation.id 
-            ? 'bg-primary/10 border border-primary/20 text-primary shadow-sm' 
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-border border border-transparent'
-        }`}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="flex-1 min-w-0 overflow-hidden">
-                  <p className="font-medium line-clamp-2 leading-tight mb-1 truncate text-sm">
-                    {getConversationPreview(conversation)}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-xs text-muted-foreground truncate">
-                      {formatTime(conversation.timestamp)}
-                    </span>
+              <div key={conversation.id} className="group relative">
+                <Button
+                  variant="ghost"
+                  onClick={() => onConversationSelect(conversation.id)}
+                  className={`w-full justify-start text-left p-3 h-auto rounded-lg text-sm transition-all duration-200 ${
+                    currentConversationId === conversation.id 
+                      ? 'bg-muted text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <p className="font-medium line-clamp-1 leading-tight mb-1 text-sm">
+                      {getConversationPreview(conversation)}
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                      <span className="text-xs text-muted-foreground">
+                        {formatTime(conversation.timestamp)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Button>
+                </Button>
+                {currentConversationId === conversation.id && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                )}
+              </div>
             ))}
           </div>
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-border space-y-3">
+      <SidebarFooter className="p-4 border-t border-sidebar-border space-y-3">
         <Button
           onClick={() => window.location.href = '/workspace-new'}
-          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-medium py-2.5 px-4 rounded-xl text-sm h-auto shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+          variant="outline"
+          className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
         >
           <Building2 className="w-4 h-4 mr-2" />
-          Workspace
+          Marketing Workspace
         </Button>
         
         <UserProfile />
