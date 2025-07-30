@@ -11,6 +11,7 @@ import WorkspaceNew from "./pages/WorkspaceNew";
 import ChatInterface from "./components/ChatInterface";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import AcceptInvitation from "./pages/AcceptInvitation";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -32,6 +33,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/accept-invitation" element={<AcceptInvitation />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />

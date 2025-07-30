@@ -45,7 +45,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Sending invitation email to:", inviteeEmail);
 
-    const acceptUrl = `${Deno.env.get("SUPABASE_URL")?.replace('/auth', '')}/accept-invitation?id=${invitationId}`;
+    // Construct the accept invitation URL - use the frontend URL
+    const frontendUrl = 'https://usuthdsminfqguflnzgs.lovable.app';
+    const acceptUrl = `${frontendUrl}/accept-invitation?id=${invitationId}`;
 
     const emailResponse = await resend.emails.send({
       from: "Weez.AI <onboarding@resend.dev>",
