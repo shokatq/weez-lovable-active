@@ -148,19 +148,24 @@ const EnhancedTeamManagement = () => {
 
     setInviteLoading(true);
     try {
-      // Create team invitation
-      const { data: invitation, error: inviteError } = await supabase
-        .from('team_invitations')
-        .insert({
-          email: inviteForm.email,
+      // Use the secure function for team invitations
+      const { data: result, error: functionError } = await supabase
+        .rpc('handle_team_invitation', {
+          invitation_email: inviteForm.email,
           team_id: userRole.teamId,
           role: inviteForm.role as 'admin' | 'team_lead' | 'employee' | 'viewer',
           invited_by: user.id,
-        })
-        .select()
-        .single();
+          custom_department: inviteForm.useCustomDepartment ? inviteForm.customDepartment : null
+        });
 
-      if (inviteError) throw inviteError;
+      if (functionError) {
+        throw functionError;
+      }
+
+      const invitationResult = result as any;
+      if (!invitationResult?.success) {
+        throw new Error(invitationResult?.error || 'Failed to create invitation');
+      }
 
       // Send invitation email
       const { error: emailError } = await supabase.functions.invoke('send-team-invitation', {
@@ -173,7 +178,7 @@ const EnhancedTeamManagement = () => {
           userDepartment: inviteForm.useCustomDepartment ? inviteForm.customDepartment :
                          departments.find(d => d.id === inviteForm.department)?.name || 'General',
           inviterName: `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || user.email,
-          invitationId: invitation.id,
+          invitationId: invitationResult.invitation_id,
         },
       });
 
@@ -196,6 +201,9 @@ const EnhancedTeamManagement = () => {
         useCustomDepartment: false,
       });
       setInviteDialogOpen(false);
+      
+      // Refresh team members
+      fetchTeamMembers();
     } catch (error: any) {
       console.error('Error sending invitation:', error);
       toast.error(error.message || 'Failed to send invitation');

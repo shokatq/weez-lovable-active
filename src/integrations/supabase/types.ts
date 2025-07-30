@@ -102,6 +102,7 @@ export type Database = {
       }
       team_employees: {
         Row: {
+          avatar_url: string | null
           created_at: string | null
           custom_department: string | null
           custom_role: string | null
@@ -109,12 +110,14 @@ export type Database = {
           id: string
           invited_by: string | null
           joined_at: string | null
+          last_active: string | null
           status: string | null
           team_id: string | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string | null
           custom_department?: string | null
           custom_role?: string | null
@@ -122,12 +125,14 @@ export type Database = {
           id?: string
           invited_by?: string | null
           joined_at?: string | null
+          last_active?: string | null
           status?: string | null
           team_id?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string | null
           custom_department?: string | null
           custom_role?: string | null
@@ -135,6 +140,7 @@ export type Database = {
           id?: string
           invited_by?: string | null
           joined_at?: string | null
+          last_active?: string | null
           status?: string | null
           team_id?: string | null
           updated_at?: string | null
@@ -276,6 +282,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_team_invitation: {
+        Args: { invitation_id: string }
+        Returns: Json
+      }
       can_view_user_roles: {
         Args: { user_id: string; team_id: string }
         Returns: boolean
@@ -292,6 +302,16 @@ export type Database = {
       get_user_role_in_team: {
         Args: { user_id: string; team_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      handle_team_invitation: {
+        Args: {
+          invitation_email: string
+          team_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          invited_by: string
+          custom_department?: string
+        }
+        Returns: Json
       }
       is_team_admin: {
         Args: { user_id: string; team_id: string }
