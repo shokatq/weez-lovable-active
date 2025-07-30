@@ -115,7 +115,7 @@ const ChatSidebar = ({
 
       <SidebarFooter className="p-4 border-t border-sidebar-border space-y-3">
         <Button
-          onClick={() => window.location.href = '/workspace-new'}
+          onClick={onNavigateToWorkspace}
           variant="outline"
           className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
         >
