@@ -235,7 +235,7 @@ What specific area would you like me to analyze for you?`;
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 h-full">
       {/* Analytics Overview */}
       <div className="xl:col-span-1 space-y-4">
-        <Card className="bg-white/80 border-primary/20 backdrop-blur-md shadow-lg">
+        <Card className="bg-card border-border backdrop-blur-md shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary">
               <TrendingUp className="w-5 h-5" />
@@ -268,7 +268,7 @@ What specific area would you like me to analyze for you?`;
           </CardContent>
         </Card>
 
-        <Card className="bg-white/80 border-primary/20 backdrop-blur-md shadow-lg">
+        <Card className="bg-card border-border backdrop-blur-md shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary">
               <Activity className="w-5 h-5" />
@@ -294,7 +294,7 @@ What specific area would you like me to analyze for you?`;
 
       {/* Chat Interface */}
       <div className="xl:col-span-2">
-        <Card className="bg-white/80 border-primary/20 backdrop-blur-md shadow-lg h-[600px] flex flex-col">
+        <Card className="bg-card border-border backdrop-blur-md shadow-lg h-[600px] flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary">
               <MessageSquare className="w-5 h-5" />

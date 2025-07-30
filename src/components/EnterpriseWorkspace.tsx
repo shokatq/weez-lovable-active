@@ -7,11 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { LogOut, Users, MessageCircle, Settings, Search, Plus, UserPlus, Building2, Briefcase } from "lucide-react";
+import { LogOut, Users, MessageCircle, Settings, Search, Plus, UserPlus, Building2, Briefcase, BarChart3, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import WorkspaceChatInterface from "./WorkspaceChatInterface";
 import EnhancedTeamManagement from "./EnhancedTeamManagement";
+import AdvancedAnalytics from "./AdvancedAnalytics";
+import DocumentManagement from "./DocumentManagement";
 
 const EnterpriseWorkspace = () => {
   const { user, signOut } = useAuth();
@@ -201,7 +203,7 @@ const EnterpriseWorkspace = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-card border border-border">
+          <TabsList className="grid w-full grid-cols-6 bg-card border border-border">
             <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Briefcase className="w-4 h-4 mr-2" />
               Overview
@@ -209,6 +211,14 @@ const EnterpriseWorkspace = () => {
             <TabsTrigger value="chat" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <MessageCircle className="w-4 h-4 mr-2" />
               AI Assistant
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="documents" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <FileText className="w-4 h-4 mr-2" />
+              Documents
             </TabsTrigger>
             {canManageTeam && (
               <TabsTrigger value="team" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
@@ -256,6 +266,26 @@ const EnterpriseWorkspace = () => {
                     <span className="text-xs text-muted-foreground">Get AI-powered insights</span>
                   </Button>
                   
+                  <Button 
+                    variant="outline" 
+                    className="h-auto p-4 flex flex-col items-center space-y-2 border-border hover:bg-muted"
+                    onClick={() => setActiveTab("analytics")}
+                  >
+                    <BarChart3 className="w-6 h-6 text-primary" />
+                    <span className="text-foreground">Advanced Analytics</span>
+                    <span className="text-xs text-muted-foreground">Performance insights & metrics</span>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-auto p-4 flex flex-col items-center space-y-2 border-border hover:bg-muted"
+                    onClick={() => setActiveTab("documents")}
+                  >
+                    <FileText className="w-6 h-6 text-primary" />
+                    <span className="text-foreground">Document Hub</span>
+                    <span className="text-xs text-muted-foreground">Manage files & knowledge base</span>
+                  </Button>
+                  
                   {canManageTeam && (
                     <Button 
                       variant="outline" 
@@ -287,6 +317,16 @@ const EnterpriseWorkspace = () => {
             <div className="h-[calc(100vh-300px)]">
               <WorkspaceChatInterface />
             </div>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <AdvancedAnalytics />
+          </TabsContent>
+
+          {/* Documents Tab */}
+          <TabsContent value="documents" className="space-y-6">
+            <DocumentManagement />
           </TabsContent>
 
           {/* Team Management Tab */}
