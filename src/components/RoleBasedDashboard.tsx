@@ -26,10 +26,10 @@ const RoleBasedDashboard = () => {
   const { userRole, hasTeam, loading, isAdmin, canManageTeam } = useUserRole();
   const navigate = useNavigate();
 
-  // Redirect to workspace setup if user has no team
+  // Redirect to workspace if user has no team (will show team creation screen)
   useEffect(() => {
     if (!loading && !hasTeam) {
-      navigate('/workspace-setup');
+      navigate('/workspace-new');
     }
   }, [loading, hasTeam, navigate]);
 
@@ -231,14 +231,14 @@ const RoleBasedDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Building2 className="w-5 h-5" />
-                    Workspace Tools
+                    Enterprise Workspace
                   </CardTitle>
                   <CardDescription>
-                    Access your workspace management tools
+                    Access your enterprise workspace with AI-powered tools
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button onClick={() => navigate('/notion')} variant="outline" className="w-full">
+                  <Button onClick={() => navigate('/workspace-new')} variant="outline" className="w-full">
                     Open Workspace
                   </Button>
                 </CardContent>

@@ -1,8 +1,8 @@
 
-import WorkspaceInterface from "@/components/WorkspaceInterface";
+import EnterpriseWorkspace from "@/components/EnterpriseWorkspace";
 
 const WorkspaceNew = () => {
-  return <WorkspaceInterface />;
+  return <EnterpriseWorkspace />;
 };
 
 export default WorkspaceNew;

@@ -7,10 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Workspace from "./pages/Workspace";
 import WorkspaceNew from "./pages/WorkspaceNew";
-import WorkspaceSetup from "./pages/WorkspaceSetup";
-import NotionInterface from "./pages/NotionInterface";
 import ChatInterface from "./components/ChatInterface";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -47,22 +44,12 @@ const App = () => {
               } />
               <Route path="/workspace" element={
                 <ProtectedRoute>
-                  <Workspace />
+                  <WorkspaceNew />
                 </ProtectedRoute>
               } />
               <Route path="/workspace-new" element={
                 <ProtectedRoute>
                   <WorkspaceNew />
-                </ProtectedRoute>
-              } />
-              <Route path="/workspace-setup" element={
-                <ProtectedRoute>
-                  <WorkspaceSetup />
-                </ProtectedRoute>
-              } />
-              <Route path="/notion" element={
-                <ProtectedRoute>
-                  <NotionInterface />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
