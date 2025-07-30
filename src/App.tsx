@@ -47,11 +47,6 @@ const App = () => {
                   <WorkspaceNew />
                 </ProtectedRoute>
               } />
-              <Route path="/workspace-new" element={
-                <ProtectedRoute>
-                  <WorkspaceNew />
-                </ProtectedRoute>
-              } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

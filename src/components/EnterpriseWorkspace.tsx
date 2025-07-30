@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { LogOut, Users, MessageCircle, Settings, Search, Plus, UserPlus, Building2, Briefcase, BarChart3, FileText } from "lucide-react";
+import { LogOut, Users, MessageCircle, Settings, Search, Plus, UserPlus, Building2, Briefcase, BarChart3, FileText, ArrowLeft } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import WorkspaceChatInterface from "./WorkspaceChatInterface";
@@ -170,6 +171,16 @@ const EnterpriseWorkspace = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => window.location.href = '/chat'}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Back to Chat</span>
+              </Button>
+              <Separator orientation="vertical" className="h-6" />
               <Building2 className="w-8 h-8 text-primary" />
               <h1 className="text-xl font-semibold text-foreground">Enterprise Workspace</h1>
               <Badge variant="secondary" className="bg-primary/20 text-primary">
