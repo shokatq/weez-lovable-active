@@ -27,20 +27,11 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Initialize Supabase client
+    // Initialize Supabase client with service role for server-side operations
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
-
-    // Get the authorization header
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
-
-    // Set the auth header for the client
-    supabaseClient.auth.setAuth(authHeader.replace('Bearer ', ''));
 
     const {
       inviteeEmail,
