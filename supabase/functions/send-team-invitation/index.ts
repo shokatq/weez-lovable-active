@@ -48,7 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
     const acceptUrl = `${Deno.env.get("SUPABASE_URL")?.replace('/auth', '')}/accept-invitation?id=${invitationId}`;
 
     const emailResponse = await resend.emails.send({
-      from: "Weez.AI <team@weez.ai>",
+      from: "Weez.AI <onboarding@resend.dev>",
       to: [inviteeEmail],
       subject: `You've been invited to join ${workspaceName} at Weez.AI`,
       html: `
