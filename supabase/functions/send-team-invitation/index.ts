@@ -49,8 +49,15 @@ const handler = async (req: Request): Promise<Response> => {
     const frontendUrl = 'https://usuthdsminfqguflnzgs.lovable.app';
     const acceptUrl = `${frontendUrl}/accept-invitation?id=${invitationId}`;
 
+    // Use a verified domain or the account owner's email for testing
+    // For production, replace with your verified domain
+    const fromEmail = "Weez.AI <sayyadshokat21@gmail.com>";
+    
+    console.log("Using from email:", fromEmail);
+    console.log("Invitation URL:", acceptUrl);
+
     const emailResponse = await resend.emails.send({
-      from: "Weez.AI <onboarding@resend.dev>",
+      from: fromEmail,
       to: [inviteeEmail],
       subject: `You've been invited to join ${workspaceName} at Weez.AI`,
       html: `
