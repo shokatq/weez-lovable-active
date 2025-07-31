@@ -12,6 +12,7 @@ import ChatInterface from "./components/ChatInterface";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AcceptInvitation from "./pages/AcceptInvitation";
+import Audit from "./pages/Audit";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -47,6 +48,11 @@ const App = () => {
               <Route path="/workspace" element={
                 <ProtectedRoute>
                   <WorkspaceNew />
+                </ProtectedRoute>
+              } />
+              <Route path="/audit" element={
+                <ProtectedRoute>
+                  <Audit />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

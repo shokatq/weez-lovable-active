@@ -14,6 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      anomaly_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          resolved_at: string | null
+          severity: string | null
+          status: string | null
+          team_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+          team_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          new_values: Json | null
+          old_values: Json | null
+          resource_id: string | null
+          resource_type: string
+          severity: string | null
+          team_id: string | null
+          timestamp: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          severity?: string | null
+          team_id?: string | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          severity?: string | null
+          team_id?: string | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           created_at: string | null
@@ -48,6 +135,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      document_versions: {
+        Row: {
+          content: Json | null
+          created_at: string
+          document_id: string
+          id: string
+          metadata: Json | null
+          team_id: string | null
+          user_id: string | null
+          version_number: number
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          document_id: string
+          id?: string
+          metadata?: Json | null
+          team_id?: string | null
+          user_id?: string | null
+          version_number: number
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          document_id?: string
+          id?: string
+          metadata?: Json | null
+          team_id?: string | null
+          user_id?: string | null
+          version_number?: number
+        }
+        Relationships: []
+      }
+      permission_audits: {
+        Row: {
+          granted_by: string | null
+          id: string
+          new_permission: string | null
+          old_permission: string | null
+          permission_type: string
+          resource_id: string | null
+          resource_type: string | null
+          target_user_id: string | null
+          team_id: string | null
+          timestamp: string
+          user_id: string | null
+        }
+        Insert: {
+          granted_by?: string | null
+          id?: string
+          new_permission?: string | null
+          old_permission?: string | null
+          permission_type: string
+          resource_id?: string | null
+          resource_type?: string | null
+          target_user_id?: string | null
+          team_id?: string | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Update: {
+          granted_by?: string | null
+          id?: string
+          new_permission?: string | null
+          old_permission?: string | null
+          permission_type?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          target_user_id?: string | null
+          team_id?: string | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       permissions: {
         Row: {
@@ -290,6 +452,22 @@ export type Database = {
         Args: { user_id: string; team_id: string }
         Returns: boolean
       }
+      create_audit_log: {
+        Args: {
+          p_user_id: string
+          p_team_id: string
+          p_action: string
+          p_resource_type: string
+          p_resource_id?: string
+          p_old_values?: Json
+          p_new_values?: Json
+          p_metadata?: Json
+          p_ip_address?: unknown
+          p_user_agent?: string
+          p_severity?: string
+        }
+        Returns: string
+      }
       create_team_with_setup: {
         Args: {
           team_name: string
@@ -298,6 +476,10 @@ export type Database = {
           user_last_name?: string
         }
         Returns: Json
+      }
+      detect_anomalies: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       get_user_role_in_team: {
         Args: { user_id: string; team_id: string }
