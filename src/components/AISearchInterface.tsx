@@ -6,15 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Brain, FileText, Lightbulb } from "lucide-react";
 import { fastApiService } from "@/services/fastApiService";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const AISearchInterface = () => {
+  const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [ragResponse, setRagResponse] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState("search");
+
+  const getUserId = () => user?.email || user?.id || 'anonymous_user';
 
   const handleSemanticSearch = async () => {
     if (!query.trim()) return;
@@ -23,7 +27,7 @@ const AISearchInterface = () => {
     try {
       const result = await fastApiService.search({
         query_text: query,
-        user_id: 'current_user', // Replace with actual user ID
+        user_id: getUserId(),
         top_k: 10
       });
       
@@ -50,7 +54,7 @@ const AISearchInterface = () => {
       const result = await fastApiService.ask({
         action: 'rag_query',
         query_text: query,
-        user_id: 'current_user',
+        user_id: getUserId(),
         top_k: 10
       });
       
@@ -76,7 +80,7 @@ const AISearchInterface = () => {
     try {
       const result = await fastApiService.askAgent({
         query: query,
-        user_id: 'current_user'
+        user_id: getUserId()
       });
       
       if (result.success && result.data?.response) {
@@ -99,7 +103,7 @@ const AISearchInterface = () => {
       try {
         const result = await fastApiService.getSearchSuggestions({
           partial_query: query,
-          user_id: 'current_user',
+          user_id: getUserId(),
           limit: 5
         });
         

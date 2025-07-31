@@ -91,6 +91,16 @@ const ConnectivityPanel = () => {
   ]);
 
   const handleConnect = async (id: string) => {
+    // Check if user is authenticated
+    if (!user?.email) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to connect your platforms.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (id === "custom-request") {
       const subject = "Custom Integration Request - Weez AI";
       const body = `Hello Weez AI Team,
@@ -129,7 +139,8 @@ Best regards,
           )
         );
 
-        const authUrl = `${import.meta.env.VITE_FLASK_URL || 'http://localhost:5000'}/auth/google`;
+        const baseUrl = 'http://localhost:5000'; // Use actual Flask backend URL
+        const authUrl = `${baseUrl}/auth/google?user_email=${encodeURIComponent(user?.email || '')}`;
         window.open(authUrl, '_blank', 'width=600,height=600');
         
         // Simulate auth completion and sync
@@ -182,7 +193,8 @@ Best regards,
           )
         );
 
-        const authUrl = `${import.meta.env.VITE_FLASK_URL || 'http://localhost:5000'}/auth/slack`;
+        const baseUrl = 'http://localhost:5000'; // Use actual Flask backend URL
+        const authUrl = `${baseUrl}/auth/slack?user_email=${encodeURIComponent(user?.email || '')}`;
         window.open(authUrl, '_blank', 'width=600,height=600');
         
         // Simulate auth completion and sync

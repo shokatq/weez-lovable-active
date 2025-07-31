@@ -2,7 +2,7 @@ import { Message } from '@/types/chat';
 
 // Configuration - Flask backend for platform connections
 const FLASK_BASE_URL = import.meta.env.VITE_FLASK_URL || 'http://localhost:5000';
-const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_URL || 'https://your-azure-fastapi-url.azurewebsites.net';
+const FASTAPI_BASE_URL = 'https://weez-openai-resource.azurewebsites.net'; // Updated to actual Azure URL
 
 export interface SearchRequest {
   query_text: string;
