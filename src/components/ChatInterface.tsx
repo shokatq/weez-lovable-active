@@ -5,7 +5,7 @@ import { useGlobalAuditLogger } from '@/hooks/useGlobalAuditLogger';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings } from "lucide-react";
+import { MessageSquare, Settings, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
@@ -13,6 +13,7 @@ import ChatMessages from "@/components/ChatMessages";
 import ImprovedChatInput from "@/components/ImprovedChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import ConnectivityPanel from "./ConnectivityPanel";
+import AISearchInterface from "./AISearchInterface";
 import { Message, Conversation } from "@/types/chat";
 import { fastApiService, detectIntent, startPlatformSync } from "@/services/fastApiService";
 import { toast } from "sonner";
@@ -103,8 +104,9 @@ From instant document answers to deep enterprise-wide intelligence, Weez solves 
   const handleSearchOperation = async (message: string) => {
     try {
       const result = await fastApiService.search({
-        query: message,
-        limit: 10
+        query_text: message,
+        user_id: 'current_user', // Replace with actual user ID
+        top_k: 10
       });
       
       if (!result.success || !result.data?.results) {
@@ -125,11 +127,13 @@ From instant document answers to deep enterprise-wide intelligence, Weez solves 
 
   const handleSummaryOperation = async (message: string) => {
     try {
-      const summaryLevel = message.toLowerCase().includes('detail') ? 'detailed' : 'brief';
+      const summaryLevel = message.toLowerCase().includes('detail') ? 'long' : 'short';
       
       const result = await fastApiService.summarize({
-        summary_type: summaryLevel as 'brief' | 'detailed',
-        file_url: message // This would be improved to extract actual file reference
+        action: 'summarize',
+        file_id: 'document-id', // Extract from message in real implementation
+        user_id: 'current_user',
+        summary_type: summaryLevel as 'short' | 'medium' | 'long'
       });
       
       if (!result.success || !result.data?.summary) {
@@ -137,7 +141,7 @@ From instant document answers to deep enterprise-wide intelligence, Weez solves 
       }
       
       const summary = result.data;
-      return `## ${summaryLevel === 'detailed' ? 'Detailed' : 'Quick'} Summary: ${summary.file_name || 'Document'}\n\n${summary.summary}\n\n**Key Topics:** ${summary.key_topics?.join(', ') || 'Analysis in progress'}`;
+      return `## ${summaryLevel === 'long' ? 'Detailed' : 'Quick'} Summary: ${summary.file_name || 'Document'}\n\n${summary.summary}\n\n**Key Topics:** ${summary.key_topics?.join(', ') || 'Analysis in progress'}`;
     } catch (error) {
       console.error('Summarization failed:', error);
       return "Sorry, I encountered an issue while generating the summary. Please try again.";
@@ -193,8 +197,10 @@ I've analyzed your deep learning related files across all platforms. Here's a co
   const handleAdvancedRAGOperation = async (message: string) => {
     try {
       const result = await fastApiService.ask({
-        question: message,
-        max_tokens: 1000
+        action: 'rag_query',
+        query_text: message,
+        user_id: 'current_user',
+        top_k: 10
       });
       
       if (!result.success || !result.data?.answer) {
@@ -220,8 +226,10 @@ I've analyzed your deep learning related files across all platforms. Here's a co
     
     try {
       const result = await fastApiService.ask({
-        question: message,
-        max_tokens: 500
+        action: 'rag_query',
+        query_text: message,
+        user_id: 'current_user',
+        top_k: 10
       });
       
       if (!result.success || !result.data?.answer) {
@@ -477,7 +485,19 @@ I've analyzed your deep learning related files across all platforms. Here's a co
                       </Button>
                     </div>
                     
-                    <div className="mt-8 pt-6 border-t border-border">
+                    <div className="mt-8 pt-6 border-t border-border space-y-3">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="default" size="lg" className="w-full">
+                            <Search className="w-4 h-4 mr-2" />
+                            AI Search Interface
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                          <AISearchInterface />
+                        </DialogContent>
+                      </Dialog>
+                      
                       <Dialog open={showConnectServices} onOpenChange={setShowConnectServices}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="lg" className="w-full">

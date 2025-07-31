@@ -5,22 +5,51 @@ const FLASK_BASE_URL = import.meta.env.VITE_FLASK_URL || 'http://localhost:5000'
 const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_URL || 'https://your-azure-fastapi-url.azurewebsites.net';
 
 export interface SearchRequest {
-  query: string;
+  query_text: string;
+  user_id: string;
   platform?: string;
   file_type?: string;
-  limit?: number;
+  time_range?: string;
+  top_k?: number;
 }
 
 export interface SummarizeRequest {
-  file_id?: string;
-  file_url?: string;
-  summary_type: 'brief' | 'detailed' | 'key_points';
+  action: 'summarize';
+  file_id: string;
+  user_id: string;
+  summary_type?: 'short' | 'medium' | 'long';
+  query_text?: string;
 }
 
 export interface RAGRequest {
-  question: string;
-  context_files?: string[];
-  max_tokens?: number;
+  action: 'rag_query';
+  query_text: string;
+  user_id: string;
+  top_k?: number;
+}
+
+export interface AgentRequest {
+  query: string;
+  user_id: string;
+}
+
+export interface FileSearchRequest {
+  file_id: string;
+  user_id: string;
+  query_text?: string;
+  top_k?: number;
+}
+
+export interface SimilarDocumentsRequest {
+  file_id: string;
+  user_id: string;
+  top_k?: number;
+}
+
+export interface SearchSuggestionsRequest {
+  partial_query: string;
+  user_id: string;
+  limit?: number;
 }
 
 export interface UploadMetadataRequest {
@@ -81,6 +110,31 @@ class FastAPIService {
   // RAG-based question answering
   async ask(request: RAGRequest): Promise<FastAPIResponse> {
     return this.makeRequest('/rag', 'POST', request);
+  }
+
+  // AI Agent query
+  async askAgent(request: AgentRequest): Promise<FastAPIResponse> {
+    return this.makeRequest('/ask', 'POST', request);
+  }
+
+  // File-specific search
+  async searchInFile(request: FileSearchRequest): Promise<FastAPIResponse> {
+    return this.makeRequest('/search/file', 'POST', request);
+  }
+
+  // Similar documents
+  async findSimilarDocuments(request: SimilarDocumentsRequest): Promise<FastAPIResponse> {
+    return this.makeRequest('/search/similar', 'POST', request);
+  }
+
+  // Search suggestions
+  async getSearchSuggestions(request: SearchSuggestionsRequest): Promise<FastAPIResponse> {
+    return this.makeRequest('/search/suggestions', 'POST', request);
+  }
+
+  // Search statistics
+  async getSearchStats(userId: string): Promise<FastAPIResponse> {
+    return this.makeRequest(`/search/stats/${userId}`, 'GET');
   }
 
   // Generate metadata for uploaded files
