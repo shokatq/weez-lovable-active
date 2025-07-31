@@ -1,7 +1,7 @@
 import { Message } from '@/types/chat';
 
 // Configuration - replace with your Azure-deployed FastAPI URL
-const FASTAPI_BASE_URL = process.env.VITE_FASTAPI_URL || 'https://your-azure-fastapi-url.azurewebsites.net';
+const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_URL || 'https://your-azure-fastapi-url.azurewebsites.net';
 
 export interface SearchRequest {
   query: string;
