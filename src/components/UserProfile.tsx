@@ -1,13 +1,18 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { User, LogOut, Settings, MoreHorizontal } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const UserProfile = () => {
-  // Simple demo user data - replace with your auth system
+  const { user: authUser, signOut } = useAuth();
+  
+  // Use real user data from authentication
   const user = {
-    name: "Demo User",
-    email: "demo@example.com",
-    avatar: null
+    name: authUser?.user_metadata?.first_name && authUser?.user_metadata?.last_name 
+      ? `${authUser.user_metadata.first_name} ${authUser.user_metadata.last_name}`.trim()
+      : authUser?.email?.split('@')[0] || 'User',
+    email: authUser?.email || '',
+    avatar: authUser?.user_metadata?.avatar_url || null
   };
 
   return (
@@ -46,7 +51,7 @@ const UserProfile = () => {
           </DropdownMenuItem>
           <DropdownMenuItem 
             className="cursor-pointer text-destructive focus:text-destructive"
-            onClick={() => console.log('Sign out clicked')}
+            onClick={signOut}
           >
             <LogOut className="w-4 h-4 mr-2" />
             Sign Out

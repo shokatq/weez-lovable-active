@@ -54,11 +54,11 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   ];
 
   return (
-    <div className="flex-1 w-full h-full flex flex-col bg-white relative overflow-hidden">
+    <div className="flex-1 w-full h-full flex flex-col bg-background relative overflow-hidden">
       {
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
-            <h1 className="text-3xl font-semibold text-gray-900 mb-3 animate-fade-in">How can I help you today?</h1>
+            <h1 className="text-3xl font-semibold text-foreground mb-3 animate-fade-in">How can I help you today?</h1>
             
             <div className="w-full max-w-3xl mt-8">
               <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
@@ -89,8 +89,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                       <div
                         className={`px-4 py-3 rounded-2xl transition-all duration-200 ${
                           message.isUser
-                            ? "bg-gray-900 text-white ml-12"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-50"
+                            ? "bg-primary text-primary-foreground ml-12"
+                            : "bg-muted text-foreground hover:bg-muted/80"
                         } ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (
