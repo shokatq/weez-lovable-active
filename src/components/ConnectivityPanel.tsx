@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { syncGoogleDrive, syncSlack } from "@/services/fastApiService";
 
 interface Integration {
   id: string;
@@ -20,6 +22,7 @@ interface Integration {
 
 const ConnectivityPanel = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [integrations, setIntegrations] = useState<Integration[]>([
     {
       id: "google-drive",
@@ -111,6 +114,113 @@ Best regards,
         title: "Email Client Opened",
         description: "Please complete and send the integration request email.",
       });
+      return;
+    }
+
+    // Handle platform-specific authentication and syncing
+    if (id === "google-drive") {
+      try {
+        // Start connecting animation
+        setIntegrations(prev => 
+          prev.map(integration => 
+            integration.id === id 
+              ? { ...integration, isConnecting: true }
+              : integration
+          )
+        );
+
+        const authUrl = `${import.meta.env.VITE_FLASK_URL || 'http://localhost:5000'}/auth/google`;
+        window.open(authUrl, '_blank', 'width=600,height=600');
+        
+        // Simulate auth completion and sync
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        
+        if (user?.email) {
+          await syncGoogleDrive(user.email);
+        }
+        
+        // Complete connection
+        setIntegrations(prev => 
+          prev.map(integration => 
+            integration.id === id 
+              ? { ...integration, connected: true, isConnecting: false }
+              : integration
+          )
+        );
+        
+        toast({
+          title: "Google Drive Connected Successfully!",
+          description: "Your files are now being synced with Weez AI.",
+        });
+        
+      } catch (error) {
+        setIntegrations(prev => 
+          prev.map(integration => 
+            integration.id === id 
+              ? { ...integration, isConnecting: false }
+              : integration
+          )
+        );
+        
+        toast({
+          title: "Connection Failed",
+          description: "Could not connect to Google Drive. Please try again.",
+          variant: "destructive"
+        });
+      }
+      return;
+    }
+
+    if (id === "slack") {
+      try {
+        // Start connecting animation
+        setIntegrations(prev => 
+          prev.map(integration => 
+            integration.id === id 
+              ? { ...integration, isConnecting: true }
+              : integration
+          )
+        );
+
+        const authUrl = `${import.meta.env.VITE_FLASK_URL || 'http://localhost:5000'}/auth/slack`;
+        window.open(authUrl, '_blank', 'width=600,height=600');
+        
+        // Simulate auth completion and sync
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        
+        if (user?.email) {
+          await syncSlack(user.email);
+        }
+        
+        // Complete connection
+        setIntegrations(prev => 
+          prev.map(integration => 
+            integration.id === id 
+              ? { ...integration, connected: true, isConnecting: false }
+              : integration
+          )
+        );
+        
+        toast({
+          title: "Slack Connected Successfully!",
+          description: "Your team conversations are now accessible through Weez AI.",
+        });
+        
+      } catch (error) {
+        setIntegrations(prev => 
+          prev.map(integration => 
+            integration.id === id 
+              ? { ...integration, isConnecting: false }
+              : integration
+          )
+        );
+        
+        toast({
+          title: "Connection Failed",
+          description: "Could not connect to Slack. Please try again.",
+          variant: "destructive"
+        });
+      }
       return;
     }
     

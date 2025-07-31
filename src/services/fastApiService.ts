@@ -1,6 +1,7 @@
 import { Message } from '@/types/chat';
 
-// Configuration - replace with your Azure-deployed FastAPI URL
+// Configuration - Flask backend for platform connections
+const FLASK_BASE_URL = import.meta.env.VITE_FLASK_URL || 'http://localhost:5000';
 const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_URL || 'https://your-azure-fastapi-url.azurewebsites.net';
 
 export interface SearchRequest {
@@ -104,6 +105,47 @@ class FastAPIService {
 }
 
 export const fastApiService = new FastAPIService();
+
+// Flask platform sync endpoints
+export const syncGoogleDrive = async (userEmail: string) => {
+  try {
+    const response = await fetch(`${FLASK_BASE_URL}/sync/google?user_email=${encodeURIComponent(userEmail)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Google Drive sync failed');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Google Drive sync error:', error);
+    throw error;
+  }
+};
+
+export const syncSlack = async (userEmail: string) => {
+  try {
+    const response = await fetch(`${FLASK_BASE_URL}/sync/slack?user_email=${encodeURIComponent(userEmail)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Slack sync failed');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Slack sync error:', error);
+    throw error;
+  }
+};
 
 // Intent detection helper
 export const detectIntent = (message: string): string => {

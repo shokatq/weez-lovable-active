@@ -5,12 +5,14 @@ import { useGlobalAuditLogger } from '@/hooks/useGlobalAuditLogger';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Settings } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMessages from "@/components/ChatMessages";
 import ImprovedChatInput from "@/components/ImprovedChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
+import ConnectivityPanel from "./ConnectivityPanel";
 import { Message, Conversation } from "@/types/chat";
 import { fastApiService, detectIntent, startPlatformSync } from "@/services/fastApiService";
 import { toast } from "sonner";
@@ -25,6 +27,7 @@ const ChatInterface = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState("default");
   const [showWorkspacePrompt, setShowWorkspacePrompt] = useState(true);
+  const [showConnectServices, setShowConnectServices] = useState(false);
   const navigate = useNavigate();
   const { logCustomEvent } = useGlobalAuditLogger();
   const { logFileAccess, logAuditEvent } = useAuditLogger();
@@ -471,11 +474,25 @@ I've analyzed your deep learning related files across all platforms. Here's a co
                          <p className="font-medium">Market Research</p>
                          <p className="text-sm text-muted-foreground">Review competitor analysis</p>
                        </div>
-                     </Button>
-                   </div>
-                   
-                 </div>
-               </div>
+                      </Button>
+                    </div>
+                    
+                    <div className="mt-8 pt-6 border-t border-border">
+                      <Dialog open={showConnectServices} onOpenChange={setShowConnectServices}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="lg" className="w-full">
+                            <Settings className="w-4 h-4 mr-2" />
+                            Connect Services
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                          <ConnectivityPanel />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    
+                  </div>
+                </div>
             ) : (
               <ChatMessages 
                 messages={messages} 
