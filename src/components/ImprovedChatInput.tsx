@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Paperclip, Smile, Mic } from "lucide-react";
+import { Send, Paperclip } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ImprovedChatInputProps {
@@ -39,7 +39,7 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
     const textarea = e.target;
     textarea.style.height = "auto";
     const scrollHeight = textarea.scrollHeight;
-    const maxHeight = 200; // Max height before scrolling
+    const maxHeight = 120; // Reduced max height for slimmer appearance
     textarea.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
   };
 
@@ -64,11 +64,11 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
   }, [disabled]);
 
   return (
-    <div className="border-t border-border bg-background/80 backdrop-blur-sm">
-      <div className="max-w-3xl mx-auto px-4 py-6">
+    <div className="border-t border-border bg-background/95 backdrop-blur">
+      <div className="max-w-3xl mx-auto px-4 py-4">
         {/* File upload indicator */}
         {uploadingFiles.length > 0 && (
-          <div className="mb-3 p-3 bg-muted/50 rounded-lg border border-border">
+          <div className="mb-3 p-3 bg-card rounded-lg border border-border">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               <span>Uploading {uploadingFiles.length} file(s)...</span>
@@ -76,14 +76,14 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
           </div>
         )}
 
-        {/* Main input area */}
+        {/* Slim input area */}
         <div className="relative">
-          <div className="flex items-end gap-3 p-4 bg-background border border-border rounded-3xl shadow-lg hover:shadow-xl transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/50">
+          <div className="flex items-center gap-2 p-2 bg-background border border-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus-within:ring-1 focus-within:ring-primary/50 focus-within:border-primary/50 min-h-[48px]">
             {/* File upload button */}
             <Button
               variant="ghost"
               size="icon"
-              className="flex-shrink-0 h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              className="flex-shrink-0 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
             >
@@ -99,45 +99,29 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
               onKeyDown={handleKeyPress}
               disabled={disabled}
               className={cn(
-                "min-h-[80px] max-h-[300px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-muted-foreground text-sm leading-6",
+                "min-h-[32px] max-h-[120px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-muted-foreground text-sm leading-5 p-1",
                 "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
               )}
-              style={{ height: "80px" }}
+              style={{ height: "32px" }}
             />
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Send button */}
+            <div className="flex-shrink-0">
               <Button
-                variant="ghost"
+                onClick={handleSend}
+                disabled={disabled || !message.trim()}
+                className={cn(
+                  "h-8 w-8 rounded-lg shadow-sm transition-all duration-200",
+                  message.trim() 
+                    ? "bg-primary hover:bg-primary/90 text-primary-foreground hover:shadow-md" 
+                    : "bg-muted text-muted-foreground cursor-not-allowed"
+                )}
                 size="icon"
-                className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                disabled={disabled}
               >
-                <Smile className="w-4 h-4" />
+                <Send className="w-4 h-4" />
               </Button>
-              
-              {message.trim() ? (
-                <Button
-                  onClick={handleSend}
-                  disabled={disabled}
-                  className="h-9 w-9 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-sm transition-all duration-200 hover:shadow-md"
-                  size="icon"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                  disabled={disabled}
-                >
-                  <Mic className="w-4 h-4" />
-                </Button>
-              )}
             </div>
           </div>
-
         </div>
 
         {/* Hidden file input */}

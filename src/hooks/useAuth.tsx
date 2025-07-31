@@ -49,18 +49,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) {
-      toast.error(error.message);
-    } else {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        toast.error(error.message);
+        return { error };
+      }
+
       toast.success('Successfully signed in!');
+      
+      // Quick redirect to chat
+      setTimeout(() => {
+        window.location.href = '/chat';
+      }, 500);
+      
+      return { error: null };
+    } catch (error: any) {
+      toast.error('An unexpected error occurred');
+      return { error };
     }
-    
-    return { error };
   };
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
@@ -88,16 +99,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error(error.message);
-    } else {
-      // Clear local state
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      // Clear local state immediately
       setUser(null);
       setSession(null);
+      
       toast.success('Successfully signed out!');
-      // Redirect to home page
-      window.location.href = '/';
+      
+      // Quick redirect to auth page
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 300);
+    } catch (error: any) {
+      toast.error('An unexpected error occurred');
     }
   };
 

@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGlobalAuditLogger } from '@/hooks/useGlobalAuditLogger';
+import { useAuditLogger } from '@/hooks/useAuditLogger';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
@@ -24,6 +26,8 @@ const ChatInterface = () => {
   const [currentConversationId, setCurrentConversationId] = useState("default");
   const [showWorkspacePrompt, setShowWorkspacePrompt] = useState(true);
   const navigate = useNavigate();
+  const { logCustomEvent } = useGlobalAuditLogger();
+  const { logFileAccess, logAuditEvent } = useAuditLogger();
 
   // Initialize with a default conversation
   useEffect(() => {

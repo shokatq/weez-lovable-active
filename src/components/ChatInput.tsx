@@ -1,8 +1,7 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Paperclip, Plus } from "lucide-react";
+import { Send, Paperclip } from "lucide-react";
 import FileUpload from "./FileUpload";
 
 interface ChatInputProps {
@@ -52,39 +51,39 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white px-4 py-4">
+    <div className="border-t border-border bg-background/95 backdrop-blur px-4 py-4">
       {uploadingFiles.length > 0 && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg animate-fade-in max-w-3xl mx-auto">
+        <div className="mb-4 p-3 bg-card border border-border rounded-lg animate-fade-in max-w-3xl mx-auto">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-blue-700">Uploading files...</span>
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-foreground">Uploading files...</span>
           </div>
           {uploadingFiles.map((file, index) => (
-            <div key={index} className="text-xs text-blue-600 ml-4 flex items-center gap-2">
-              <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
+            <div key={index} className="text-xs text-muted-foreground ml-4 flex items-center gap-2">
+              <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
               {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
             </div>
           ))}
         </div>
       )}
       
-      {/* Compact Input Container */}
+      {/* Slim Input Container */}
       <div className="max-w-2xl mx-auto">
-        <div className="relative flex items-center w-full bg-background rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-200 focus-within:border-primary/50 focus-within:shadow-md">
+        <div className="relative flex items-center w-full bg-background rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-200 focus-within:border-primary/50 focus-within:shadow-md min-h-[44px]">
           {/* Left side file upload */}
           <div className="flex items-center pl-3">
             <FileUpload onFileSelect={handleFileSelect} />
           </div>
 
           {/* Message input area */}
-          <div className="flex-1 min-w-0 px-2 py-2">
+          <div className="flex-1 min-w-0 px-2 py-1">
             <Textarea
               ref={textareaRef}
               value={message}
               onChange={handleTextareaChange}
               onKeyPress={handleKeyPress}
               placeholder="Message Weez AI..."
-              className="w-full min-h-[20px] max-h-[120px] bg-transparent border-none resize-none text-foreground placeholder:text-muted-foreground focus:ring-0 focus:ring-offset-0 text-sm leading-5 px-2 py-1 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+              className="w-full min-h-[32px] max-h-[120px] bg-transparent border-none resize-none text-foreground placeholder:text-muted-foreground focus:ring-0 focus:ring-offset-0 text-sm leading-5 px-2 py-1 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
               rows={1}
             />
           </div>

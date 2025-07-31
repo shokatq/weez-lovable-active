@@ -15,13 +15,52 @@ import AcceptInvitation from "./pages/AcceptInvitation";
 import Audit from "./pages/Audit";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { useGlobalAuditLogger } from "./hooks/useGlobalAuditLogger";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  useGlobalAuditLogger(); // Global audit logging
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/accept-invitation" element={<AcceptInvitation />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/chat" element={
+          <ProtectedRoute>
+            <ChatInterface />
+          </ProtectedRoute>
+        } />
+        <Route path="/workspace" element={
+          <ProtectedRoute>
+            <WorkspaceNew />
+          </ProtectedRoute>
+        } />
+        <Route path="/audit" element={
+          <ProtectedRoute>
+            <Audit />
+          </ProtectedRoute>
+        } />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 const App = () => {
-  // Force dark mode
+  // Force dark mode globally
   useEffect(() => {
     document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+    // Ensure dark theme persists
+    localStorage.setItem('theme', 'dark');
   }, []);
 
   return (
@@ -30,35 +69,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/accept-invitation" element={<AcceptInvitation />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/chat" element={
-                <ProtectedRoute>
-                  <ChatInterface />
-                </ProtectedRoute>
-              } />
-              <Route path="/workspace" element={
-                <ProtectedRoute>
-                  <WorkspaceNew />
-                </ProtectedRoute>
-              } />
-              <Route path="/audit" element={
-                <ProtectedRoute>
-                  <Audit />
-                </ProtectedRoute>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <AppContent />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
