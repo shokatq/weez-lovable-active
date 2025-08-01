@@ -1,10 +1,8 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { User, LogOut, Settings, MoreHorizontal } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const UserProfile = () => {
-  const { user: authUser, signOut } = useAuth();
+  const { user: authUser } = useAuth();
   
   // Use real user data from authentication
   const user = {
@@ -34,30 +32,6 @@ const UserProfile = () => {
         </p>
         <p className="text-xs text-muted-foreground truncate">Premium Plan</p>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-7 h-7 p-0 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg flex-shrink-0 transition-colors duration-200"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem className="cursor-pointer">
-            <Settings className="w-4 h-4 mr-2" />
-            Account Settings
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            className="cursor-pointer text-destructive focus:text-destructive"
-            onClick={signOut}
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 };

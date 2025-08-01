@@ -6,7 +6,6 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/compone
 import { Plus, MessageSquare, Building2, Clock, Settings, Trash2 } from "lucide-react";
 import { Conversation } from "@/types/chat";
 import UserProfile from "./UserProfile";
-import ThemeToggle from "./ThemeToggle";
 
 interface ChatSidebarProps {
   conversations: Conversation[];
@@ -60,7 +59,6 @@ const ChatSidebar = ({
               <p className="text-xs text-muted-foreground">Marketing Assistant</p>
             </div>
           </div>
-          <ThemeToggle />
         </div>
         
         <Button

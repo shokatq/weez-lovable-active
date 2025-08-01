@@ -9,10 +9,12 @@ import { toast } from "sonner";
 
 const SettingsPanel = () => {
   const { signOut } = useAuth();
-  const [showInMenuBar, setShowInMenuBar] = useState(true);
-  const [correctSpelling, setCorrectSpelling] = useState(false);
-  const [openLinksInApp, setOpenLinksInApp] = useState(true);
-  const [appLanguage, setAppLanguage] = useState("english");
+  const [correctSpelling, setCorrectSpelling] = useState(() => 
+    localStorage.getItem('weez-correct-spelling') === 'true'
+  );
+  const [appLanguage, setAppLanguage] = useState(() => 
+    localStorage.getItem('weez-app-language') || 'english'
+  );
 
   const handleSignOut = async () => {
     try {
@@ -29,7 +31,14 @@ const SettingsPanel = () => {
 
   const handleLanguageChange = (value: string) => {
     setAppLanguage(value);
+    localStorage.setItem('weez-app-language', value);
     toast.success(`Language changed to ${value.charAt(0).toUpperCase() + value.slice(1)}`);
+  };
+
+  const handleSpellingChange = (checked: boolean) => {
+    setCorrectSpelling(checked);
+    localStorage.setItem('weez-correct-spelling', String(checked));
+    toast.success(`Spell check ${checked ? 'enabled' : 'disabled'}`);
   };
 
   return (
@@ -53,35 +62,13 @@ const SettingsPanel = () => {
         </div>
 
         <div className="flex items-center justify-between py-2">
-          <Label htmlFor="menu-bar" className="text-sm font-medium text-foreground">
-            Show in Menu Bar
-          </Label>
-          <Switch
-            id="menu-bar"
-            checked={showInMenuBar}
-            onCheckedChange={setShowInMenuBar}
-          />
-        </div>
-
-        <div className="flex items-center justify-between py-2">
           <Label htmlFor="spelling" className="text-sm font-medium text-foreground">
             Correct Spelling Automatically
           </Label>
           <Switch
             id="spelling"
             checked={correctSpelling}
-            onCheckedChange={setCorrectSpelling}
-          />
-        </div>
-
-        <div className="flex items-center justify-between py-2">
-          <Label htmlFor="links" className="text-sm font-medium text-foreground">
-            Open Weez AI Links in Desktop App
-          </Label>
-          <Switch
-            id="links"
-            checked={openLinksInApp}
-            onCheckedChange={setOpenLinksInApp}
+            onCheckedChange={handleSpellingChange}
           />
         </div>
 

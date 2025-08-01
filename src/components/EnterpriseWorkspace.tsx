@@ -214,14 +214,10 @@ const EnterpriseWorkspace = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-card border border-border">
+          <TabsList className="grid w-full grid-cols-5 bg-card border border-border">
             <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Briefcase className="w-4 h-4 mr-2" />
               Overview
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              AI Assistant
             </TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <BarChart3 className="w-4 h-4 mr-2" />
@@ -232,7 +228,7 @@ const EnterpriseWorkspace = () => {
               Documents
             </TabsTrigger>
             {canManageTeam && (
-              <TabsTrigger value="team" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="team" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Users className="w-4 h-4 mr-2" />
                 Team Management
               </TabsTrigger>
@@ -270,11 +266,11 @@ const EnterpriseWorkspace = () => {
                   <Button 
                     variant="outline" 
                     className="h-auto p-4 flex flex-col items-center space-y-2 border-border hover:bg-muted"
-                    onClick={() => setActiveTab("chat")}
+                    onClick={() => window.location.href = '/chat'}
                   >
                     <MessageCircle className="w-6 h-6 text-primary" />
-                    <span className="text-foreground">AI Assistant</span>
-                    <span className="text-xs text-muted-foreground">Get AI-powered insights</span>
+                    <span className="text-foreground">AI Chat</span>
+                    <span className="text-xs text-muted-foreground">Interact with AI Assistant</span>
                   </Button>
                   
                   <Button 
@@ -320,15 +316,43 @@ const EnterpriseWorkspace = () => {
                   </Button>
                 </div>
               </Card>
+
+              {/* Recent Activity */}
+              <Card className="p-6 bg-card border-border">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <MessageCircle className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-foreground">AI Query processed</p>
+                      <p className="text-xs text-muted-foreground">2 minutes ago</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <Users className="w-4 h-4 text-green-500" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-foreground">New team member added</p>
+                      <p className="text-xs text-muted-foreground">1 hour ago</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-blue-500" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-foreground">Document uploaded</p>
+                      <p className="text-xs text-muted-foreground">3 hours ago</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </div>
           </TabsContent>
 
-          {/* AI Assistant Tab */}
-          <TabsContent value="chat" className="space-y-6">
-            <div className="h-[calc(100vh-300px)]">
-              <WorkspaceChatInterface />
-            </div>
-          </TabsContent>
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
@@ -349,32 +373,71 @@ const EnterpriseWorkspace = () => {
 
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-6">
-            <Card className="p-6 bg-card border-border">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Workspace Settings</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground">Workspace Name</label>
-                  <Input 
-                    value={userRole?.teamName || "Enterprise Workspace"}
-                    disabled
-                    className="mt-1 bg-muted border-border"
-                  />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="p-6 bg-card border-border">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Workspace Information</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground">Workspace Name</label>
+                    <Input 
+                      value={userRole?.teamName || "Enterprise Workspace"}
+                      disabled
+                      className="mt-1 bg-muted border-border"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground">Your Role</label>
+                    <Input 
+                      value={userRole?.role || "member"}
+                      disabled
+                      className="mt-1 bg-muted border-border"
+                    />
+                  </div>
+                  <div className="pt-4 border-t border-border">
+                    <p className="text-sm text-muted-foreground">
+                      Contact your workspace administrator to modify settings or request role changes.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground">Your Role</label>
-                  <Input 
-                    value={userRole?.role || "member"}
-                    disabled
-                    className="mt-1 bg-muted border-border"
-                  />
+              </Card>
+
+              <Card className="p-6 bg-card border-border">
+                <h3 className="text-lg font-semibold text-foreground mb-4">User Preferences</h3>
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-foreground">App Language</label>
+                    <select className="w-full p-2 rounded-md border border-border bg-background text-foreground">
+                      <option value="english">English</option>
+                      <option value="spanish">Español</option>
+                      <option value="french">Français</option>
+                      <option value="german">Deutsch</option>
+                    </select>
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-sm font-medium text-foreground">Email Notifications</span>
+                    <input type="checkbox" className="toggle" defaultChecked />
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-sm font-medium text-foreground">Auto-save Documents</span>
+                    <input type="checkbox" className="toggle" defaultChecked />
+                  </div>
+                  
+                  <div className="pt-4 border-t border-border">
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={signOut}
+                      className="w-full"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </div>
                 </div>
-                <div className="pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground">
-                    Contact your workspace administrator to modify settings or request role changes.
-                  </p>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

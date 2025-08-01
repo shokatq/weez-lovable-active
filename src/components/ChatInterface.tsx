@@ -13,7 +13,7 @@ import ChatMessages from "@/components/ChatMessages";
 import ImprovedChatInput from "@/components/ImprovedChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import ConnectivityPanel from "./ConnectivityPanel";
-import AISearchInterface from "./AISearchInterface";
+
 import { Message, Conversation } from "@/types/chat";
 import { fastApiService, detectIntent, startPlatformSync } from "@/services/fastApiService";
 import { toast } from "sonner";
@@ -485,19 +485,7 @@ I've analyzed your deep learning related files across all platforms. Here's a co
                       </Button>
                     </div>
                     
-                    <div className="mt-8 pt-6 border-t border-border space-y-3">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="default" size="lg" className="w-full">
-                            <Search className="w-4 h-4 mr-2" />
-                            AI Search Interface
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-                          <AISearchInterface />
-                        </DialogContent>
-                      </Dialog>
-                      
+                    <div className="mt-8 pt-6 border-t border-border">
                       <Dialog open={showConnectServices} onOpenChange={setShowConnectServices}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="lg" className="w-full">
