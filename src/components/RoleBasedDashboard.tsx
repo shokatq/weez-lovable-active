@@ -136,9 +136,6 @@ const RoleBasedDashboard = () => {
                 </p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
-              <Button variant="outline" onClick={signOut}>
-                Sign Out
-              </Button>
             </div>
           </div>
         </div>

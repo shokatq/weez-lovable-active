@@ -98,9 +98,6 @@ const EnterpriseWorkspace = () => {
                   </div>
                   <span className="text-sm text-muted-foreground">{user?.email}</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={signOut}>
-                  <LogOut className="w-4 h-4" />
-                </Button>
               </div>
             </div>
           </div>
@@ -203,9 +200,6 @@ const EnterpriseWorkspace = () => {
                 </div>
                 <span className="text-sm text-muted-foreground hidden sm:block">{user?.email}</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={signOut}>
-                <LogOut className="w-4 h-4" />
-              </Button>
             </div>
           </div>
         </div>
@@ -425,15 +419,6 @@ const EnterpriseWorkspace = () => {
                   </div>
                   
                   <div className="pt-4 border-t border-border">
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={signOut}
-                      className="w-full"
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
-                    </Button>
                   </div>
                 </div>
               </Card>

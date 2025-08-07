@@ -376,3 +376,9 @@
     transform: translateX(0) scale(1);
   }
 }
+
+/* Hide any Lovable/GPTEngineer badges injected by scripts */
+#lovable-badge, .lovable-badge, [data-lovable-badge], [data-testid="lovable-badge"], .gptengineer-badge {
+  display: none !important;
+}
+
