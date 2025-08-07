@@ -44,23 +44,6 @@ const SettingsPanel = () => {
   return (
     <div className="w-80 p-6 space-y-6">
       <div className="space-y-4">
-        <div className="space-y-3">
-          <Label className="text-sm font-medium text-foreground">App Language</Label>
-          <Select value={appLanguage} onValueChange={handleLanguageChange}>
-            <SelectTrigger className="bg-background border-border">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-background border-border">
-              <SelectItem value="english">English</SelectItem>
-              <SelectItem value="spanish">Español</SelectItem>
-              <SelectItem value="french">Français</SelectItem>
-              <SelectItem value="german">Deutsch</SelectItem>
-              <SelectItem value="chinese">中文</SelectItem>
-              <SelectItem value="japanese">日本語</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className="flex items-center justify-between py-2">
           <Label htmlFor="spelling" className="text-sm font-medium text-foreground">
             Correct Spelling Automatically
@@ -73,14 +56,6 @@ const SettingsPanel = () => {
         </div>
 
         <Separator className="bg-border" />
-        
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-foreground hover:bg-accent"
-          onClick={handleCheckUpdates}
-        >
-          Check for Updates...
-        </Button>
         
         <Button 
           variant="ghost" 

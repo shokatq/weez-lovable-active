@@ -16,11 +16,11 @@ const ChatHeader = () => {
         <SidebarTrigger className="h-8 w-8" />
         <div className="flex items-center gap-3">
           {/* Circular Logo */}
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/10 border border-border flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center">
             <img 
               src="/lovable-uploads/weezy-logo.png" 
               alt="Weez AI" 
-              className="w-6 h-6 object-cover rounded-full"
+              className="w-full h-full object-cover object-center rounded-full"
             />
           </div>
           <h1 className="text-lg font-semibold text-foreground">Weez AI</h1>

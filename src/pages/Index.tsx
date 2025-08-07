@@ -61,11 +61,11 @@ const Index = () => {
       <header className="relative z-10 px-6 py-6 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 fade-in">
-            <div className="w-12 h-12 rounded-xl bg-card flex items-center justify-center shadow-lg p-1 border border-border">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg">
               <img 
-                src="/lovable-uploads/0e372f3a-9596-4ed9-9dc2-068ab8534e62.png" 
+                src="/lovable-uploads/weezy-logo.png" 
                 alt="Weez AI Logo" 
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover object-center rounded-full"
               />
             </div>
             <div>
@@ -156,26 +156,34 @@ const Index = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="backdrop-blur-sm shadow-sm hover:shadow-xl transition-all duration-500 group slide-up" style={{ animationDelay: `${0.1 * index}s` }}>
-                <CardContent className="p-8">
+              <Card 
+                key={index} 
+                className="relative overflow-hidden backdrop-blur-md bg-card/50 border border-border/50 shadow-lg hover:shadow-2xl transition-all duration-700 group slide-up hover:scale-105 hover:-translate-y-2" 
+                style={{ animationDelay: `${0.1 * index}s` }}
+              >
+                {/* Glass morphism effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <CardContent className="relative p-8">
                   <div className="flex items-start gap-6">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 relative`}>
                       <feature.icon className="w-8 h-8 text-white" />
+                      {/* Icon glow effect */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-2xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500`} />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-card-foreground mb-3 group-hover:text-primary transition-colors duration-300">
+                      <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
                         {feature.title}
                       </h3>
-                      <p className="text-muted-foreground text-lg leading-relaxed mb-4">
+                      <p className="text-muted-foreground text-base leading-relaxed">
                         {feature.description}
                       </p>
-                      <Button variant="ghost" className="text-primary hover:text-primary/80 p-0 h-auto font-semibold group">
-                        Learn More
-                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                      </Button>
                     </div>
                   </div>
                 </CardContent>
+                
+                {/* Animated border */}
+                <div className="absolute inset-0 rounded-lg border-2 border-transparent bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude' }} />
               </Card>
             ))}
           </div>

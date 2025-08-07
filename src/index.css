@@ -29,6 +29,17 @@
   to { opacity: 1; }
 }
 
+@keyframes thinking-wave {
+  0%, 60%, 100% { 
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  30% { 
+    transform: scale(1.4);
+    opacity: 1;
+  }
+}
+
 .float-animation {
   animation: float-animation 6s ease-in-out infinite;
 }
