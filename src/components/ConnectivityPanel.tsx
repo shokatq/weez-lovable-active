@@ -529,12 +529,8 @@ Best regards,
 
       const baseUrl = 'https://platform-connection-api-g0b5c3fve2dfb2ag.canadacentral-01.azurewebsites.net';
       const platformEndpoint = platformMapping[id as keyof typeof platformMapping];
-      const params = new URLSearchParams({
-        user_email: user.email,
-        app_origin: window.location.origin,
-        redirect_url: `${window.location.origin}/chat`
-      });
-      const authUrl = `${baseUrl}/auth/${platformEndpoint}?${params.toString()}`;
+      const authUrl = `${baseUrl}/auth/${platformEndpoint}?user_email=${encodeURIComponent(user.email)}`;
+      
       // Open popup window for OAuth
       const popup = window.open(
         authUrl, 
