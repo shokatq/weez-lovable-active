@@ -11,10 +11,15 @@ import WorkspaceNew from "./pages/WorkspaceNew";
 import ChatInterface from "./components/ChatInterface";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import EmployeeLogin from "./pages/EmployeeLogin";
+import EmployeeSignup from "./pages/EmployeeSignup";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import Audit from "./pages/Audit";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RoleGuard from "./components/auth/RoleGuard";
 import { useGlobalAuditLogger } from "./hooks/useGlobalAuditLogger";
 
 const queryClient = new QueryClient();
@@ -32,6 +37,22 @@ const AppContent = () => {
             <Dashboard />
           </ProtectedRoute>
         } />
+        <Route path="/admin-dashboard" element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['admin','team_lead']}>
+              <AdminDashboard />
+            </RoleGuard>
+          </ProtectedRoute>
+        } />
+        <Route path="/employee-dashboard" element={
+          <ProtectedRoute>
+            <RoleGuard allowedRoles={['employee','viewer']}>
+              <EmployeeDashboard />
+            </RoleGuard>
+          </ProtectedRoute>
+        } />
+        <Route path="/employee-login" element={<EmployeeLogin />} />
+        <Route path="/employee-signup" element={<EmployeeSignup />} />
         <Route path="/chat" element={
           <ProtectedRoute>
             <ChatInterface />

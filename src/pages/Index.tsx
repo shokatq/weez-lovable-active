@@ -79,13 +79,27 @@ const Index = () => {
               onClick={() => navigate("/auth?mode=signin")}
               className="transition-all duration-300"
             >
-              Sign In
+              Admin Sign In
             </Button>
             <Button 
               onClick={() => navigate("/auth?mode=signup")}
               className="font-semibold px-6 py-2 rounded-lg transition-all duration-300"
             >
-              Get Started
+              Admin Get Started
+            </Button>
+            <Button 
+              variant="secondary"
+              onClick={() => navigate("/employee-login")}
+              className="transition-all duration-300"
+            >
+              Employee Sign In
+            </Button>
+            <Button 
+              variant="secondary"
+              onClick={() => navigate("/employee-signup")}
+              className="font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+            >
+              Employee Sign Up
             </Button>
           </div>
         </div>
@@ -115,15 +129,15 @@ const Index = () => {
                   size="lg"
                   className="font-semibold px-8 py-4 rounded-full text-lg shadow-lg transition-all duration-300"
                 >
-                  Start Your Journey
+                  Admin Get Started
                 </Button>
                 <Button 
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/employee-signup")}
                   size="lg"
                   variant="outline"
                   className="font-semibold px-8 py-4 rounded-full text-lg shadow-lg transition-all duration-300"
                 >
-                  Dashboard
+                  Employee Sign Up
                 </Button>
               </div>
             </div>
