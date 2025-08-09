@@ -63,9 +63,9 @@ const Index = () => {
           <div className="flex items-center gap-3 fade-in">
             <div className="w-12 h-12 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg">
               <img 
-                src="/lovable-uploads/weezy-logo.png" 
+                src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
                 alt="Weez AI Logo" 
-                className="w-full h-full object-cover object-center rounded-full"
+                className="w-full h-full object-contain p-1 rounded-full"
               />
             </div>
             <div>

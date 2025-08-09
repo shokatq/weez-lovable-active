@@ -306,7 +306,7 @@ const AdvancedAnalytics = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {['Engineering', 'Marketing', 'Sales', 'Operations', 'HR', 'Finance'].map((dept, index) => (
+                {['Marketing', 'Creative', 'Design', 'Content', 'Social Media', 'Client Services'].map((dept, index) => (
                   <div key={dept} className="p-4 bg-muted/50 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-foreground">{dept}</span>

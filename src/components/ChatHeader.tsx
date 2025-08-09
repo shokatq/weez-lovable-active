@@ -18,9 +18,9 @@ const ChatHeader = () => {
           {/* Circular Logo */}
           <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center">
             <img 
-              src="/lovable-uploads/weezy-logo.png" 
-              alt="Weez AI" 
-              className="w-full h-full object-cover object-center rounded-full"
+              src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
+              alt="Weez AI Logo" 
+              className="w-full h-full object-contain p-0.5 rounded-full"
             />
           </div>
           <h1 className="text-lg font-semibold text-foreground">Weez AI</h1>

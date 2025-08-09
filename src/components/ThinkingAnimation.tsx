@@ -62,9 +62,9 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
           icon: (
             <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center">
               <img 
-                src="/lovable-uploads/weezy-logo.png" 
-                alt="Weez AI" 
-                className="w-6 h-6 object-cover rounded-full"
+                src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
+                alt="Weez AI Logo" 
+                className="w-6 h-6 object-contain rounded-full"
               />
             </div>
           ),
