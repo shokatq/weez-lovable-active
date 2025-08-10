@@ -73,35 +73,7 @@ const Index = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-4 slide-in-right">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/auth?mode=signin")}
-              className="transition-all duration-300"
-            >
-              Admin Sign In
-            </Button>
-            <Button 
-              onClick={() => navigate("/auth?mode=signup")}
-              className="font-semibold px-6 py-2 rounded-lg transition-all duration-300"
-            >
-              Admin Get Started
-            </Button>
-            <Button 
-              variant="secondary"
-              onClick={() => navigate("/employee-login")}
-              className="transition-all duration-300"
-            >
-              Employee Sign In
-            </Button>
-            <Button 
-              variant="secondary"
-              onClick={() => navigate("/employee-signup")}
-              className="font-semibold px-6 py-2 rounded-lg transition-all duration-300"
-            >
-              Employee Sign Up
-            </Button>
-          </div>
+{/* Removed header auth buttons per request */}
         </div>
       </header>
 

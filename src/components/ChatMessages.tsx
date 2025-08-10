@@ -83,14 +83,14 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
           </div>
         ) : (
           <ScrollArea className="flex-1 w-full h-full">
-            <div className="max-w-3xl mx-auto px-4 py-6">
+            <div className="max-w-4xl mx-auto px-4 py-6">
               <div className="space-y-6">
                 {messages.map((message, index) => (
                   <div
                     key={message.id}
-                    className={`group flex gap-4 ${
-                      message.isUser ? "justify-end" : "justify-start"
-                    } animate-slide-up opacity-0`}
+                    className={`group flex gap-4 items-start ${
+                      message.isUser ? "justify-end" : "justify-start bg-muted/30 rounded-xl"
+                    } animate-slide-up opacity-0 px-3 py-2`}
                     style={{ 
                       animationDelay: `${index * 50}ms`,
                       animationFillMode: 'forwards'
@@ -102,12 +102,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                       </div>
                     )}
 
-                    <div className={`max-w-[85%] md:max-w-[70%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
+                    <div className={`max-w-[90%] md:max-w-[75%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
                       <div
                         className={`px-4 py-3 rounded-2xl transition-all duration-200 ${
                           message.isUser
                             ? "bg-primary text-primary-foreground ml-12"
-                            : "bg-muted text-foreground hover:bg-muted/80"
+                            : "bg-card border border-border text-foreground hover:bg-card/90"
                         } ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (

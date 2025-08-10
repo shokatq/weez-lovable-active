@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 const Auth = () => {
   const { user, signIn, signUp, signInWithGoogle } = useAuth();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -183,7 +184,7 @@ const Auth = () => {
             <div className="mt-6 text-center">
               <Button
                 variant="ghost"
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => isSignUp ? navigate('/auth?mode=signin') : navigate('/auth?mode=signup')}
                 disabled={isLoading}
               >
                 {isSignUp 

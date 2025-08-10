@@ -84,7 +84,7 @@ const EmployeeLogin = () => {
         }
       }
 
-      // Role redirect will be handled by the effect above once session updates
+      navigate('/employee-dashboard', { replace: true });
     } catch (err: any) {
       toast.error(err.message || 'Sign in failed');
     } finally {
