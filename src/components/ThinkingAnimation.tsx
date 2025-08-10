@@ -78,42 +78,14 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
   const config = getThinkingConfig();
 
   return (
-    <div className="flex items-center gap-4 px-6 py-6 bg-gradient-to-r from-background/50 to-background/80 rounded-lg backdrop-blur-sm border border-border/50">
-      <div className="relative">
-        {config.icon}
-      </div>
-      
-      {/* Advanced wave animation */}
+    <div className="flex items-center gap-3 px-4 py-3 bg-muted rounded-lg border border-border">
+      {config.icon}
       <div className="flex items-center gap-1">
-        <div 
-          className={`w-2 h-2 ${config.accentColor} rounded-full animate-pulse`}
-          style={{ 
-            animation: 'thinking-wave 1.4s ease-in-out infinite',
-            animationDelay: '0ms'
-          }}
-        />
-        <div 
-          className={`w-2 h-2 ${config.accentColor} rounded-full animate-pulse`}
-          style={{ 
-            animation: 'thinking-wave 1.4s ease-in-out infinite',
-            animationDelay: '150ms'
-          }}
-        />
-        <div 
-          className={`w-2 h-2 ${config.accentColor} rounded-full animate-pulse`}
-          style={{ 
-            animation: 'thinking-wave 1.4s ease-in-out infinite',
-            animationDelay: '300ms'
-          }}
-        />
+        <span className={`w-2 h-2 ${config.accentColor} rounded-full`} style={{ animation: 'pulse 1.2s ease-in-out infinite', animationDelay: '0s' }} />
+        <span className={`w-2 h-2 ${config.accentColor} rounded-full`} style={{ animation: 'pulse 1.2s ease-in-out infinite', animationDelay: '150ms' }} />
+        <span className={`w-2 h-2 ${config.accentColor} rounded-full`} style={{ animation: 'pulse 1.2s ease-in-out infinite', animationDelay: '300ms' }} />
       </div>
-      
-      <span className={`text-sm font-medium ${config.primaryColor} animate-pulse`}>
-        {config.text}
-      </span>
-      
-      {/* Subtle glow effect */}
-      <div className={`absolute inset-0 ${config.accentColor} opacity-5 rounded-lg blur-xl animate-pulse`} />
+      <span className={`text-sm ${config.primaryColor}`}>{config.text}</span>
     </div>
   );
 };

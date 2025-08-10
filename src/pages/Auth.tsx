@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 
 const Auth = () => {
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle } = useAuth();
   const [searchParams] = useSearchParams();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +74,11 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="space-y-4 mb-4">
+              <Button variant="outline" className="w-full" onClick={() => signInWithGoogle()}>
+                Continue with Google
+              </Button>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (
                 <div className="grid grid-cols-2 gap-4">

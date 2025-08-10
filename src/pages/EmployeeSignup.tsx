@@ -10,7 +10,7 @@ import { Eye, EyeOff, Mail, Lock, User, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 
 const EmployeeSignup = () => {
-  const { user, signUp } = useAuth();
+  const { user, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -95,6 +95,9 @@ const EmployeeSignup = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <Button type="button" variant="outline" className="w-full" onClick={() => signInWithGoogle()}>
+                Continue with Google
+              </Button>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
