@@ -3,13 +3,19 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, Search, FileText, CheckSquare } from 'lucide-react';
-import DocumentManagement from '@/components/DocumentManagement';
-
+import { LogOut, FileText as FileIcon, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import ProjectSpaces from '@/components/employee/ProjectSpaces';
+import GlobalSearch from '@/components/employee/GlobalSearch';
+import ConnectedPlatforms from '@/components/employee/ConnectedPlatforms';
+import PinnedSection from '@/components/employee/PinnedSection';
+import ActivityFeed from '@/components/employee/ActivityFeed';
+import ContentLibrary from '@/components/employee/ContentLibrary';
+import MyTasks from '@/components/employee/MyTasks';
+import AskAIBox from '@/components/employee/AskAIBox';
+import Recommendations from '@/components/employee/Recommendations';
 const EmployeeDashboard = () => {
   const { user, signOut } = useAuth();
   const { userRole, loading } = useUserRole();
@@ -51,7 +57,7 @@ const EmployeeDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-4">
-              <FileText className="w-8 h-8 text-primary" />
+              <FileIcon className="w-8 h-8 text-primary" />
               <h1 className="text-xl font-semibold text-foreground">Employee Workspace</h1>
               <Badge variant="secondary" className="bg-primary/20 text-primary">
                 {userRole?.role || 'employee'}
@@ -82,47 +88,56 @@ const EmployeeDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="documents" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-card border border-border">
-            <TabsTrigger value="documents" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <FileText className="w-4 h-4 mr-2" />
-              Documents
-            </TabsTrigger>
-            <TabsTrigger value="tasks" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <CheckSquare className="w-4 h-4 mr-2" />
-              My Tasks
-            </TabsTrigger>
-            <TabsTrigger value="search" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Search className="w-4 h-4 mr-2" />
-              Search
-            </TabsTrigger>
-          </TabsList>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* 3-column responsive layout: left (spaces), center (main), right (AI) */}
+          <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_340px] gap-6">
+            {/* Left: Project Spaces */}
+            <div>
+              <ProjectSpaces />
+            </div>
 
-          <TabsContent value="documents" className="space-y-6">
-            <DocumentManagement />
-          </TabsContent>
+            {/* Center: Main Tabs */}
+            <div>
+              <Tabs defaultValue="dashboard" className="space-y-6">
+                <TabsList className="grid w-full grid-cols-4 bg-card border border-border">
+                  <TabsTrigger value="dashboard" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Dashboard</TabsTrigger>
+                  <TabsTrigger value="library" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Library</TabsTrigger>
+                  <TabsTrigger value="tasks" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">My Tasks</TabsTrigger>
+                  <TabsTrigger value="search" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Search</TabsTrigger>
+                </TabsList>
 
-          <TabsContent value="tasks" className="space-y-6">
-            <Card className="p-6 bg-card border-border">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Your Assignments</h3>
-              <p className="text-muted-foreground">Task assignment module will appear here. You can view tasks assigned to you.</p>
-            </Card>
-          </TabsContent>
+                {/* Unified Dashboard */}
+                <TabsContent value="dashboard" className="space-y-6">
+                  <GlobalSearch />
+                  <ConnectedPlatforms />
+                  <PinnedSection />
+                  <ActivityFeed />
+                </TabsContent>
 
-          <TabsContent value="search" className="space-y-6">
-            <Card className="p-6 bg-card border-border">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Search Documents</h3>
-              <div className="flex items-center gap-3">
-                <Input placeholder="Type to search across workspace documents..." className="flex-1" />
-                <Button>Search</Button>
-              </div>
-              <Separator className="my-6" />
-              <p className="text-muted-foreground">Results will be shown here.</p>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                {/* Content & Asset Library */}
+                <TabsContent value="library" className="space-y-6">
+                  <ContentLibrary />
+                </TabsContent>
+
+                {/* My Tasks */}
+                <TabsContent value="tasks" className="space-y-6">
+                  <MyTasks />
+                </TabsContent>
+
+                {/* Global Search dedicated */}
+                <TabsContent value="search" className="space-y-6">
+                  <GlobalSearch />
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            {/* Right: Ask AI and Recommendations */}
+            <div className="space-y-6">
+              <AskAIBox />
+              <Recommendations />
+            </div>
+          </div>
+        </div>
     </div>
   );
 };
