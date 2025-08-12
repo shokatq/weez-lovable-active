@@ -48,15 +48,14 @@ const RoleGuard = ({ allowedRoles, children }: RoleGuardProps) => {
 
   const role = userRole?.role;
 
-  // If role is known and not permitted, smart-redirect based on role
-  if (role && !allowedRoles.includes(role)) {
+  // Default-deny: if role is missing or not permitted, redirect safely
+  if (!role || !allowedRoles.includes(role)) {
     if (role === 'admin' || role === 'team_lead') {
       navigate('/admin-dashboard', { replace: true });
-      return null;
     } else {
       navigate('/employee-dashboard', { replace: true });
-      return null;
     }
+    return null;
   }
 
   return <>{children}</>;
