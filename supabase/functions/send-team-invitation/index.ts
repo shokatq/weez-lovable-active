@@ -24,11 +24,29 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Initialize Supabase client with service role for server-side operations
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const authHeader = req.headers.get('Authorization') || '';
+
+    // Client with caller's JWT (respect RLS)
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    // Service role client for internal verification only
+    const adminClient = createClient(
+      supabaseUrl,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // Ensure caller is authenticated
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const {
       inviteeEmail,
@@ -39,6 +57,44 @@ const handler = async (req: Request): Promise<Response> => {
       inviterName,
       invitationId
     }: InvitationRequest = await req.json();
+
+    // Verify the invitation exists and caller is authorized
+    const { data: inviteRecord, error: inviteErr } = await adminClient
+      .from('team_invitations')
+      .select('id, team_id, invited_by')
+      .eq('id', invitationId)
+      .maybeSingle();
+
+    if (inviteErr || !inviteRecord) {
+      return new Response(JSON.stringify({ error: 'Invalid or unknown invitation' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { data: roleRows, error: roleErr } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userData.user.id)
+      .eq('team_id', inviteRecord.team_id);
+
+    if (roleErr) {
+      console.error('Role check error:', roleErr);
+      return new Response(JSON.stringify({ error: 'Role verification failed' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const isInviter = inviteRecord.invited_by === userData.user.id;
+    const hasPermission = (roleRows || []).some((r: any) => r.role === 'admin' || r.role === 'team_lead');
+
+    if (!isInviter && !hasPermission) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     console.log("Sending invitation email to:", inviteeEmail);
 

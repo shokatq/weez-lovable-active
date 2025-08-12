@@ -13,14 +13,49 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const authHeader = req.headers.get('Authorization') || '';
 
-    console.log('Starting anomaly detection...');
+    // Use the caller's JWT for all operations (respect RLS)
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
-    // Call the anomaly detection function
+    // Ensure caller is authenticated
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Only allow admins to run anomaly detection
+    const { data: adminRoles, error: rolesError } = await supabase
+      .from('user_roles')
+      .select('team_id, role')
+      .eq('user_id', userData.user.id)
+      .eq('role', 'admin');
+
+    if (rolesError) {
+      console.error('Error verifying roles:', rolesError);
+      return new Response(JSON.stringify({ error: 'Role verification failed' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!adminRoles || adminRoles.length === 0) {
+      return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Starting anomaly detection by user', userData.user.id);
+
+    // Call the anomaly detection function (SECURITY DEFINER handles inserts)
     const { error } = await supabase.rpc('detect_anomalies');
 
     if (error) {
@@ -34,25 +69,23 @@ serve(async (req) => {
       );
     }
 
-    // Check for any new alerts that need notification
+    // Fetch new alerts for teams where the user is admin
+    const teamIds = adminRoles.map((r: any) => r.team_id).filter(Boolean);
+    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
     const { data: newAlerts, error: alertsError } = await supabase
       .from('anomaly_alerts')
-      .select(`
-        *,
-        profiles (first_name, last_name, email)
-      `)
+      .select(`*, profiles (first_name, last_name, email)`) // relies on FK/view setup
       .eq('status', 'open')
-      .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()); // Last hour
+      .gte('created_at', since)
+      .in('team_id', teamIds);
 
     if (alertsError) {
       console.error('Error fetching alerts:', alertsError);
     } else if (newAlerts && newAlerts.length > 0) {
       console.log(`Found ${newAlerts.length} new anomaly alerts`);
-      
-      // Here you could send notifications via email or other channels
-      // For now, we'll just log them
       for (const alert of newAlerts) {
-        console.log(`🚨 ${alert.severity.toUpperCase()} Alert: ${alert.description}`);
+        console.log(`🚨 ${alert.severity?.toUpperCase?.() || 'INFO'} Alert: ${alert.description}`);
         console.log(`   User: ${alert.profiles?.email}`);
         console.log(`   Type: ${alert.alert_type}`);
       }

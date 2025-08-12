@@ -481,6 +481,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_auth_email: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_role_in_team: {
         Args: { user_id: string; team_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
