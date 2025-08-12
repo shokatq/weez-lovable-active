@@ -94,26 +94,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error };
   };
 
-const signInWithGoogle = async () => {
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          // Keep redirect to app origin (must be in Supabase provider redirect allowlist)
+          redirectTo: window.location.origin,
+        },
+      });
+
+      if (error) {
+        const msg = error.message || 'Google sign-in failed';
+        // Provide clearer guidance when provider is disabled or misconfigured
+        if (msg.toLowerCase().includes('unsupported provider') || msg.toLowerCase().includes('not enabled')) {
+          toast.error('Google provider is not enabled. Please enable Google in Supabase Auth > Providers and add your Client ID/Secret.');
+        } else if (msg.toLowerCase().includes('validation_failed')) {
+          toast.error('Google sign-in validation failed. Verify redirect URL and OAuth credentials in Supabase.');
+        } else {
+          toast.error(msg);
+        }
+        return { error };
       }
-    });
-    if (error) {
-      toast.error(error.message);
+
+      return { error: null };
+    } catch (error: any) {
+      toast.error('An unexpected error occurred');
       return { error };
     }
-    return { error: null };
-  } catch (error: any) {
-    toast.error('An unexpected error occurred');
-    return { error };
-  }
-};
+  };
 
-const signOut = async () => {
+  const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       
