@@ -36,6 +36,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Post-auth redirect: honor destination set before OAuth/password flows
+        if (session?.user) {
+          const target = localStorage.getItem('postAuthRedirect');
+          if (target) {
+            localStorage.removeItem('postAuthRedirect');
+            if (window.location.pathname !== target) {
+              window.location.replace(target);
+            }
+          }
+        }
       }
     );
 
@@ -71,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
-    const redirectUrl = `${window.location.origin}/workspace-new`;
+    const redirectUrl = `${window.location.origin}/employee-dashboard`;
     
     const { error } = await supabase.auth.signUp({
       email,

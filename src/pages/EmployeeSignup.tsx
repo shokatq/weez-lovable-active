@@ -77,7 +77,7 @@ const EmployeeSignup = () => {
         }
       }
 
-      navigate('/employee-login');
+      navigate('/employee-dashboard', { replace: true });
     } catch (err: any) {
       toast.error(err.message || 'Sign up failed');
     } finally {
@@ -95,7 +95,7 @@ const EmployeeSignup = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Button type="button" variant="outline" className="w-full" onClick={() => signInWithGoogle()}>
+              <Button type="button" variant="outline" className="w-full" onClick={() => { localStorage.setItem('postAuthRedirect','/employee-dashboard'); signInWithGoogle(); }}>
                 Continue with Google
               </Button>
               <div className="grid grid-cols-2 gap-4">

@@ -102,7 +102,7 @@ const EmployeeLogin = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Button type="button" variant="outline" className="w-full" onClick={() => signInWithGoogle()}>
+              <Button type="button" variant="outline" className="w-full" onClick={() => { localStorage.setItem('postAuthRedirect','/employee-dashboard'); signInWithGoogle(); }}>
                 Continue with Google
               </Button>
               <div className="space-y-2">

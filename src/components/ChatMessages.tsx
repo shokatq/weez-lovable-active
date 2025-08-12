@@ -60,8 +60,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   }, [messages, isThinking]);
 
   const suggestions = [
-    "📄 Search files from my Notion workspace",
-    "💬 Find conversations in Slack channels", 
+    "🔎 Search files across the workspace",
+    "💬 Find conversations in Slack channels",
     "📊 Show me reports from Google Drive",
     "🎨 Locate assets from Dropbox",
     "📝 Find documents in OneDrive",
@@ -89,8 +89,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                   <div
                     key={message.id}
                     className={`group flex gap-4 items-start ${
-                      message.isUser ? "justify-end" : "justify-start bg-muted/30 rounded-xl"
-                    } animate-slide-up opacity-0 px-3 py-2`}
+                      message.isUser ? "justify-end" : "justify-start"
+                    } animate-slide-up opacity-0`}
                     style={{ 
                       animationDelay: `${index * 50}ms`,
                       animationFillMode: 'forwards'
