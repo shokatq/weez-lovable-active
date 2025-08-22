@@ -1,12 +1,11 @@
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import EnhancedTeamManagement from './EnhancedTeamManagement';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 import { 
   Building2, 
   Users, 
@@ -18,76 +17,204 @@ import {
   Eye,
   Sparkles,
   ArrowRight,
-  Plus
+  Plus,
+  RefreshCw,
+  AlertCircle,
+  UserPlus
 } from 'lucide-react';
+import { useRBAC } from '@/contexts/RBACContext';
+import { ProtectedComponent } from '@/components/ProtectedComponent';
+import { Role, Permission } from '@/types/rbac';
 
-const RoleBasedDashboard = () => {
-  const { user, signOut } = useAuth();
-  const { userRole, hasTeam, loading, isAdmin, canManageTeam } = useUserRole();
-  const navigate = useNavigate();
+// Team Management Component
+const TeamManagement = () => {
+  const { teamMembers, inviteUser, refreshTeamData, loading, error } = useRBAC();
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
 
-  // Redirect to workspace if user has no team (will show team creation screen)
-  useEffect(() => {
-    if (!loading && !hasTeam) {
-      navigate('/workspace-new');
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail.trim()) return;
+    
+    setIsInviting(true);
+    const success = await inviteUser(inviteEmail, Role.EMPLOYEE);
+    if (success) {
+      setInviteEmail('');
     }
-  }, [loading, hasTeam, navigate]);
+    setIsInviting(false);
+  };
 
-  const getRoleIcon = (role: string) => {
+  const getRoleIcon = (role: Role) => {
     switch (role) {
-      case 'admin': return <Crown className="w-4 h-4" />;
-      case 'team_lead': return <Shield className="w-4 h-4" />;
-      case 'employee': return <User className="w-4 h-4" />;
-      case 'viewer': return <Eye className="w-4 h-4" />;
+      case Role.ADMIN: return <Crown className="w-4 h-4" />;
+      case Role.TEAM_LEAD: return <Shield className="w-4 h-4" />;
+      case Role.EMPLOYEE: return <User className="w-4 h-4" />;
+      case Role.VIEWER: return <Eye className="w-4 h-4" />;
       default: return <User className="w-4 h-4" />;
     }
   };
 
-  const getRoleBadgeVariant = (role: string) => {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <Badge variant="default" className="text-xs">Active</Badge>;
+      case 'pending':
+        return <Badge variant="secondary" className="text-xs">Pending</Badge>;
+      case 'inactive':
+        return <Badge variant="outline" className="text-xs">Inactive</Badge>;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Invite New Member */}
+      <ProtectedComponent permissions={[Permission.INVITE_MEMBERS]}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserPlus className="w-5 h-5" />
+              Invite New Member
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleInvite} className="flex gap-2">
+              <Input
+                type="email"
+                placeholder="Enter email address"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                disabled={isInviting}
+                className="flex-1"
+              />
+              <Button type="submit" disabled={isInviting || !inviteEmail.trim()}>
+                {isInviting ? 'Inviting...' : 'Invite'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </ProtectedComponent>
+
+      {/* Team Members List */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Team Members ({teamMembers.length})</CardTitle>
+            <CardDescription>Manage your team members and their roles</CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={refreshTeamData} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {teamMembers.map((member) => (
+              <div key={member.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  {getRoleIcon(member.role)}
+                  <div>
+                    <p className="font-medium">
+                      {member.first_name && member.last_name 
+                        ? `${member.first_name} ${member.last_name}`
+                        : member.email
+                      }
+                    </p>
+                    <p className="text-sm text-muted-foreground">{member.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline" className="capitalize">
+                    {member.role.replace('_', ' ')}
+                  </Badge>
+                  {getStatusBadge(member.status)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const RoleBasedDashboard = () => {
+  const { user, userRole, team, loading, signOut, hasPermission, teamMembers } = useRBAC();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect to workspace setup if user doesn't have a team
+    if (user && !team && !loading) {
+      navigate('/workspace-new');
+    }
+  }, [user, team, loading, navigate]);
+
+  const getRoleIcon = (role: Role | null) => {
     switch (role) {
-      case 'admin': return 'default';
-      case 'team_lead': return 'secondary';
-      case 'employee': return 'outline';
-      case 'viewer': return 'outline';
+      case Role.ADMIN: return <Crown className="w-4 h-4" />;
+      case Role.TEAM_LEAD: return <Shield className="w-4 h-4" />;
+      case Role.EMPLOYEE: return <User className="w-4 h-4" />;
+      case Role.VIEWER: return <Eye className="w-4 h-4" />;
+      default: return <User className="w-4 h-4" />;
+    }
+  };
+
+  const getRoleBadgeVariant = (role: Role | null) => {
+    switch (role) {
+      case Role.ADMIN: return 'default';
+      case Role.TEAM_LEAD: return 'secondary';
+      case Role.EMPLOYEE: return 'outline';
+      case Role.VIEWER: return 'outline';
       default: return 'outline';
     }
   };
 
   const getQuickActions = () => {
-    const actions = [
-      {
+    const actions = [];
+
+    // AI Chat - available to all authenticated users
+    if (hasPermission(Permission.USE_AI_CHAT)) {
+      actions.push({
         title: 'AI Chat',
         description: 'Chat with AI assistants',
         icon: MessageSquare,
         href: '/chat',
-        available: true,
-      },
-      {
-        title: 'Notion Interface',
-        description: 'Manage your workspace',
-        icon: Building2,
-        href: '/notion',
-        available: true,
-      },
-    ];
+      });
+    }
 
-    if (canManageTeam) {
+    // Workspace - available to all
+    actions.push({
+      title: 'Workspace',
+      description: 'Access your workspace',
+      icon: Building2,
+      href: '/workspace',
+    });
+
+    // Team Management - only for managers
+    if (hasPermission(Permission.MANAGE_TEAM)) {
       actions.unshift({
         title: 'Team Management',
         description: 'Manage team members and roles',
         icon: Users,
         href: '#team',
-        available: true,
       });
     }
 
-    if (isAdmin) {
+    // Settings - only for admins
+    if (hasPermission(Permission.CONFIGURE_SETTINGS)) {
       actions.push({
-        title: 'Workspace Settings',
+        title: 'Settings',
         description: 'Configure workspace settings',
         icon: Settings,
-        href: '/workspace',
-        available: true,
+        href: '/settings',
       });
     }
 
@@ -105,8 +232,22 @@ const RoleBasedDashboard = () => {
     );
   }
 
-  if (!hasTeam) {
-    return null; // Will redirect to workspace setup
+  if (!team) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>No Team Found</CardTitle>
+            <CardDescription>You don't belong to any team yet.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/workspace-new')} className="w-full">
+              Create Team
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -120,13 +261,13 @@ const RoleBasedDashboard = () => {
                 <Sparkles className="w-8 h-8 text-primary" />
                 <div>
                   <h1 className="text-2xl font-bold text-foreground">Weez.AI</h1>
-                  <p className="text-sm text-muted-foreground">{userRole?.teamName}</p>
+                  <p className="text-sm text-muted-foreground">{team?.name}</p>
                 </div>
               </div>
               <Separator orientation="vertical" className="h-8" />
-              <Badge variant={getRoleBadgeVariant(userRole?.role || 'employee')} className="flex items-center gap-1">
-                {getRoleIcon(userRole?.role || 'employee')}
-                {userRole?.role || 'Employee'}
+              <Badge variant={getRoleBadgeVariant(userRole)} className="flex items-center gap-1">
+                {getRoleIcon(userRole)}
+                {userRole?.replace('_', ' ') || 'Employee'}
               </Badge>
             </div>
             <div className="flex items-center space-x-4">
@@ -181,51 +322,56 @@ const RoleBasedDashboard = () => {
           </div>
         </div>
 
-        {/* Role-specific content */}
-        {canManageTeam && (
+        {/* Team Management Section - Only for users with MANAGE_TEAM permission */}
+        <ProtectedComponent 
+          permissions={[Permission.MANAGE_TEAM]}
+          fallback={null}
+        >
           <div id="team-management" className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-foreground">Team Management</h3>
-              {isAdmin && (
+              <ProtectedComponent permissions={[Permission.CONFIGURE_SETTINGS]}>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/workspace')}
+                  onClick={() => navigate('/settings')}
                   className="flex items-center gap-2"
                 >
                   <Settings className="w-4 h-4" />
                   Advanced Settings
                 </Button>
-              )}
+              </ProtectedComponent>
             </div>
             <Card>
               <CardContent className="p-6">
-                <EnhancedTeamManagement />
+                <TeamManagement />
               </CardContent>
             </Card>
           </div>
-        )}
+        </ProtectedComponent>
 
-        {/* Regular employee view */}
-        {!canManageTeam && (
+        {/* Employee/Viewer Dashboard - For users without MANAGE_TEAM permission */}
+        {!hasPermission(Permission.MANAGE_TEAM) && (
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-foreground">Your Workspace</h3>
             <div className="grid gap-4 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5" />
-                    AI Chat Assistant
-                  </CardTitle>
-                  <CardDescription>
-                    Get help with your tasks using AI-powered assistance
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={() => navigate('/chat')} className="w-full">
-                    Start Chatting
-                  </Button>
-                </CardContent>
-              </Card>
+              <ProtectedComponent permissions={[Permission.USE_AI_CHAT]}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5" />
+                      AI Chat Assistant
+                    </CardTitle>
+                    <CardDescription>
+                      Get help with your tasks using AI-powered assistance
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button onClick={() => navigate('/chat')} className="w-full">
+                      Start Chatting
+                    </Button>
+                  </CardContent>
+                </Card>
+              </ProtectedComponent>
 
               <Card>
                 <CardHeader>
@@ -238,7 +384,7 @@ const RoleBasedDashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button onClick={() => navigate('/workspace-new')} variant="outline" className="w-full">
+                  <Button onClick={() => navigate('/workspace')} variant="outline" className="w-full">
                     Open Workspace
                   </Button>
                 </CardContent>
@@ -246,6 +392,62 @@ const RoleBasedDashboard = () => {
             </div>
           </div>
         )}
+
+        {/* Team Overview - Show for all users who can view team */}
+        <ProtectedComponent permissions={[Permission.VIEW_TEAM]}>
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-foreground">Team Overview</h3>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Team Members
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-primary">
+                    {teamMembers.filter(m => m.status === 'active').length}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Active members</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Pending Invites
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-orange-500">
+                    {teamMembers.filter(m => m.status === 'pending').length}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Awaiting response</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    Your Role
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2">
+                    {getRoleIcon(userRole)}
+                    <span className="text-lg font-semibold capitalize">
+                      {userRole?.replace('_', ' ')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Current access level</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </ProtectedComponent>
       </div>
     </div>
   );
