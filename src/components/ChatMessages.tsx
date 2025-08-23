@@ -71,15 +71,11 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
   ];
 
   return (
-    <div className="flex-1 w-full h-full flex flex-col bg-background relative overflow-hidden">
+    <div className="flex-1 w-full h-full flex flex-col bg-white relative overflow-hidden">
       {
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
-            <h1 className="text-3xl font-semibold text-foreground mb-3 animate-fade-in">How can I help you today?</h1>
-            
-            <div className="w-full max-w-3xl mt-8">
-              <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
-            </div>
+            {/* This will be handled by the main ChatInterface component */}
           </div>
         ) : (
           <ScrollArea className="flex-1 w-full h-full">
@@ -97,8 +93,10 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                     }}
                   >
                     {!message.isUser && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary text-primary-foreground">
-                        AI
+                      <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
+                          <div className="w-2 h-2 bg-black rounded-full"></div>
+                        </div>
                       </div>
                     )}
 
@@ -106,36 +104,36 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                       <div
                         className={`px-4 py-3 rounded-2xl transition-all duration-200 ${
                           message.isUser
-                            ? "bg-primary text-primary-foreground ml-12"
-                            : "bg-card border border-border text-foreground hover:bg-card/90"
+                            ? "bg-blue-500 text-white ml-12"
+                            : "bg-gray-100 border border-gray-200 text-gray-900 hover:bg-gray-50"
                         } ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (
                           <div className="flex items-center gap-2 mb-3">
-                            <Upload className="w-4 h-4 text-primary animate-bounce" />
+                            <Upload className="w-4 h-4 text-blue-500 animate-bounce" />
                             <div className="flex gap-1">
-                              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-                              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
                             </div>
-                            <span className="text-sm text-primary">Uploading...</span>
+                            <span className="text-sm text-blue-500">Uploading...</span>
                           </div>
                         )}
                         
-                        <div className="text-[15px] leading-6 whitespace-pre-wrap text-foreground">
+                        <div className="text-[15px] leading-6 whitespace-pre-wrap">
                           <MarkdownContent text={message.content} />
                         </div>
                         
                         {message.files && message.files.length > 0 && (
-                          <div className="mt-3 space-y-2 border-t border-border pt-3">
+                          <div className="mt-3 space-y-2 border-t border-gray-200 pt-3">
                             {message.files.map((file) => (
-                              <div key={file.id} className="bg-muted rounded-lg p-3 flex items-center gap-3 border border-border hover:bg-muted/80 transition-colors duration-200">
-                                <div className="w-8 h-8 rounded-md bg-primary/20 flex items-center justify-center">
-                                  <FileText className="w-4 h-4 text-primary" />
+                              <div key={file.id} className="bg-white rounded-lg p-3 flex items-center gap-3 border border-gray-200 hover:bg-gray-50 transition-colors duration-200">
+                                <div className="w-8 h-8 rounded-md bg-blue-100 flex items-center justify-center">
+                                  <FileText className="w-4 h-4 text-blue-600" />
                                 </div>
                                 <div className="flex-1 overflow-hidden">
-                                  <p className="font-medium text-foreground text-sm truncate">{file.name}</p>
-                                  <span className="text-xs text-muted-foreground">{file.platform} • {file.size}</span>
+                                  <p className="font-medium text-gray-900 text-sm truncate">{file.name}</p>
+                                  <span className="text-xs text-gray-500">{file.platform} • {file.size}</span>
                                 </div>
                               </div>
                             ))}
@@ -143,7 +141,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                         )}
                       </div>
                       
-                      <div className={`text-xs text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity ${
+                      <div className={`text-xs text-gray-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity ${
                         message.isUser ? 'text-right' : 'text-left'
                       }`}>
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -151,8 +149,8 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                     </div>
 
                     {message.isUser && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-foreground">
-                        <User className="w-4 h-4 text-background" />
+                      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-gray-700" />
                       </div>
                     )}
                   </div>
@@ -160,10 +158,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       
                 {isThinking && (
                   <div className="flex gap-4 animate-fade-in">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
-                      AI
+                    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+                      <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
+                        <div className="w-2 h-2 bg-black rounded-full"></div>
+                      </div>
                     </div>
-                    <div className="bg-muted rounded-2xl px-4 py-3 max-w-[85%] md:max-w-[70%]">
+                    <div className="bg-gray-100 rounded-2xl px-4 py-3 max-w-[85%] md:max-w-[70%]">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
                   </div>

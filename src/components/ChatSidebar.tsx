@@ -45,83 +45,120 @@ const ChatSidebar = ({
 
   return (
     <Sidebar 
-      className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
+      className="w-16 bg-gray-50 border-r border-gray-200 hover:w-64 transition-all duration-300 group" 
       collapsible="offcanvas"
     >
-      <SidebarHeader className="p-4 border-b border-sidebar-border">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-sidebar-foreground">Weez AI</h2>
-              <p className="text-xs text-muted-foreground">Marketing Assistant</p>
+      <SidebarHeader className="p-4">
+        <div className="flex flex-col items-center group-hover:items-start space-y-4">
+          {/* Compact logo */}
+          <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
+            <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
+              <div className="w-2 h-2 bg-black rounded-full"></div>
             </div>
           </div>
+          
+          {/* New Chat - only show on hover */}
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity w-full">
+            <Button
+              onClick={onNewConversation}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2.5 px-4 rounded-lg text-sm h-auto shadow-sm transition-all duration-200"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              New Chat
+            </Button>
+          </div>
         </div>
-        
-        <Button
-          onClick={onNewConversation}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-lg text-sm h-auto shadow-sm transition-all duration-200"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Chat
-        </Button>
       </SidebarHeader>
 
       <SidebarContent className="flex-1 p-3">
-        <ScrollArea className="flex-1">
-          <div className="space-y-1 pb-4">
-            {conversations.map((conversation, index) => (
-              <div key={conversation.id} className="group relative">
-                <Button
-                  variant="ghost"
-                  onClick={() => onConversationSelect(conversation.id)}
-                  className={`w-full justify-start text-left p-3 h-auto rounded-lg text-sm transition-all duration-200 ${
-                    currentConversationId === conversation.id 
-                      ? 'bg-muted text-foreground' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  }`}
-                >
-                  <div className="flex-1 min-w-0 overflow-hidden">
-                    <p className="font-medium line-clamp-1 leading-tight mb-1 text-sm">
-                      {getConversationPreview(conversation)}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                      <span className="text-xs text-muted-foreground">
-                        {formatTime(conversation.timestamp)}
-                      </span>
-                    </div>
-                  </div>
-                </Button>
-                {currentConversationId === conversation.id && (
+        {/* Sidebar icons - always visible */}
+        <div className="flex flex-col items-center group-hover:items-start space-y-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg group-hover:w-full group-hover:justify-start"
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Chat</span>
+          </Button>
+          
+          <Button
+            onClick={onNavigateToWorkspace}
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg group-hover:w-full group-hover:justify-start"
+          >
+            <Building2 className="w-4 h-4" />
+            <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Workspace</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg group-hover:w-full group-hover:justify-start"
+          >
+            <Clock className="w-4 h-4" />
+            <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">History</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg group-hover:w-full group-hover:justify-start"
+          >
+            <Settings className="w-4 h-4" />
+            <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">Settings</span>
+          </Button>
+        </div>
+
+        {/* Conversations - only show on hover */}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-6">
+          <ScrollArea className="flex-1">
+            <div className="space-y-1 pb-4">
+              {conversations.map((conversation, index) => (
+                <div key={conversation.id} className="group/item relative">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => onConversationSelect(conversation.id)}
+                    className={`w-full justify-start text-left p-3 h-auto rounded-lg text-sm transition-all duration-200 ${
+                      currentConversationId === conversation.id 
+                        ? 'bg-gray-200 text-gray-900' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                   >
-                    <Trash2 className="w-3 h-3" />
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <p className="font-medium line-clamp-1 leading-tight mb-1 text-sm">
+                        {getConversationPreview(conversation)}
+                      </p>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                        <span className="text-xs text-gray-400">
+                          {formatTime(conversation.timestamp)}
+                        </span>
+                      </div>
+                    </div>
                   </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+                  {currentConversationId === conversation.id && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 p-0 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-sidebar-border space-y-3">
-        <Button
-          onClick={onNavigateToWorkspace}
-          variant="outline"
-          className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
-        >
-          <Building2 className="w-4 h-4 mr-2" />
-          Marketing Workspace
-        </Button>
-        
-        <UserProfile />
+      <SidebarFooter className="p-4">
+        {/* User profile - only show on hover */}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <UserProfile />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

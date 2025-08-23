@@ -64,45 +64,45 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
   }, [disabled]);
 
   return (
-    <div className="border-t border-border bg-background/95 backdrop-blur">
-      <div className="max-w-3xl mx-auto px-4 py-4">
+    <div className="bg-white border-t border-gray-200">
+      <div className="max-w-4xl mx-auto px-6 py-6">
         {/* File upload indicator */}
         {uploadingFiles.length > 0 && (
-          <div className="mb-3 p-3 bg-card rounded-lg border border-border">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
               <span>Uploading {uploadingFiles.length} file(s)...</span>
             </div>
           </div>
         )}
 
-        {/* Slim input area */}
+        {/* Input area matching the design */}
         <div className="relative">
-          <div className="flex items-center gap-2 p-2 bg-background border border-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus-within:ring-1 focus-within:ring-primary/50 focus-within:border-primary/50 min-h-[48px]">
+          <div className="flex items-center gap-3 p-4 bg-white border border-gray-300 rounded-2xl shadow-sm hover:border-gray-400 transition-all duration-200 focus-within:border-blue-500 focus-within:shadow-lg min-h-[56px]">
             {/* File upload button */}
             <Button
               variant="ghost"
               size="icon"
-              className="flex-shrink-0 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              className="flex-shrink-0 h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
             >
-              <Paperclip className="w-4 h-4" />
+              <Paperclip className="w-5 h-5" />
             </Button>
 
             {/* Text input */}
             <Textarea
               ref={textareaRef}
-              placeholder="Message Weez AI..."
+              placeholder="Ask me anything"
               value={message}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyPress}
               disabled={disabled}
               className={cn(
-                "min-h-[32px] max-h-[120px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-muted-foreground text-sm leading-5 p-1",
-                "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+                "min-h-[24px] max-h-[120px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-gray-500 text-gray-900 text-base leading-6 p-0",
+                "scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
               )}
-              style={{ height: "32px" }}
+              style={{ height: "24px" }}
             />
 
             {/* Send button */}
@@ -111,17 +111,22 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
                 onClick={handleSend}
                 disabled={disabled || !message.trim()}
                 className={cn(
-                  "h-8 w-8 rounded-lg shadow-sm transition-all duration-200",
+                  "h-10 w-10 rounded-xl shadow-sm transition-all duration-200",
                   message.trim() 
-                    ? "bg-primary hover:bg-primary/90 text-primary-foreground hover:shadow-md" 
-                    : "bg-muted text-muted-foreground cursor-not-allowed"
+                    ? "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md" 
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 )}
                 size="icon"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-5 h-5" />
               </Button>
             </div>
           </div>
+          
+          {/* Footer text */}
+          <p className="text-center text-xs text-gray-500 mt-3">
+            Centria may display inaccurate info, so please double check the response. <span className="text-gray-700 font-medium">Your Privacy & Centria AI</span>
+          </p>
         </div>
 
         {/* Hidden file input */}
