@@ -175,7 +175,7 @@ const ChatInterface = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full bg-white">
+      <div className="flex h-screen w-full bg-background">
         <ChatSidebar
           conversations={conversations}
           currentConversationId={currentConversationId}
@@ -185,62 +185,80 @@ const ChatInterface = () => {
         />
         
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Remove header for cleaner look */}
+          <ChatHeader />
           
           <div className="flex-1 flex flex-col min-h-0">
             {messages.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center p-8 bg-white">
+              <div className="flex-1 flex items-center justify-center p-8">
                 <div className="text-center max-w-2xl mx-auto">
-                  {/* Black circular logo */}
-                  <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                      <div className="w-4 h-4 bg-black rounded-full"></div>
-                    </div>
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <MessageSquare className="w-8 h-8 text-primary-foreground" />
+                  </div>
+                  <h2 className="text-2xl font-semibold text-foreground mb-3">
+                    How can I help you today?
+                  </h2>
+                  <p className="text-muted-foreground mb-8">
+                    Ask me anything about your files, documents, or any questions you have. I'm powered by AI and ready to assist!
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("Analyze my files and provide a summary")}
+                      disabled={isLoading}
+                    >
+                      <div>
+                        <p className="font-medium">File Analysis</p>
+                        <p className="text-sm text-muted-foreground">Analyze and summarize documents</p>
+                      </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("Help me organize my workspace")}
+                      disabled={isLoading}
+                    >
+                      <div>
+                        <p className="font-medium">Workspace Organization</p>
+                        <p className="text-sm text-muted-foreground">Get help organizing files</p>
+                      </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("What can you help me with?")}
+                      disabled={isLoading}
+                    >
+                      <div>
+                        <p className="font-medium">Capabilities</p>
+                        <p className="text-sm text-muted-foreground">Learn what I can do</p>
+                      </div>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-4 justify-start"
+                      onClick={() => handleSendMessage("Show me my recent activity")}
+                      disabled={isLoading}
+                    >
+                      <div>
+                        <p className="font-medium">Recent Activity</p>
+                        <p className="text-sm text-muted-foreground">View recent actions</p>
+                      </div>
+                    </Button>
                   </div>
                   
-                  <h2 className="text-xl font-medium text-gray-600 mb-2">
-                    Hi, there 👋
-                  </h2>
-                  <h1 className="text-3xl font-semibold text-gray-900 mb-8">
-                    How can we help?
-                  </h1>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                    <div 
-                      className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => handleSendMessage("Help me to create a personal branding and web page")}
-                    >
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                        <div className="w-4 h-4 bg-blue-600 rounded"></div>
-                      </div>
-                      <p className="text-gray-800 font-medium text-left">
-                        Help me to create a personal branding and web page
-                      </p>
-                    </div>
-                    
-                    <div 
-                      className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => handleSendMessage("Write a report based on my website data")}
-                    >
-                      <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-                        <div className="w-4 h-4 bg-pink-600 rounded"></div>
-                      </div>
-                      <p className="text-gray-800 font-medium text-left">
-                        Write a report based on my website data
-                      </p>
-                    </div>
-                    
-                    <div 
-                      className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => handleSendMessage("Write a tailored, engaging content, with a focus quality")}
-                    >
-                      <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                        <div className="w-4 h-4 bg-yellow-600 rounded"></div>
-                      </div>
-                      <p className="text-gray-800 font-medium text-left">
-                        Write a tailored, engaging content, with a focus quality
-                      </p>
-                    </div>
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <Dialog open={showConnectServices} onOpenChange={setShowConnectServices}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="lg" className="w-full">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Connect Services
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                        <ConnectivityPanel />
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               </div>
@@ -253,7 +271,7 @@ const ChatInterface = () => {
               />
             )}
             
-            <div className="border-t border-gray-200 bg-white p-4">
+            <div className="border-t border-border bg-background p-4">
               <div className="max-w-4xl mx-auto">
                 <ImprovedChatInput 
                   onSendMessage={handleSendMessage} 
