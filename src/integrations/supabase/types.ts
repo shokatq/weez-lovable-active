@@ -101,6 +101,63 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          team_id: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          team_id?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          team_id?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          files: Json | null
+          id: string
+          is_user: boolean
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          files?: Json | null
+          id?: string
+          is_user?: boolean
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          files?: Json | null
+          id?: string
+          is_user?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           created_at: string | null
@@ -316,6 +373,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      space_members: {
+        Row: {
+          added_at: string
+          added_by: string
+          id: string
+          space_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          added_by: string
+          id?: string
+          space_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          added_by?: string
+          id?: string
+          space_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      spaces: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       tasks: {
         Row: {

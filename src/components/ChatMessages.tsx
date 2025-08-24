@@ -97,17 +97,21 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                     }}
                   >
                     {!message.isUser && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary text-primary-foreground">
-                        AI
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20">
+                        <img 
+                          src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
+                          alt="Weez AI" 
+                          className="w-6 h-6 object-contain"
+                        />
                       </div>
                     )}
 
-                    <div className={`max-w-[90%] md:max-w-[75%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
+                    <div className={`max-w-[85%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
                       <div
-                        className={`px-4 py-3 rounded-2xl transition-all duration-200 ${
+                        className={`px-5 py-4 transition-all duration-200 ${
                           message.isUser
-                            ? "bg-primary text-primary-foreground ml-12"
-                            : "bg-card border border-border text-foreground hover:bg-card/90"
+                            ? "bg-primary text-primary-foreground rounded-3xl rounded-br-lg"
+                            : "bg-background border border-border rounded-3xl rounded-bl-lg shadow-sm"
                         } ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (
@@ -122,37 +126,33 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                           </div>
                         )}
                         
-                        <div className="text-[15px] leading-6 whitespace-pre-wrap text-foreground">
+                        <div className="text-[15px] leading-7 whitespace-pre-wrap">
                           <MarkdownContent text={message.content} />
                         </div>
                         
                         {message.files && message.files.length > 0 && (
-                          <div className="mt-3 space-y-2 border-t border-border pt-3">
-                            {message.files.map((file) => (
-                              <div key={file.id} className="bg-muted rounded-lg p-3 flex items-center gap-3 border border-border hover:bg-muted/80 transition-colors duration-200">
-                                <div className="w-8 h-8 rounded-md bg-primary/20 flex items-center justify-center">
-                                  <FileText className="w-4 h-4 text-primary" />
-                                </div>
-                                <div className="flex-1 overflow-hidden">
-                                  <p className="font-medium text-foreground text-sm truncate">{file.name}</p>
-                                  <span className="text-xs text-muted-foreground">{file.platform} • {file.size}</span>
-                                </div>
+                          <div className="mb-4 space-y-2">
+                            {message.files.map((file, fileIndex) => (
+                              <div key={fileIndex} className="flex items-center gap-2 text-sm bg-muted/50 rounded-xl p-3 border">
+                                <FileText className="w-4 h-4 text-muted-foreground" />
+                                <span className="font-medium text-foreground">{file.name}</span>
+                                <span className="text-xs text-muted-foreground">({file.platform})</span>
                               </div>
                             ))}
                           </div>
                         )}
                       </div>
                       
-                      <div className={`text-xs text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity ${
-                        message.isUser ? 'text-right' : 'text-left'
+                      <div className={`text-xs mt-3 ${
+                        message.isUser ? 'text-primary-foreground/60 text-right' : 'text-muted-foreground'
                       }`}>
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
 
                     {message.isUser && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-foreground">
-                        <User className="w-4 h-4 text-background" />
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0 mt-1 text-primary-foreground">
+                        <User className="w-5 h-5" />
                       </div>
                     )}
                   </div>
@@ -160,10 +160,14 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
       
                 {isThinking && (
                   <div className="flex gap-4 animate-fade-in">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
-                      AI
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20">
+                      <img 
+                        src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
+                        alt="Weez AI" 
+                        className="w-6 h-6 object-contain"
+                      />
                     </div>
-                    <div className="bg-muted rounded-2xl px-4 py-3 max-w-[85%] md:max-w-[70%]">
+                    <div className="bg-background border border-border rounded-3xl rounded-bl-lg shadow-sm px-5 py-4 max-w-[85%]">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
                   </div>

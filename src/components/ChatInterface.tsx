@@ -1,21 +1,19 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useGlobalAuditLogger } from '@/hooks/useGlobalAuditLogger';
-import { useAuditLogger } from '@/hooks/useAuditLogger';
-import { useAIAgent } from '@/hooks/aiAgent';
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import ChatSidebar from "@/components/ChatSidebar";
-import ChatHeader from "@/components/ChatHeader";
-import ChatMessages from "@/components/ChatMessages";
-import ImprovedChatInput from "@/components/ImprovedChatInput";
-import ChatWelcomeDialog from "./ChatWelcomeDialog";
+import { useState, useCallback, useEffect } from "react";
+import { Conversation, Message } from "@/types/chat";
+import ChatSidebar from "./ChatSidebar";
+import ChatMessages from "./ChatMessages";
+import ChatHeader from "./ChatHeader";
+import ImprovedChatInput from "./ImprovedChatInput";
 import ConnectivityPanel from "./ConnectivityPanel";
-
-import { Message, Conversation } from "@/types/chat";
-import { toast } from "sonner";
+import ChatWelcomeDialog from "./ChatWelcomeDialog";
+import ThinkingAnimation from "./ThinkingAnimation";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useAIAgent } from "@/hooks/aiAgent";
+import { useGlobalAuditLogger } from "@/hooks/useGlobalAuditLogger";
+import { useAuditLogger } from "@/hooks/useAuditLogger";
+import { toast } from "@/hooks/use-toast";
+import { ChatService } from "@/services/chatService";
+import { useAuth } from "@/hooks/useAuth";
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
