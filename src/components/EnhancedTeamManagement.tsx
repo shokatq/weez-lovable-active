@@ -9,8 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { UserPlus, Mail, Building2, Crown, User, Shield, Eye } from 'lucide-react';
+import { 
+  UserPlus, Mail, Building2, Crown, User, Shield, Eye, Plus, 
+  FolderOpen, Share, MessageSquare, Activity, Search, Trash2, 
+  Settings, FileText
+} from 'lucide-react';
+import { SpacesService } from '@/services/spacesService';
+import type { Space, SpaceMember } from '@/services/spacesService';
+
+// Import theme-responsive icons
+import teamMembersIcon from '@/assets/team-members-icon.png';
+import activeProjectsIcon from '@/assets/active-projects-icon.png';
+import aiQueriesIcon from '@/assets/ai-queries-icon.png';
+import departmentsIcon from '@/assets/departments-icon.png';
 
 interface Department {
   id: string;
@@ -43,10 +57,23 @@ const EnhancedTeamManagement = () => {
   const { userRole, canManageTeam } = useUserRole();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
+  const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Dialog states
+  const [showCreateSpaceDialog, setShowCreateSpaceDialog] = useState(false);
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
+  const [showFileShareDialog, setShowFileShareDialog] = useState(false);
+  
+  // Form states
+  const [newSpace, setNewSpace] = useState({ name: '', description: '' });
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [fileShareForm, setFileShareForm] = useState({ title: '', url: '', platform: '' });
   
   const [inviteForm, setInviteForm] = useState({
     name: '',
@@ -66,10 +93,39 @@ const EnhancedTeamManagement = () => {
     { value: 'viewer', label: 'Viewer', icon: Eye },
   ];
 
+  // Overview stats
+  const overviewStats = [
+    {
+      title: 'Team Members',
+      value: teamMembers.length,
+      icon: teamMembersIcon,
+      description: 'Active team members'
+    },
+    {
+      title: 'Active Projects',
+      value: spaces.length,
+      icon: activeProjectsIcon,
+      description: 'Ongoing workspaces'
+    },
+    {
+      title: 'AI Queries Today',
+      value: 24,
+      icon: aiQueriesIcon,
+      description: 'Questions answered'
+    },
+    {
+      title: 'Departments',
+      value: departments.length,
+      icon: departmentsIcon,
+      description: 'Organizational units'
+    }
+  ];
+
   useEffect(() => {
     if (userRole?.teamId) {
       fetchDepartments();
       fetchTeamMembers();
+      fetchSpaces();
     }
   }, [userRole?.teamId]);
 
@@ -139,6 +195,63 @@ const EnhancedTeamManagement = () => {
       console.error('Error fetching team members:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSpaces = async () => {
+    if (!userRole?.teamId) return;
+    
+    try {
+      const teamSpaces = await SpacesService.getTeamSpaces(userRole.teamId);
+      setSpaces(teamSpaces);
+    } catch (error) {
+      console.error('Error fetching spaces:', error);
+    }
+  };
+
+  const handleCreateSpace = async () => {
+    if (!newSpace.name.trim() || !userRole?.teamId) return;
+
+    try {
+      const spaceId = await SpacesService.createSpace(
+        userRole.teamId,
+        newSpace.name,
+        newSpace.description
+      );
+      
+      if (spaceId) {
+        toast.success('Space created successfully');
+        setNewSpace({ name: '', description: '' });
+        setShowCreateSpaceDialog(false);
+        fetchSpaces();
+      }
+    } catch (error) {
+      toast.error('Failed to create space');
+    }
+  };
+
+  const handleShareFile = async () => {
+    if (!selectedSpace || !fileShareForm.title.trim() || !fileShareForm.url.trim()) return;
+
+    try {
+      // Implement file sharing logic here using supabase
+      const { error } = await supabase
+        .from('shared_files')
+        .insert({
+          team_id: userRole?.teamId,
+          title: fileShareForm.title,
+          url: fileShareForm.url,
+          platform: fileShareForm.platform,
+          shared_by: user?.id
+        });
+
+      if (error) throw error;
+
+      toast.success('File shared successfully');
+      setFileShareForm({ title: '', url: '', platform: '' });
+      setShowFileShareDialog(false);
+    } catch (error) {
+      toast.error('Failed to share file');
     }
   };
 
@@ -253,17 +366,20 @@ const EnhancedTeamManagement = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Team Management</h2>
-          <p className="text-muted-foreground">Manage your team members, roles, and departments</p>
+          <h2 className="text-3xl font-bold text-foreground">Team Management</h2>
+          <p className="text-muted-foreground mt-1">
+            Manage your organization's team structure, spaces, and collaboration
+          </p>
         </div>
         {canManageTeam && (
-          <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <UserPlus className="w-4 h-4" />
-                Invite Member
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Invite Member
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Invite Team Member</DialogTitle>
@@ -382,76 +498,396 @@ const EnhancedTeamManagement = () => {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         )}
       </div>
 
-      {/* Search */}
-      <div className="flex items-center gap-4">
-        <Input
-          placeholder="Search team members..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-      </div>
-
-      {/* Team Members Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredMembers.map((member) => (
-          <Card key={member.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {overviewStats.map((stat, index) => (
+          <Card key={index} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    {member.profiles?.avatar_url ? (
-                      <img
-                        src={member.profiles.avatar_url}
-                        alt="Avatar"
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User className="w-5 h-5 text-primary" />
-                    )}
-                  </div>
-                  <div>
-                    <CardTitle className="text-sm">
-                      {member.profiles?.first_name} {member.profiles?.last_name}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      {member.profiles?.email}
-                    </CardDescription>
-                  </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.description}</p>
                 </div>
-                <Badge variant={getRoleBadgeVariant(member.role)} className="flex items-center gap-1">
-                  {getRoleIcon(member.role)}
-                  {member.custom_role || member.role}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-3 h-3" />
-                  <span>{member.departments?.name || member.custom_department || 'General'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-3 h-3" />
-                  <span>Joined {new Date(member.joined_at).toLocaleDateString()}</span>
-                </div>
+                <img 
+                  src={stat.icon} 
+                  alt={stat.title}
+                  className="w-8 h-8 theme-responsive-icon opacity-70"
+                />
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {filteredMembers.length === 0 && (
-        <div className="text-center py-8">
-          <User className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">
-            {searchTerm ? 'No team members found matching your search.' : 'No team members found.'}
-          </p>
-        </div>
-      )}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="members">Members</TabsTrigger>
+          <TabsTrigger value="spaces">Spaces</TabsTrigger>
+          <TabsTrigger value="departments">Departments</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <UserPlus className="w-4 h-4 text-green-500" />
+                    <span>New team member joined Engineering</span>
+                    <span className="text-muted-foreground ml-auto">2h ago</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <FolderOpen className="w-4 h-4 text-blue-500" />
+                    <span>New space "Marketing Campaign" created</span>
+                    <span className="text-muted-foreground ml-auto">4h ago</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Share className="w-4 h-4 text-purple-500" />
+                    <span>File shared in Product Development space</span>
+                    <span className="text-muted-foreground ml-auto">1d ago</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {canManageTeam && (
+                    <>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start"
+                        onClick={() => setShowCreateSpaceDialog(true)}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create New Space
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start"
+                        onClick={() => setInviteDialogOpen(true)}
+                      >
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Invite Team Member
+                      </Button>
+                    </>
+                  )}
+                  <Button variant="outline" className="w-full justify-start">
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Start Chat
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="members" className="space-y-4">
+          {/* Search */}
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search team members..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Members Grid */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredMembers.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                No team members found. {canManageTeam && "Invite team members to get started."}
+              </div>
+            ) : (
+              filteredMembers.map((member) => (
+                <Card key={member.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          {member.profiles?.avatar_url ? (
+                            <img
+                              src={member.profiles.avatar_url}
+                              alt="Avatar"
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <User className="w-5 h-5 text-primary" />
+                          )}
+                        </div>
+                        <div>
+                          <CardTitle className="text-sm">
+                            {member.profiles?.first_name} {member.profiles?.last_name}
+                          </CardTitle>
+                          <CardDescription className="text-xs">
+                            {member.profiles?.email}
+                          </CardDescription>
+                        </div>
+                      </div>
+                      <Badge variant={getRoleBadgeVariant(member.role)} className="flex items-center gap-1">
+                        {getRoleIcon(member.role)}
+                        {member.custom_role || member.role}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-3 h-3" />
+                        <span>{member.departments?.name || member.custom_department || 'General'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-3 h-3" />
+                        <span>Joined {new Date(member.joined_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="spaces" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Team Spaces</h3>
+            {canManageTeam && (
+              <Button onClick={() => setShowCreateSpaceDialog(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Space
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Spaces List */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Spaces ({spaces.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {spaces.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No spaces created yet.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {spaces.map(space => (
+                      <div
+                        key={space.id}
+                        className={`p-4 border rounded-lg cursor-pointer transition-colors hover:bg-muted/50 ${
+                          selectedSpace?.id === space.id ? 'border-primary bg-primary/5' : ''
+                        }`}
+                        onClick={() => setSelectedSpace(space)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground">{space.name}</h3>
+                            {space.description && (
+                              <p className="text-sm text-muted-foreground mt-1">{space.description}</p>
+                            )}
+                            <Badge variant="secondary" className="mt-2">
+                              {space.member_count || 0} members
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Space Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {selectedSpace ? `${selectedSpace.name} Actions` : 'Select a Space'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {selectedSpace ? (
+                  <div className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => setShowAddMemberDialog(true)}
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Add Member
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => setShowFileShareDialog(true)}
+                    >
+                      <Share className="w-4 h-4 mr-2" />
+                      Share File
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Open Chat
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Select a space to view available actions
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="departments" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {departments.map((dept) => (
+              <Card key={dept.id}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Building2 className="w-5 h-5" />
+                    {dept.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3">{dept.description}</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Members:</span>
+                      <span className="font-medium">
+                        {teamMembers.filter(m => 
+                          m.departments?.name === dept.name || m.custom_department === dept.name
+                        ).length}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="activity" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="w-5 h-5" />
+                Team Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-sm">
+                  <UserPlus className="w-4 h-4 text-green-500" />
+                  <span>New team member added to Engineering</span>
+                  <span className="text-muted-foreground ml-auto">2 hours ago</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Settings className="w-4 h-4 text-blue-500" />
+                  <span>Space permissions updated</span>
+                  <span className="text-muted-foreground ml-auto">4 hours ago</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Share className="w-4 h-4 text-purple-500" />
+                  <span>File shared in Marketing space</span>
+                  <span className="text-muted-foreground ml-auto">1 day ago</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Create Space Dialog */}
+      <Dialog open={showCreateSpaceDialog} onOpenChange={setShowCreateSpaceDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Space</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="space-name">Space Name</Label>
+              <Input
+                id="space-name"
+                value={newSpace.name}
+                onChange={(e) => setNewSpace(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Enter space name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="space-description">Description (Optional)</Label>
+              <Textarea
+                id="space-description"
+                value={newSpace.description}
+                onChange={(e) => setNewSpace(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Enter space description"
+              />
+            </div>
+            <Button onClick={handleCreateSpace} disabled={!newSpace.name.trim()}>
+              Create Space
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* File Share Dialog */}
+      <Dialog open={showFileShareDialog} onOpenChange={setShowFileShareDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Share File to {selectedSpace?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="file-title">File Title</Label>
+              <Input
+                id="file-title"
+                value={fileShareForm.title}
+                onChange={(e) => setFileShareForm(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Enter file title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="file-url">File URL</Label>
+              <Input
+                id="file-url"
+                value={fileShareForm.url}
+                onChange={(e) => setFileShareForm(prev => ({ ...prev, url: e.target.value }))}
+                placeholder="Enter file URL"
+              />
+            </div>
+            <div>
+              <Label htmlFor="file-platform">Platform (Optional)</Label>
+              <Input
+                id="file-platform"
+                value={fileShareForm.platform}
+                onChange={(e) => setFileShareForm(prev => ({ ...prev, platform: e.target.value }))}
+                placeholder="e.g., Google Drive, Dropbox"
+              />
+            </div>
+            <Button onClick={handleShareFile} disabled={!fileShareForm.title.trim() || !fileShareForm.url.trim()}>
+              Share File
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

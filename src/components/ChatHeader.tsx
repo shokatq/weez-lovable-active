@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SettingsPanel from "./SettingsPanel";
+import ThemeToggle from "./ThemeToggle";
 
 const ChatHeader = () => {
 
@@ -28,6 +29,7 @@ const ChatHeader = () => {
       </div>
       
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
