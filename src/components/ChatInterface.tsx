@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Conversation, Message } from "@/types/chat";
 import ChatSidebar from "./ChatSidebar";
 import ChatMessages from "./ChatMessages";
@@ -7,7 +8,10 @@ import ImprovedChatInput from "./ImprovedChatInput";
 import ConnectivityPanel from "./ConnectivityPanel";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import ThinkingAnimation from "./ThinkingAnimation";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { MessageSquare, Settings } from "lucide-react";
 import { useAIAgent } from "@/hooks/aiAgent";
 import { useGlobalAuditLogger } from "@/hooks/useGlobalAuditLogger";
 import { useAuditLogger } from "@/hooks/useAuditLogger";
