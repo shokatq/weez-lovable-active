@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import { Plus, MessageSquare, Building2, Clock, Trash2, Loader2 } from "lucide-react";
 import UserProfile from "./UserProfile";
+import ThemeToggle from "./ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversationManager } from "@/hooks/ConvoManagement";
 import { type Conversation } from "@/services/ConversationService";
@@ -150,6 +151,7 @@ const ChatSidebar = ({
               <p className="text-xs text-muted-foreground">Marketing Assistant</p>
             </div>
           </div>
+          <ThemeToggle />
         </div>
         
         <Button

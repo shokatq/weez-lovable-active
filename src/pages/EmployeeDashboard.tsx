@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import EmployeeChatCard from '@/components/employee/EmployeeChatCard';
 import EmployeeSharedFiles from '@/components/employee/EmployeeSharedFiles';
 import EmployeeTasks from '@/components/employee/EmployeeTasks';
+import ThemeToggle from "@/components/ThemeToggle";
 
 const EmployeeDashboard = () => {
   const { user, signOut } = useAuth();
@@ -66,6 +67,7 @@ const EmployeeDashboard = () => {
                 </div>
                 <span className="text-sm text-muted-foreground hidden sm:block">{user?.email}</span>
               </div>
+              <ThemeToggle />
               <Button variant="ghost" size="sm" onClick={signOut}>
                 <LogOut className="w-4 h-4" />
               </Button>

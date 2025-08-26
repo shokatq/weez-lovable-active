@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SettingsPanel from "./SettingsPanel";
+import ThemeToggle from "./ThemeToggle";
 
 const ChatHeader = () => {
 
@@ -17,17 +18,18 @@ const ChatHeader = () => {
         <div className="flex items-center gap-3">
           {/* Circular Logo */}
           <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <img 
-              src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
-              alt="Weez AI Logo" 
+            <img
+              src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png"
+              alt="Weez AI Logo"
               className="w-full h-full object-contain p-0.5 rounded-full"
             />
           </div>
           <h1 className="text-lg font-semibold text-foreground">Weez AI</h1>
         </div>
       </div>
-      
+
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">

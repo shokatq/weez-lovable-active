@@ -60,6 +60,30 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Theme Toggle Feature
+
+The application includes a comprehensive theme toggle system with the following features:
+
+- **Light Mode**: Clean, bright interface for daytime use
+- **Dark Mode**: Easy on the eyes for low-light environments  
+- **System Mode**: Automatically follows your operating system's theme preference
+
+### How to Use
+
+The theme toggle is available in multiple locations throughout the application:
+
+1. **Chat Interface**: Located in the top-right corner of the chat header, next to the settings icon
+2. **Sidebar**: Found in the sidebar header next to the Weez AI logo
+3. **Dashboard Headers**: Available in all dashboard interfaces (Employee, Admin, etc.)
+
+### Implementation Details
+
+- Uses `next-themes` for robust theme management
+- Persists theme preference in localStorage
+- Smooth transitions between themes
+- Responsive design that works across all screen sizes
+- Accessible with proper ARIA labels and keyboard navigation
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/977f9aa4-755a-4147-9867-4e1c40c708c0) and click on Share -> Publish.

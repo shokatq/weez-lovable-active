@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -7,19 +7,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import EnhancedTeamManagement from './EnhancedTeamManagement';
-import { 
-  Building2, 
-  Users, 
-  MessageSquare, 
-  Settings, 
-  Crown, 
-  Shield, 
-  User, 
+import {
+  Building2,
+  Users,
+  MessageSquare,
+  Settings,
+  Crown,
+  Shield,
+  User,
   Eye,
   Sparkles,
   ArrowRight,
   Plus
 } from 'lucide-react';
+import ThemeToggle from "./ThemeToggle";
 
 const RoleBasedDashboard = () => {
   const { user, signOut } = useAuth();
@@ -136,6 +137,7 @@ const RoleBasedDashboard = () => {
                 </p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
+              <ThemeToggle />
               <Button variant="outline" onClick={signOut}>
                 Sign Out
               </Button>
@@ -160,11 +162,11 @@ const RoleBasedDashboard = () => {
           <h3 className="text-xl font-semibold text-foreground">Quick Actions</h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {getQuickActions().map((action) => (
-              <Card 
-                key={action.title} 
+              <Card
+                key={action.title}
                 className="hover:shadow-md transition-all duration-200 cursor-pointer group"
-                onClick={() => action.href.startsWith('#') ? 
-                  document.getElementById('team-management')?.scrollIntoView({ behavior: 'smooth' }) : 
+                onClick={() => action.href.startsWith('#') ?
+                  document.getElementById('team-management')?.scrollIntoView({ behavior: 'smooth' }) :
                   navigate(action.href)
                 }
               >

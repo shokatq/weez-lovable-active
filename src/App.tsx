@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import WorkspaceNew from "./pages/WorkspaceNew";
@@ -39,14 +40,14 @@ const AppContent = () => {
         } />
         <Route path="/admin-dashboard" element={
           <ProtectedRoute>
-            <RoleGuard allowedRoles={['admin','team_lead']}>
+            <RoleGuard allowedRoles={['admin', 'team_lead']}>
               <AdminDashboard />
             </RoleGuard>
           </ProtectedRoute>
         } />
         <Route path="/employee-dashboard" element={
           <ProtectedRoute>
-            <RoleGuard allowedRoles={['employee','viewer']}>
+            <RoleGuard allowedRoles={['employee', 'viewer']}>
               <EmployeeDashboard />
             </RoleGuard>
           </ProtectedRoute>
@@ -76,23 +77,22 @@ const AppContent = () => {
 };
 
 const App = () => {
-  // Force dark mode globally
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('dark');
-    // Ensure dark theme persists
-    localStorage.setItem('theme', 'dark');
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AppContent />
-        </TooltipProvider>
-      </AuthProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <AppContent />
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
