@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleGuard from "./components/auth/RoleGuard";
 import { useGlobalAuditLogger } from "./hooks/useGlobalAuditLogger";
+import { ThemeProvider } from "./components/ThemeProvider";
 
 const queryClient = new QueryClient();
 
@@ -76,23 +76,17 @@ const AppContent = () => {
 };
 
 const App = () => {
-  // Force dark mode globally
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('dark');
-    // Ensure dark theme persists
-    localStorage.setItem('theme', 'dark');
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AppContent />
-        </TooltipProvider>
-      </AuthProvider>
+      <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <AppContent />
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
