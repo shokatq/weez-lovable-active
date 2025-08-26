@@ -1,12 +1,14 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '@/hooks/useAuth';
 import { useGlobalAuditLogger } from '@/hooks/useGlobalAuditLogger';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings, Search } from "lucide-react";
+import { MessageSquare, Settings } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMessages from "@/components/ChatMessages";
@@ -15,8 +17,16 @@ import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import ConnectivityPanel from "./ConnectivityPanel";
 
 import { Message, Conversation } from "@/types/chat";
-import { fastApiService, detectIntent, startPlatformSync } from "@/services/fastApiService";
 import { toast } from "sonner";
+
+// Interface to match what ChatSidebar expects
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  timestamp: Date;
+  lastMessage: string;
+}
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -27,21 +37,82 @@ const ChatInterface = () => {
   });
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState("default");
-  const [showWorkspacePrompt, setShowWorkspacePrompt] = useState(true);
   const [showConnectServices, setShowConnectServices] = useState(false);
   const navigate = useNavigate();
+  
+  // Auth hook to get user information dynamically
+  const { user, session, loading: authLoading } = useAuth();
+  
   const { logCustomEvent } = useGlobalAuditLogger();
   const { logFileAccess, logAuditEvent } = useAuditLogger();
 
-  // Initialize with a default conversation
+  // AI Agent hook - this handles the loading state and errors
+  const { askAgent, isLoading, error: aiError, clearError } = useAIAgent();
+
+  // User ID - replace with actual user from auth context
+  const userId = 'sayyadshakiltajoddin@gmail.com';
+
+  // Redirect to auth if user is not authenticated
   useEffect(() => {
-    const defaultConversation: Conversation = {
-      id: "default",
-      messages: [],
-      timestamp: new Date()
-    };
-    setConversations([defaultConversation]);
-  }, []);
+    if (!authLoading && !user) {
+      console.log('🚫 User not authenticated, redirecting to auth page');
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
+
+  // API helper for saving messages to backend
+  const saveMessageToBackend = async (userMessage: string, aiResponse: string, conversationId: string) => {
+    if (!userId) return;
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          conversationId,
+          userQuery: userMessage,
+          agentResponse: aiResponse
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to save message to backend:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error saving message to backend:', error);
+    }
+  };
+
+  // API helper for creating new conversation
+  const createNewConversationInBackend = async (): Promise<string | null> => {
+    if (!userId) return null;
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/conversations/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to create conversation in backend:', response.statusText);
+        return null;
+      }
+
+      const data = await response.json();
+      return data.conversationId || data.conversation_id;
+    } catch (error) {
+      console.error('Error creating conversation in backend:', error);
+      return null;
+    }
+  };
 
   // Initialize platform sync on component mount
   useEffect(() => {
@@ -368,6 +439,12 @@ I've analyzed your deep learning related files across all platforms. Here's a co
   };
 
   const handleSendMessage = async (newMessage: string) => {
+    if (!newMessage.trim() || isLoading) return;
+
+    // Clear any previous errors
+    clearError();
+
+    // Add user message immediately
     const userMessage: Message = {
       id: Date.now().toString(),
       content: newMessage,
@@ -377,53 +454,174 @@ I've analyzed your deep learning related files across all platforms. Here's a co
     
     setMessages(prevMessages => [...prevMessages, userMessage]);
 
-    // Update current conversation with user message
-    setConversations(prev => prev.map(conv => 
-      conv.id === currentConversationId 
-        ? { ...conv, messages: [...conv.messages, userMessage] }
-        : conv
-    ));
+    try {
+      console.log('🚀 Sending message to AI Agent:', newMessage);
+      console.log('👤 User ID:', userId);
+      
+      // Call AI agent - the hook handles loading state
+      const aiResponse = await askAgent(newMessage.trim(), userId);
 
-    // Process with backend
-    await handleBackendResponse(newMessage);
+      console.log('📥 AI Agent response:', {
+        responseReceived: !!aiResponse,
+        responseType: typeof aiResponse,
+        responseLength: aiResponse?.length || 0,
+        responsePreview: aiResponse?.substring(0, 100) || 'No response',
+        hasError: !!aiError
+      });
+
+      if (aiResponse && aiResponse.trim()) {
+        // Add AI response message
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: aiResponse,
+          isUser: false,
+          timestamp: new Date()
+        };
+
+        setMessages(prevMessages => [...prevMessages, aiMessage]);
+
+        // Update current conversation with AI response
+        setConversations(prev => prev.map(conv => 
+          conv.id === currentConversationId 
+            ? { ...conv, messages: [...conv.messages, aiMessage] }
+            : conv
+        ));
+
+        console.log('✅ AI Agent response displayed successfully');
+      } else {
+        // Handle case where AI agent returns null or empty string
+        console.log('❌ AI Agent returned null/empty response');
+        console.log('🔍 Current aiError:', aiError);
+        
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: aiError 
+            ? `AI Agent Error: ${aiError}` 
+            : "I received an empty response from the AI service. Please try rephrasing your message.",
+          isUser: false,
+          timestamp: new Date()
+        };
+
+        setMessages(prevMessages => [...prevMessages, errorMessage]);
+        
+        setConversations(prev => prev.map(conv => 
+          conv.id === currentConversationId 
+            ? { ...conv, messages: [...conv.messages, errorMessage] }
+            : conv
+        ));
+      }
+    } catch (error) {
+      console.error('💥 Error in handleSendMessage:', error);
+      
+      // Add error message
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: `Connection Error: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your connection and try again.`,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setMessages(prevMessages => [...prevMessages, errorMessage]);
+      
+      setConversations(prev => prev.map(conv => 
+        conv.id === currentConversationId 
+          ? { ...conv, messages: [...conv.messages, errorMessage] }
+          : conv
+      ));
+    }
   };
 
   const handleFileAction = (file: any) => {
     console.log("File action triggered:", file);
-  };
-
-  const handleConversationSelect = (id: string) => {
-    setCurrentConversationId(id);
-    const conversation = conversations.find(c => c.id === id);
-    if (conversation) {
-      setMessages(conversation.messages);
+    
+    // Log file access with authenticated user using correct API
+    if (user && file?.id) {
+      logFileAccess(file.id, file.name || 'Unknown file');
     }
   };
 
-  const handleNewConversation = () => {
-    const newConversation: Conversation = {
-      id: Date.now().toString(),
-      messages: [],
-      timestamp: new Date()
-    };
-    setConversations(prev => [newConversation, ...prev]);
-    setCurrentConversationId(newConversation.id);
+  // Handle conversation selection from sidebar
+  const handleConversationSelect = (conversation: Conversation) => {
+    console.log('Selecting conversation:', conversation);
+    setCurrentConversationId(conversation.id);
+    setCurrentConversation(conversation);
+    setMessages(conversation.messages);
+
+    // Log conversation selection event using correct API
+    if (user) {
+      logAuditEvent({
+        action: 'conversation_selected',
+        resourceType: 'chat',
+        resourceId: conversation.id,
+        metadata: { conversationId: conversation.id },
+        severity: 'low'
+      });
+    }
+  };
+
+  // Handle new conversation creation
+  const handleNewConversation = async () => {
+    console.log('Creating new conversation');
+    
+    // Clear current conversation state
+    setCurrentConversationId(null);
+    setCurrentConversation(null);
     setMessages([]);
+    clearError();
+
+    // Log new conversation creation using correct API
+    if (user) {
+      logAuditEvent({
+        action: 'conversation_created',
+        resourceType: 'chat',
+        resourceId: 'new',
+        metadata: { action: 'new_conversation_initiated' },
+        severity: 'low'
+      });
+    }
   };
 
   const handleNavigateToWorkspace = () => {
     navigate("/workspace");
   };
 
+  // Show loading screen while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className="flex h-screen w-full bg-background items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Authenticating...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error message if user is not authenticated
+  if (!user) {
+    return (
+      <div className="flex h-screen w-full bg-background items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Please sign in to access the chat interface. You will be redirected to the authentication page.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-background">
         <ChatSidebar
-          conversations={conversations}
-          currentConversationId={currentConversationId}
+          currentConversationId={currentConversationId || ""}
           onConversationSelect={handleConversationSelect}
           onNewConversation={handleNewConversation}
           onNavigateToWorkspace={handleNavigateToWorkspace}
+          apiBaseUrl="http://localhost:5000" // Make this configurable via environment variable if needed
         />
         
         <div className="flex-1 flex flex-col min-w-0">
@@ -437,10 +635,10 @@ I've analyzed your deep learning related files across all platforms. Here's a co
                     <MessageSquare className="w-8 h-8 text-primary-foreground" />
                   </div>
                   <h2 className="text-2xl font-semibold text-foreground mb-3">
-                    How can I help you today?
+                    Welcome back, {user.email?.split('@')[0] || 'User'}!
                   </h2>
                   <p className="text-muted-foreground mb-8">
-                    Ask me anything about your marketing files, campaigns, or strategy. I'm here to help you find insights and create content.
+                    Ask me anything about your files, documents, or any questions you have. I'm powered by AI and ready to assist!
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
                     <Button
@@ -512,14 +710,30 @@ I've analyzed your deep learning related files across all platforms. Here's a co
             
             <div className="border-t border-border bg-background p-4">
               <div className="max-w-4xl mx-auto">
-                <ImprovedChatInput onSendMessage={handleSendMessage} disabled={isThinking} />
+                <ImprovedChatInput 
+                  onSendMessage={handleSendMessage} 
+                  disabled={isLoading} 
+                />
+                
+                {/* Show error if there's an AI error */}
+                {aiError && (
+                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                    <span>Error: {aiError}</span>
+                    <button 
+                      onClick={clearError} 
+                      className="ml-2 text-red-500 hover:text-red-700"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
       
-      {showWelcome && (
+      {showWelcome && user && (
         <ChatWelcomeDialog
           open={showWelcome}
           onOpenChange={(open) => {
@@ -535,3 +749,4 @@ I've analyzed your deep learning related files across all platforms. Here's a co
 };
 
 export default ChatInterface;
+
