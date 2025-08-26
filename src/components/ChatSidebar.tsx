@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
-import { Plus, MessageSquare, Building2, Clock, Trash2, Loader2 } from "lucide-react";
+import { Plus, MessageSquare, Building2, Clock, Trash2, Loader2, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import UserProfile from "./UserProfile";
 import ThemeToggle from "./ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
@@ -48,10 +49,28 @@ const ChatSidebar = ({
     filterToolExecution
   });
 
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredConversations, setFilteredConversations] = useState<Conversation[]>([]);
+
+  // Filter conversations based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredConversations(conversations);
+    } else {
+      const filtered = conversations.filter(conversation =>
+        conversation.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        conversation.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredConversations(filtered);
+    }
+  }, [conversations, searchQuery]);
+
   // Handle new conversation creation
   const handleNewConversation = () => {
     createNewConversation();
     onNewConversation();
+    setSearchQuery(""); // Clear search when creating new conversation
   };
 
   // Handle conversation selection
@@ -106,7 +125,7 @@ const ChatSidebar = ({
   if (authLoading) {
     return (
       <Sidebar 
-        className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
+        className="w-64 sm:w-72 lg:w-80 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
         collapsible="offcanvas"
       >
         <SidebarContent className="flex-1 p-3">
@@ -123,7 +142,7 @@ const ChatSidebar = ({
   if (!user) {
     return (
       <Sidebar 
-        className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
+        className="w-64 sm:w-72 lg:w-80 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
         collapsible="offcanvas"
       >
         <SidebarContent className="flex-1 p-3">
@@ -137,18 +156,18 @@ const ChatSidebar = ({
 
   return (
     <Sidebar 
-      className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
+      className="w-64 sm:w-72 lg:w-80 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
       collapsible="offcanvas"
     >
-      <SidebarHeader className="p-4 border-b border-sidebar-border">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-primary-foreground" />
+      <SidebarHeader className="p-3 sm:p-4 border-b border-sidebar-border">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary flex items-center justify-center">
+              <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-sidebar-foreground">Weez AI</h2>
-              <p className="text-xs text-muted-foreground">Marketing Assistant</p>
+              <h2 className="text-xs sm:text-sm font-semibold text-sidebar-foreground">Weez AI</h2>
+              <p className="text-xs text-muted-foreground hidden sm:block">Marketing Assistant</p>
             </div>
           </div>
           <ThemeToggle />
@@ -156,30 +175,41 @@ const ChatSidebar = ({
         
         <Button
           onClick={handleNewConversation}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-lg text-sm h-auto shadow-sm transition-all duration-200"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg text-xs sm:text-sm h-auto shadow-sm transition-all duration-200"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
           New Chat
         </Button>
+
+        {/* Search Conversations */}
+        <div className="mt-3 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search conversations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 sm:pl-10 h-8 sm:h-9 text-xs sm:text-sm bg-muted/50 border-border focus:bg-background"
+          />
+        </div>
       </SidebarHeader>
 
-      <SidebarContent className="flex-1 p-3">
-        <ScrollArea className="flex-1">
+      <SidebarContent className="flex-1 p-2 sm:p-3">
+        <ScrollArea className="flex-1 h-full">
           {loading && (
             <div className="flex items-center justify-center p-4">
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              <span className="text-sm text-muted-foreground">Loading conversations...</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">Loading conversations...</span>
             </div>
           )}
           
           {error && (
-            <div className="p-4">
-              <p className="text-sm text-red-500 mb-2">{error}</p>
+            <div className="p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-red-500 mb-2">{error}</p>
               <Button 
                 onClick={refreshConversations} 
                 variant="outline" 
                 size="sm"
-                className="w-full"
+                className="w-full text-xs sm:text-sm"
                 disabled={loading}
               >
                 {loading ? (
@@ -196,29 +226,38 @@ const ChatSidebar = ({
           
           {!loading && !error && (
             <div className="space-y-1 pb-4">
-              {conversations.length === 0 ? (
-                <div className="p-4 text-center">
-                  <p className="text-sm text-muted-foreground">No conversations yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Start a new chat to begin</p>
+              {filteredConversations.length === 0 ? (
+                <div className="p-3 sm:p-4 text-center">
+                  {searchQuery ? (
+                    <>
+                      <p className="text-xs sm:text-sm text-muted-foreground">No conversations found</p>
+                      <p className="text-xs text-muted-foreground mt-1">Try a different search term</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs sm:text-sm text-muted-foreground">No conversations yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">Start a new chat to begin</p>
+                    </>
+                  )}
                 </div>
               ) : (
-                conversations.map((conversation) => (
+                filteredConversations.map((conversation) => (
                   <div key={conversation.id} className="group relative">
                     <Button
                       variant="ghost"
                       onClick={() => handleConversationSelect(conversation)}
-                      className={`w-full justify-start text-left p-3 h-auto rounded-lg text-sm transition-all duration-200 ${
+                      className={`w-full justify-start text-left p-2 sm:p-3 h-auto rounded-lg text-xs sm:text-sm transition-all duration-200 ${
                         activeConversationId === conversation.id 
                           ? 'bg-muted text-foreground' 
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }`}
                     >
                       <div className="flex-1 min-w-0 overflow-hidden">
-                        <p className="font-medium line-clamp-1 leading-tight mb-1 text-sm">
+                        <p className="font-medium line-clamp-1 leading-tight mb-1 text-xs sm:text-sm">
                           {getConversationPreviewText(conversation)}
                         </p>
                         <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                          <Clock className="w-2 h-2 sm:w-3 sm:h-3 text-muted-foreground flex-shrink-0" />
                           <span className="text-xs text-muted-foreground">
                             {formatTime(conversation.timestamp)}
                           </span>
@@ -242,13 +281,13 @@ const ChatSidebar = ({
                           e.stopPropagation();
                           handleDeleteConversation(conversation.id);
                         }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 hover:text-red-600"
+                        className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 hover:text-red-600"
                         disabled={loading}
                       >
                         {loading ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <Loader2 className="w-2 h-2 sm:w-3 sm:h-3 animate-spin" />
                         ) : (
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-2 h-2 sm:w-3 sm:h-3" />
                         )}
                       </Button>
                     )}
@@ -260,14 +299,15 @@ const ChatSidebar = ({
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-sidebar-border space-y-3">
+      <SidebarFooter className="p-3 sm:p-4 border-t border-sidebar-border space-y-2 sm:space-y-3">
         <Button
           onClick={onNavigateToWorkspace}
           variant="outline"
-          className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
+          className="w-full justify-start text-left py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg text-xs sm:text-sm h-auto"
         >
-          <Building2 className="w-4 h-4 mr-2" />
-          Marketing Workspace
+          <Building2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+          <span className="hidden sm:inline">Marketing Workspace</span>
+          <span className="sm:hidden">Workspace</span>
         </Button>
         
         <UserProfile />
