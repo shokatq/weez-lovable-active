@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '@/hooks/useAuth';
 import { useGlobalAuditLogger } from '@/hooks/useGlobalAuditLogger';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
 import { useAIAgent } from '@/hooks/aiAgent';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Settings } from "lucide-react";
+import { MessageSquare, Settings, AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import ChatSidebar from "@/components/ChatSidebar";
 import ChatHeader from "@/components/ChatHeader";
 import ChatMessages from "@/components/ChatMessages";
@@ -14,40 +16,123 @@ import ImprovedChatInput from "@/components/ImprovedChatInput";
 import ChatWelcomeDialog from "./ChatWelcomeDialog";
 import ConnectivityPanel from "./ConnectivityPanel";
 
-import { Message, Conversation } from "@/types/chat";
+import { Message } from "@/types/chat";
 import { toast } from "sonner";
+
+// Interface to match what ChatSidebar expects
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  timestamp: Date;
+  lastMessage: string;
+}
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showWelcome, setShowWelcome] = useState(() => {
     return !localStorage.getItem('weez-welcome-shown');
   });
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [currentConversationId, setCurrentConversationId] = useState("default");
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [showConnectServices, setShowConnectServices] = useState(false);
   const navigate = useNavigate();
+  
+  // Auth hook to get user information dynamically
+  const { user, session, loading: authLoading } = useAuth();
+  
   const { logCustomEvent } = useGlobalAuditLogger();
-  const { logFileAccess, logAuditEvent } = useAuditLogger();
+  const { logAuditEvent, logFileAccess } = useAuditLogger();
 
   // AI Agent hook - this handles the loading state and errors
   const { askAgent, isLoading, error: aiError, clearError } = useAIAgent();
 
-  // User ID - replace with actual user from auth context
-  const userId = 'sayyadshakiltajoddin@gmail.com';
+  // Get userId dynamically from authenticated user
+  const userId = user?.email || user?.id || null;
 
-  // Initialize with a default conversation
+  // Redirect to auth if user is not authenticated
   useEffect(() => {
-    const defaultConversation: Conversation = {
-      id: "default",
-      messages: [],
-      timestamp: new Date()
-    };
-    setConversations([defaultConversation]);
-  }, []);
+    if (!authLoading && !user) {
+      console.log('🚫 User not authenticated, redirecting to auth page');
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
+
+  // API helper for saving messages to backend
+  const saveMessageToBackend = async (userMessage: string, aiResponse: string, conversationId: string) => {
+    if (!userId) return;
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          conversationId,
+          userQuery: userMessage,
+          agentResponse: aiResponse
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to save message to backend:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error saving message to backend:', error);
+    }
+  };
+
+  // API helper for creating new conversation
+  const createNewConversationInBackend = async (): Promise<string | null> => {
+    if (!userId) return null;
+    
+    try {
+      const response = await fetch('http://localhost:5000/api/conversations/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to create conversation in backend:', response.statusText);
+        return null;
+      }
+
+      const data = await response.json();
+      return data.conversationId || data.conversation_id;
+    } catch (error) {
+      console.error('Error creating conversation in backend:', error);
+      return null;
+    }
+  };
 
   // Handle sending message to AI agent
   const handleSendMessage = async (newMessage: string) => {
     if (!newMessage.trim() || isLoading) return;
+
+    // Check if user is authenticated before sending message
+    if (!userId) {
+      toast.error('Please sign in to send messages');
+      navigate('/auth');
+      return;
+    }
+
+    // If no current conversation, create a new one
+    let conversationId = currentConversationId;
+    if (!conversationId) {
+      conversationId = await createNewConversationInBackend();
+      if (!conversationId) {
+        toast.error('Failed to create new conversation');
+        return;
+      }
+      setCurrentConversationId(conversationId);
+    }
 
     // Clear any previous errors
     clearError();
@@ -62,18 +147,12 @@ const ChatInterface = () => {
     
     setMessages(prevMessages => [...prevMessages, userMessage]);
 
-    // Update current conversation with user message
-    setConversations(prev => prev.map(conv => 
-      conv.id === currentConversationId 
-        ? { ...conv, messages: [...conv.messages, userMessage] }
-        : conv
-    ));
-
     try {
       console.log('🚀 Sending message to AI Agent:', newMessage);
-      console.log('👤 User ID:', userId);
+      console.log('👤 Authenticated User ID:', userId);
+      console.log('💬 Conversation ID:', conversationId);
       
-      // Call AI agent - the hook handles loading state
+      // Call AI agent with authenticated user ID
       const aiResponse = await askAgent(newMessage.trim(), userId);
 
       console.log('📥 AI Agent response:', {
@@ -81,7 +160,8 @@ const ChatInterface = () => {
         responseType: typeof aiResponse,
         responseLength: aiResponse?.length || 0,
         responsePreview: aiResponse?.substring(0, 100) || 'No response',
-        hasError: !!aiError
+        hasError: !!aiError,
+        userId: userId
       });
 
       if (aiResponse && aiResponse.trim()) {
@@ -95,14 +175,25 @@ const ChatInterface = () => {
 
         setMessages(prevMessages => [...prevMessages, aiMessage]);
 
-        // Update current conversation with AI response
-        setConversations(prev => prev.map(conv => 
-          conv.id === currentConversationId 
-            ? { ...conv, messages: [...conv.messages, aiMessage] }
-            : conv
-        ));
+        // Save both messages to backend
+        await saveMessageToBackend(newMessage.trim(), aiResponse, conversationId);
 
         console.log('✅ AI Agent response displayed successfully');
+        
+        // Log successful AI interaction
+        if (user) {
+          logAuditEvent({
+            action: 'ai_message_sent',
+            resourceType: 'chat',
+            resourceId: conversationId,
+            metadata: { 
+              messageLength: newMessage.length,
+              responseLength: aiResponse.length,
+              conversationId: conversationId
+            },
+            severity: 'low'
+          });
+        }
       } else {
         // Handle case where AI agent returns null or empty string
         console.log('❌ AI Agent returned null/empty response');
@@ -118,12 +209,6 @@ const ChatInterface = () => {
         };
 
         setMessages(prevMessages => [...prevMessages, errorMessage]);
-        
-        setConversations(prev => prev.map(conv => 
-          conv.id === currentConversationId 
-            ? { ...conv, messages: [...conv.messages, errorMessage] }
-            : conv
-        ));
       }
     } catch (error) {
       console.error('💥 Error in handleSendMessage:', error);
@@ -137,51 +222,100 @@ const ChatInterface = () => {
       };
 
       setMessages(prevMessages => [...prevMessages, errorMessage]);
-      
-      setConversations(prev => prev.map(conv => 
-        conv.id === currentConversationId 
-          ? { ...conv, messages: [...conv.messages, errorMessage] }
-          : conv
-      ));
     }
   };
 
   const handleFileAction = (file: any) => {
     console.log("File action triggered:", file);
-  };
-
-  const handleConversationSelect = (id: string) => {
-    setCurrentConversationId(id);
-    const conversation = conversations.find(c => c.id === id);
-    if (conversation) {
-      setMessages(conversation.messages);
+    
+    // Log file access with authenticated user using correct API
+    if (user && file?.id) {
+      logFileAccess(file.id, file.name || 'Unknown file');
     }
   };
 
-  const handleNewConversation = () => {
-    const newConversation: Conversation = {
-      id: Date.now().toString(),
-      messages: [],
-      timestamp: new Date()
-    };
-    setConversations(prev => [newConversation, ...prev]);
-    setCurrentConversationId(newConversation.id);
+  // Handle conversation selection from sidebar
+  const handleConversationSelect = (conversation: Conversation) => {
+    console.log('Selecting conversation:', conversation);
+    setCurrentConversationId(conversation.id);
+    setCurrentConversation(conversation);
+    setMessages(conversation.messages);
+
+    // Log conversation selection event using correct API
+    if (user) {
+      logAuditEvent({
+        action: 'conversation_selected',
+        resourceType: 'chat',
+        resourceId: conversation.id,
+        metadata: { conversationId: conversation.id },
+        severity: 'low'
+      });
+    }
+  };
+
+  // Handle new conversation creation
+  const handleNewConversation = async () => {
+    console.log('Creating new conversation');
+    
+    // Clear current conversation state
+    setCurrentConversationId(null);
+    setCurrentConversation(null);
     setMessages([]);
+    clearError();
+
+    // Log new conversation creation using correct API
+    if (user) {
+      logAuditEvent({
+        action: 'conversation_created',
+        resourceType: 'chat',
+        resourceId: 'new',
+        metadata: { action: 'new_conversation_initiated' },
+        severity: 'low'
+      });
+    }
   };
 
   const handleNavigateToWorkspace = () => {
     navigate("/workspace");
   };
 
+  // Show loading screen while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className="flex h-screen w-full bg-background items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Authenticating...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error message if user is not authenticated
+  if (!user) {
+    return (
+      <div className="flex h-screen w-full bg-background items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Please sign in to access the chat interface. You will be redirected to the authentication page.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-background">
         <ChatSidebar
-          conversations={conversations}
-          currentConversationId={currentConversationId}
+          currentConversationId={currentConversationId || ""}
           onConversationSelect={handleConversationSelect}
           onNewConversation={handleNewConversation}
           onNavigateToWorkspace={handleNavigateToWorkspace}
+          apiBaseUrl="http://localhost:5000" // Make this configurable via environment variable if needed
         />
         
         <div className="flex-1 flex flex-col min-w-0">
@@ -195,10 +329,10 @@ const ChatInterface = () => {
                     <MessageSquare className="w-8 h-8 text-primary-foreground" />
                   </div>
                   <h2 className="text-2xl font-semibold text-foreground mb-3">
-                    How can I help you today?
+                    Welcome back, {user.email?.split('@')[0] || 'User'}!
                   </h2>
                   <p className="text-muted-foreground mb-8">
-                    Ask me anything about your files, documents, or any questions you have. I'm powered by AI and ready to assist!
+                    How can I help you today? Ask me anything about your files, documents, or any questions you have.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
                     <Button
@@ -275,8 +409,16 @@ const ChatInterface = () => {
               <div className="max-w-4xl mx-auto">
                 <ImprovedChatInput 
                   onSendMessage={handleSendMessage} 
-                  disabled={isLoading} 
+                  disabled={isLoading || !userId} 
                 />
+                
+                {/* Show authentication warning if no userId */}
+                {!userId && (
+                  <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-700 text-sm">
+                    <AlertCircle className="w-4 h-4 inline mr-2" />
+                    Please sign in to send messages
+                  </div>
+                )}
                 
                 {/* Show error if there's an AI error */}
                 {aiError && (
@@ -296,7 +438,7 @@ const ChatInterface = () => {
         </div>
       </div>
       
-      {showWelcome && (
+      {showWelcome && user && (
         <ChatWelcomeDialog
           open={showWelcome}
           onOpenChange={(open) => {
@@ -312,3 +454,4 @@ const ChatInterface = () => {
 };
 
 export default ChatInterface;
+
