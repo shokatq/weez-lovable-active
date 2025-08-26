@@ -629,76 +629,79 @@ I've analyzed your deep learning related files across all platforms. Here's a co
           
           <div className="flex-1 flex flex-col min-h-0">
             {messages.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center p-8">
-                <div className="text-center max-w-2xl mx-auto">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-                    <MessageSquare className="w-8 h-8 text-primary-foreground" />
+              <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
+                <div className="text-center max-w-2xl mx-auto w-full">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                    <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-foreground mb-3">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground mb-2 sm:mb-3">
                     Welcome back, {user.email?.split('@')[0] || 'User'}!
                   </h2>
-                  <p className="text-muted-foreground mb-8">
-                    Ask me anything about your files, documents, or any questions you have. I'm powered by AI and ready to assist!
+                  <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 px-4">
+                    How can I help you today? Ask me anything about your files, documents, or any questions you have.
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto px-4">
                     <Button
                       variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("Summarize my latest marketing campaign files")}
+                      className="text-left h-auto p-3 sm:p-4 justify-start hover:bg-muted/50 transition-all duration-200"
+                      onClick={() => handleSendMessage("Analyze my files and provide a summary")}
+                      disabled={isLoading}
                     >
                       <div>
-                        <p className="font-medium">Campaign Analysis</p>
-                        <p className="text-sm text-muted-foreground">Summarize my latest marketing files</p>
+                        <p className="font-medium text-sm sm:text-base">File Analysis</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Analyze documents</p>
                       </div>
                     </Button>
                     <Button
                       variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("Help me create content for social media")}
+                      className="text-left h-auto p-3 sm:p-4 justify-start hover:bg-muted/50 transition-all duration-200"
+                      onClick={() => handleSendMessage("Help me organize my workspace")}
+                      disabled={isLoading}
                     >
                       <div>
-                        <p className="font-medium">Content Creation</p>
-                        <p className="text-sm text-muted-foreground">Generate social media content</p>
+                        <p className="font-medium text-sm sm:text-base">Workspace Organization</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Get help organizing files</p>
                       </div>
                     </Button>
                     <Button
                       variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("Find files about our brand guidelines")}
+                      className="text-left h-auto p-3 sm:p-4 justify-start hover:bg-muted/50 transition-all duration-200"
+                      onClick={() => handleSendMessage("What can you help me with?")}
+                      disabled={isLoading}
                     >
                       <div>
-                        <p className="font-medium">Brand Assets</p>
-                        <p className="text-sm text-muted-foreground">Locate brand guidelines and assets</p>
+                        <p className="font-medium text-sm sm:text-base">Capabilities</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Learn what I can do</p>
                       </div>
                     </Button>
-                     <Button
-                       variant="outline"
-                       className="text-left h-auto p-4 justify-start"
-                       onClick={() => handleSendMessage("Analyze our competitor research")}
-                     >
-                       <div>
-                         <p className="font-medium">Market Research</p>
-                         <p className="text-sm text-muted-foreground">Review competitor analysis</p>
-                       </div>
-                      </Button>
-                    </div>
-                    
-                    <div className="mt-8 pt-6 border-t border-border">
-                      <Dialog open={showConnectServices} onOpenChange={setShowConnectServices}>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="lg" className="w-full">
-                            <Settings className="w-4 h-4 mr-2" />
-                            Connect Services
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                          <ConnectivityPanel />
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                    
+                    <Button
+                      variant="outline"
+                      className="text-left h-auto p-3 sm:p-4 justify-start hover:bg-muted/50 transition-all duration-200"
+                      onClick={() => handleSendMessage("Show me my recent activity")}
+                      disabled={isLoading}
+                    >
+                      <div>
+                        <p className="font-medium text-sm sm:text-base">Recent Activity</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">View recent actions</p>
+                      </div>
+                    </Button>
+                  </div>
+                  
+                  <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border px-4">
+                    <Dialog open={showConnectServices} onOpenChange={setShowConnectServices}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="lg" className="w-full text-sm sm:text-base">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Connect Services
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto w-[95vw] sm:w-auto">
+                        <ConnectivityPanel />
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
+              </div>
             ) : (
               <ChatMessages 
                 messages={messages} 
@@ -708,20 +711,28 @@ I've analyzed your deep learning related files across all platforms. Here's a co
               />
             )}
             
-            <div className="border-t border-border bg-background p-4">
+            <div className="border-t border-border bg-background p-3 sm:p-4">
               <div className="max-w-4xl mx-auto">
                 <ImprovedChatInput 
                   onSendMessage={handleSendMessage} 
                   disabled={isLoading} 
                 />
                 
+                {/* Show authentication warning if no userId */}
+                {!userId && (
+                  <div className="mt-2 p-2 sm:p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded text-yellow-700 dark:text-yellow-300 text-xs sm:text-sm">
+                    <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 inline mr-2" />
+                    Please sign in to send messages
+                  </div>
+                )}
+                
                 {/* Show error if there's an AI error */}
                 {aiError && (
-                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                  <div className="mt-2 p-2 sm:p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-300 text-xs sm:text-sm">
                     <span>Error: {aiError}</span>
                     <button 
                       onClick={clearError} 
-                      className="ml-2 text-red-500 hover:text-red-700"
+                      className="ml-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-200"
                     >
                       ✕
                     </button>
