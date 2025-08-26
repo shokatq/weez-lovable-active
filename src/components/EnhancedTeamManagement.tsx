@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { SpacesService } from '@/services/spacesService';
 import type { Space, SpaceMember } from '@/services/spacesService';
+import SimplifiedInviteDialog from './SimplifiedInviteDialog';
+import CreateSpaceDialog from './CreateSpaceDialog';
+import AllMembersDialog from './AllMembersDialog';
 
 // Import theme-responsive icons
 import teamMembersIcon from '@/assets/team-members-icon.png';
@@ -69,6 +72,7 @@ const EnhancedTeamManagement = () => {
   const [showCreateSpaceDialog, setShowCreateSpaceDialog] = useState(false);
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
   const [showFileShareDialog, setShowFileShareDialog] = useState(false);
+  const [showAllMembersDialog, setShowAllMembersDialog] = useState(false);
   
   // Form states
   const [newSpace, setNewSpace] = useState({ name: '', description: '' });
@@ -525,11 +529,10 @@ const EnhancedTeamManagement = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
           <TabsTrigger value="spaces">Spaces</TabsTrigger>
-          <TabsTrigger value="departments">Departments</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
 
@@ -586,10 +589,14 @@ const EnhancedTeamManagement = () => {
                       </Button>
                     </>
                   )}
-                  <Button variant="outline" className="w-full justify-start">
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Start Chat
-                  </Button>
+                   <Button 
+                     variant="outline" 
+                     className="w-full justify-start"
+                     onClick={() => window.location.href = '/team-chat'}
+                   >
+                     <MessageSquare className="w-4 h-4 mr-2" />
+                     Start Chatting
+                   </Button>
                 </div>
               </CardContent>
             </Card>
@@ -618,7 +625,11 @@ const EnhancedTeamManagement = () => {
               </div>
             ) : (
               filteredMembers.map((member) => (
-                <Card key={member.id} className="hover:shadow-md transition-shadow">
+                <Card 
+                  key={member.id} 
+                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => setShowAllMembersDialog(true)}
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -663,6 +674,18 @@ const EnhancedTeamManagement = () => {
                 </Card>
               ))
             )}
+          </div>
+          
+          {/* Show All Members Button */}
+          <div className="text-center pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAllMembersDialog(true)}
+              className="flex items-center gap-2"
+            >
+              <User className="w-4 h-4" />
+              View All {teamMembers.length} Members
+            </Button>
           </div>
         </TabsContent>
 
@@ -757,33 +780,6 @@ const EnhancedTeamManagement = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="departments" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {departments.map((dept) => (
-              <Card key={dept.id}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Building2 className="w-5 h-5" />
-                    {dept.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3">{dept.description}</p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Members:</span>
-                      <span className="font-medium">
-                        {teamMembers.filter(m => 
-                          m.departments?.name === dept.name || m.custom_department === dept.name
-                        ).length}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
 
         <TabsContent value="activity" className="space-y-4">
           <Card>
@@ -816,37 +812,6 @@ const EnhancedTeamManagement = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Create Space Dialog */}
-      <Dialog open={showCreateSpaceDialog} onOpenChange={setShowCreateSpaceDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New Space</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="space-name">Space Name</Label>
-              <Input
-                id="space-name"
-                value={newSpace.name}
-                onChange={(e) => setNewSpace(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Enter space name"
-              />
-            </div>
-            <div>
-              <Label htmlFor="space-description">Description (Optional)</Label>
-              <Textarea
-                id="space-description"
-                value={newSpace.description}
-                onChange={(e) => setNewSpace(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Enter space description"
-              />
-            </div>
-            <Button onClick={handleCreateSpace} disabled={!newSpace.name.trim()}>
-              Create Space
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* File Share Dialog */}
       <Dialog open={showFileShareDialog} onOpenChange={setShowFileShareDialog}>
@@ -888,6 +853,28 @@ const EnhancedTeamManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Simplified Invite Dialog */}
+      <SimplifiedInviteDialog 
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        onInviteSuccess={fetchTeamMembers}
+      />
+
+      {/* Create Space Dialog */}
+      <CreateSpaceDialog
+        open={showCreateSpaceDialog}
+        onOpenChange={setShowCreateSpaceDialog}
+        onSpaceCreated={fetchSpaces}
+        teamMembers={teamMembers}
+      />
+
+      {/* All Members Dialog */}
+      <AllMembersDialog
+        open={showAllMembersDialog}
+        onOpenChange={setShowAllMembersDialog}
+        members={teamMembers}
+      />
     </div>
   );
 };
