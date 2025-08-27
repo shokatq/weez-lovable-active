@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { Plus, Check, AlertCircle, Wifi, WifiOff, ExternalLink, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,9 @@ interface Integration {
   isCustomRequest?: boolean;
   isConnecting?: boolean;
   isSyncing?: boolean;
+  transferProgress?: number;
+  filesTransferred?: number;
+  totalFiles?: number;
 }
 
 interface WebSocketStatus {
@@ -409,7 +413,13 @@ const ConnectivityPanel = () => {
     if (!integration) return;
 
     try {
-      setIntegrations(prev => prev.map(i => i.id === id ? { ...i, isConnecting: true } : i));
+      setIntegrations(prev => prev.map(i => i.id === id ? {
+        ...i,
+        isConnecting: true,
+        transferProgress: 0,
+        filesTransferred: 0,
+        totalFiles: 0
+      } : i));
 
       // Call the backend API based on platform
       const platformEndpoint = platformMapping[id as keyof typeof platformMapping];
@@ -421,7 +431,17 @@ const ConnectivityPanel = () => {
         });
 
         if (response.ok) {
-          setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connected: true, isConnecting: false } : i));
+          // Simulate file transfer progress
+          await simulateFileTransfer(id);
+
+          setIntegrations(prev => prev.map(i => i.id === id ? {
+            ...i,
+            connected: true,
+            isConnecting: false,
+            transferProgress: 100,
+            filesTransferred: i.totalFiles || 0,
+            totalFiles: i.totalFiles || 0
+          } : i));
           toast({ title: `${integration.name} Connected!`, description: "Platform connected successfully." });
         } else {
           throw new Error('Failed to connect platform');
@@ -446,9 +466,43 @@ const ConnectivityPanel = () => {
       }
     } catch (error) {
       console.error('Connection error:', error);
-      setIntegrations(prev => prev.map(i => i.id === id ? { ...i, isConnecting: false } : i));
+      setIntegrations(prev => prev.map(i => i.id === id ? {
+        ...i,
+        isConnecting: false,
+        transferProgress: 0,
+        filesTransferred: 0,
+        totalFiles: 0
+      } : i));
       const errorMessage = error instanceof Error ? error.message : "Could not connect. Please try again.";
       toast({ title: "Connection Failed", description: errorMessage, variant: "destructive" });
+    }
+  };
+
+  const simulateFileTransfer = async (id: string) => {
+    // Simulate file discovery and transfer progress
+    const integration = integrations.find(i => i.id === id);
+    if (!integration) return;
+
+    // Set initial file count (simulated)
+    const totalFiles = Math.floor(Math.random() * 50) + 10; // 10-60 files
+    setIntegrations(prev => prev.map(i => i.id === id ? {
+      ...i,
+      totalFiles,
+      filesTransferred: 0,
+      transferProgress: 0
+    } : i));
+
+    // Simulate progress updates
+    for (let progress = 0; progress <= 100; progress += Math.random() * 15 + 5) {
+      await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 300));
+
+      const filesTransferred = Math.floor((progress / 100) * totalFiles);
+
+      setIntegrations(prev => prev.map(i => i.id === id ? {
+        ...i,
+        transferProgress: Math.min(progress, 100),
+        filesTransferred: Math.min(filesTransferred, totalFiles)
+      } : i));
     }
   };
 
@@ -488,6 +542,31 @@ const ConnectivityPanel = () => {
       );
     }
     return null;
+  };
+
+  const renderTransferProgress = (integration: Integration) => {
+    if (!integration.isConnecting || integration.transferProgress === undefined) return null;
+
+    return (
+      <div className="mt-3 space-y-2">
+        <div className="flex justify-between text-xs text-gray-400">
+          <span>Transferring files...</span>
+          <span>{integration.transferProgress}%</span>
+        </div>
+        <Progress
+          value={integration.transferProgress}
+          className="h-2 bg-gray-700"
+        />
+        <div className="flex justify-between text-xs text-gray-400">
+          <span>
+            {integration.filesTransferred || 0} of {integration.totalFiles || 0} files
+          </span>
+          <span>
+            {integration.totalFiles ? Math.round((integration.filesTransferred || 0) / integration.totalFiles * 100) : 0}% complete
+          </span>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -556,6 +635,9 @@ const ConnectivityPanel = () => {
                   {getStatusBadge(integration)}
                 </div>
                 <p className="text-sm text-gray-400 font-medium truncate">{integration.description}</p>
+
+                {/* Transfer Progress Bar */}
+                {renderTransferProgress(integration)}
               </div>
             </div>
 
