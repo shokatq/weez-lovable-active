@@ -55,7 +55,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
     const timer = setTimeout(() => {
       scrollToBottom();
     }, 50);
-    
+
     return () => clearTimeout(timer);
   }, [messages, isThinking]);
 
@@ -76,7 +76,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
             <h1 className="text-3xl font-semibold text-foreground mb-3 animate-fade-in">How can I help you today?</h1>
-            
+
             <div className="w-full max-w-3xl mt-8">
               <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
             </div>
@@ -88,44 +88,42 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                 {messages.map((message, index) => (
                   <div
                     key={message.id}
-                    className={`group flex gap-4 items-start ${
-                      message.isUser ? "justify-end" : "justify-start"
-                    } animate-slide-up opacity-0`}
-                    style={{ 
+                    className={`group flex gap-4 items-start ${message.isUser ? "justify-end" : "justify-start"
+                      } animate-slide-up opacity-0`}
+                    style={{
                       animationDelay: `${index * 50}ms`,
                       animationFillMode: 'forwards'
                     }}
                   >
                     {!message.isUser && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary text-primary-foreground">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/10 border border-primary/30 text-primary shadow-sm">
                         AI
                       </div>
                     )}
 
                     <div className={`max-w-[90%] md:max-w-[75%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
                       <div
-                        className={`px-4 py-3 rounded-2xl transition-all duration-200 ${
-                          message.isUser
-                            ? "bg-primary text-primary-foreground ml-12"
-                            : "bg-card border border-border text-foreground hover:bg-card/90"
-                        } ${message.isUploading ? 'animate-pulse' : ''}`}
+                        className={`px-4 py-3 rounded-2xl transition-all duration-200 ${message.isUser
+                            ? "bg-gradient-to-r from-primary to-indigo-500 text-primary-foreground ml-12 shadow-md"
+                            : "bg-card/80 backdrop-blur border border-border text-foreground hover:bg-card/90 shadow-sm"
+                          } ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (
                           <div className="flex items-center gap-2 mb-3">
                             <Upload className="w-4 h-4 text-primary animate-bounce" />
                             <div className="flex gap-1">
                               <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-                              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                             </div>
                             <span className="text-sm text-primary">Uploading...</span>
                           </div>
                         )}
-                        
+
                         <div className="text-[15px] leading-6 whitespace-pre-wrap text-foreground">
                           <MarkdownContent text={message.content} />
                         </div>
-                        
+
                         {message.files && message.files.length > 0 && (
                           <div className="mt-3 space-y-2 border-t border-border pt-3">
                             {message.files.map((file) => (
@@ -142,33 +140,32 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                           </div>
                         )}
                       </div>
-                      
-                      <div className={`text-xs text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity ${
-                        message.isUser ? 'text-right' : 'text-left'
-                      }`}>
+
+                      <div className={`text-xs text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity ${message.isUser ? 'text-right' : 'text-left'
+                        }`}>
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
 
                     {message.isUser && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-foreground">
-                        <User className="w-4 h-4 text-background" />
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-foreground to-muted-foreground text-background shadow">
+                        <User className="w-4 h-4" />
                       </div>
                     )}
                   </div>
                 ))}
-      
+
                 {isThinking && (
                   <div className="flex gap-4 animate-fade-in">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center flex-shrink-0 text-sm">
                       AI
                     </div>
-                    <div className="bg-muted rounded-2xl px-4 py-3 max-w-[85%] md:max-w-[70%]">
+                    <div className="bg-muted/80 backdrop-blur rounded-2xl px-4 py-3 max-w-[85%] md:max-w-[70%] border border-border shadow-sm">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
                   </div>
                 )}
-      
+
                 <div ref={messagesEndRef} />
               </div>
             </div>

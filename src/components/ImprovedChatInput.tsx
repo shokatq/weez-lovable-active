@@ -34,7 +34,7 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
-    
+
     // Auto-resize textarea
     const textarea = e.target;
     textarea.style.height = "auto";
@@ -48,7 +48,7 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
     if (files && files.length > 0) {
       const fileNames = Array.from(files).map(file => file.name);
       setUploadingFiles(fileNames);
-      
+
       setTimeout(() => {
         onSendMessage(`📎 Uploaded ${fileNames.length} file(s): ${fileNames.join(', ')}`);
         setUploadingFiles([]);
@@ -78,7 +78,10 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
 
         {/* Slim input area */}
         <div className="relative">
-          <div className="flex items-center gap-2 p-2 bg-background border border-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus-within:ring-1 focus-within:ring-primary/50 focus-within:border-primary/50 min-h-[48px]">
+          <div className={cn(
+            "flex items-center gap-2 p-2 bg-background border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus-within:ring-1 focus-within:ring-primary/50 focus-within:border-primary/50 min-h-[48px]",
+            disabled ? "border-primary/40 animate-pulse-glow" : "border-border"
+          )}>
             {/* File upload button */}
             <Button
               variant="ghost"
@@ -100,6 +103,7 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
               disabled={disabled}
               className={cn(
                 "min-h-[32px] max-h-[120px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-muted-foreground text-sm leading-5 p-1",
+                disabled ? "opacity-80" : "",
                 "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
               )}
               style={{ height: "32px" }}
@@ -112,8 +116,8 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
                 disabled={disabled || !message.trim()}
                 className={cn(
                   "h-8 w-8 rounded-lg shadow-sm transition-all duration-200",
-                  message.trim() 
-                    ? "bg-primary hover:bg-primary/90 text-primary-foreground hover:shadow-md" 
+                  message.trim()
+                    ? "bg-primary hover:bg-primary/90 text-primary-foreground hover:shadow-md"
                     : "bg-muted text-muted-foreground cursor-not-allowed"
                 )}
                 size="icon"

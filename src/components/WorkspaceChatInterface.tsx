@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  MessageSquare, 
-  Users, 
-  FileText, 
-  TrendingUp, 
-  Clock, 
+import {
+  MessageSquare,
+  Users,
+  FileText,
+  TrendingUp,
+  Clock,
   Send,
   Bot,
   User as UserIcon,
@@ -18,6 +18,7 @@ import {
   Database,
   Activity
 } from 'lucide-react';
+import ThinkingAnimation from '@/components/ThinkingAnimation';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -43,7 +44,7 @@ const WorkspaceChatInterface = () => {
   // Suggestion bubbles with analytics focus
   const suggestions = [
     "Show me team analytics for this month",
-    "What's our current team structure?", 
+    "What's our current team structure?",
     "How many files were processed today?",
     "Generate department performance report",
     "Show time saved by AI automation"
@@ -117,7 +118,7 @@ const WorkspaceChatInterface = () => {
 
   const generateAIResponse = (input: string) => {
     const lowerInput = input.toLowerCase();
-    
+
     if (lowerInput.includes('team analytics') || lowerInput.includes('analytics')) {
       return `## 📊 Team Analytics Overview
 
@@ -308,21 +309,18 @@ What specific area would you like me to analyze for you?`;
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex gap-3 ${
-                      message.type === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
+                    className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'
+                      }`}
                   >
                     <div
-                      className={`flex gap-3 max-w-[80%] ${
-                        message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
-                      }`}
+                      className={`flex gap-3 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
+                        }`}
                     >
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          message.type === 'user'
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${message.type === 'user'
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-muted text-muted-foreground'
-                        }`}
+                          }`}
                       >
                         {message.type === 'user' ? (
                           <UserIcon className="w-4 h-4" />
@@ -331,11 +329,10 @@ What specific area would you like me to analyze for you?`;
                         )}
                       </div>
                       <div
-                        className={`rounded-lg p-3 ${
-                          message.type === 'user'
+                        className={`rounded-lg p-3 ${message.type === 'user'
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-muted text-foreground'
-                        }`}
+                          }`}
                       >
                         <div className="whitespace-pre-wrap text-sm leading-relaxed">
                           {message.content}
@@ -347,18 +344,10 @@ What specific area would you like me to analyze for you?`;
                     </div>
                   </div>
                 ))}
-                
+
                 {isThinking && (
                   <div className="flex gap-3 justify-start">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <div className="bg-muted rounded-lg p-3">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 animate-pulse text-primary" />
-                        <span className="text-sm text-muted-foreground">AI is thinking...</span>
-                      </div>
-                    </div>
+                    <ThinkingAnimation type="general" />
                   </div>
                 )}
               </div>
@@ -391,9 +380,9 @@ What specific area would you like me to analyze for you?`;
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder="Ask about team analytics, file management, or productivity insights..."
-                className="flex-1 border-primary/20 focus:border-primary/40"
+                className={`flex-1 border-primary/20 focus:border-primary/40 ${isThinking ? 'animate-pulse-glow border-primary/40' : ''}`}
               />
-              <Button 
+              <Button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isThinking}
                 className="bg-primary hover:bg-primary/90"

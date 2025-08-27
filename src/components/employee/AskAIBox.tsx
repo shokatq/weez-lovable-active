@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Bot, User, Copy } from "lucide-react";
+import ThinkingAnimation from "@/components/ThinkingAnimation";
 import { fastApiService } from "@/services/fastApiService";
 
 interface Msg { role: "user" | "ai"; content: string }
@@ -54,9 +55,8 @@ export default function AskAIBox() {
             </div>
           ))}
           {loading && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Thinking…</span>
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+              <ThinkingAnimation type="general" />
             </div>
           )}
         </div>
@@ -65,7 +65,7 @@ export default function AskAIBox() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Summarize a file, find assets, or brainstorm…"
-            className="min-h-[48px]"
+            className={`min-h-[48px] ${loading ? 'animate-pulse-glow border-primary/40' : ''}`}
           />
           <Button onClick={onAsk} disabled={loading}>Ask</Button>
         </div>
