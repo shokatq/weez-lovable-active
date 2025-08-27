@@ -343,7 +343,7 @@ const ChatInterface = () => {
                     >
                       <div>
                         <p className="font-medium">File Analysis</p>
-                        <p className="text-sm text-muted-foreground">Analyze and summarize documents</p>
+                        <p className="text-sm text-muted-foreground">Analyze  documents</p>
                       </div>
                     </Button>
                     <Button
