@@ -2,7 +2,6 @@
 import { useEffect, useRef } from "react";
 import { Message } from "@/types/chat";
 import ThinkingAnimation from "./ThinkingAnimation";
-import SuggestionBubbles from "./SuggestionBubbles";
 import { FileText, User, Upload } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReactMarkdown from "react-markdown";
@@ -59,27 +58,13 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
     return () => clearTimeout(timer);
   }, [messages, isThinking]);
 
-  const suggestions = [
-    "🔎 Search files across the workspace",
-    "💬 Find conversations in Slack channels",
-    "📊 Show me reports from Google Drive",
-    "🎨 Locate assets from Dropbox",
-    "📝 Find documents in OneDrive",
-    "💰 Search financial data across platforms",
-    "🔍 Help me find specific files",
-    "📋 Summarize my uploaded documents"
-  ];
-
   return (
     <div className="flex-1 w-full h-full flex flex-col bg-background relative overflow-hidden">
       {
         (messages.length === 0 && !isThinking) ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto p-8">
             <h1 className="text-3xl font-semibold text-foreground mb-3 animate-fade-in">How can I help you today?</h1>
-            
-            <div className="w-full max-w-3xl mt-8">
-              <SuggestionBubbles suggestions={suggestions} onSendMessage={onSendMessage} />
-            </div>
+            <p className="text-muted-foreground">Ask me anything about your files, documents, or any questions you have.</p>
           </div>
         ) : (
           <ScrollArea className="flex-1 w-full h-full">
@@ -99,7 +84,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                     {!message.isUser && (
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20">
                         <img 
-                          src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
+                          src="/lovable-uploads/weezy-logo.png" 
                           alt="Weez AI" 
                           className="w-6 h-6 object-contain"
                         />
@@ -108,11 +93,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
 
                     <div className={`max-w-[85%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
                       <div
-                        className={`px-5 py-4 transition-all duration-200 ${
-                          message.isUser
-                            ? "bg-primary text-primary-foreground rounded-3xl rounded-br-lg"
-                            : "bg-background border border-border rounded-3xl rounded-bl-lg shadow-sm"
-                        } ${message.isUploading ? 'animate-pulse' : ''}`}
+                        className={`${message.isUser ? '' : 'py-1'} ${message.isUploading ? 'animate-pulse' : ''}`}
                       >
                         {message.isUploading && (
                           <div className="flex items-center gap-2 mb-3">
@@ -126,8 +107,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                           </div>
                         )}
                         
-                        <div className="text-[15px] leading-7 whitespace-pre-wrap">
-                          <MarkdownContent text={message.content} />
+                        <div className={`text-[15px] leading-7 whitespace-pre-wrap ${
+                          message.isUser 
+                            ? "bg-primary text-primary-foreground rounded-3xl rounded-br-lg px-5 py-4" 
+                            : "text-foreground"
+                        }`}>
+                          {message.isUser ? message.content : <MarkdownContent text={message.content} />}
                         </div>
                         
                         {message.files && message.files.length > 0 && (
@@ -162,12 +147,12 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                   <div className="flex gap-4 animate-fade-in">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20">
                       <img 
-                        src="/lovable-uploads/92fd1f43-ec1e-4562-9a19-fd70618ad920.png" 
+                        src="/lovable-uploads/weezy-logo.png" 
                         alt="Weez AI" 
                         className="w-6 h-6 object-contain"
                       />
                     </div>
-                    <div className="bg-background border border-border rounded-3xl rounded-bl-lg shadow-sm px-5 py-4 max-w-[85%]">
+                    <div className="py-1 max-w-[85%]">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
                   </div>

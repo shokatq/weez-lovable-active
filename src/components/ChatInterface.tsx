@@ -206,65 +206,11 @@ const ChatInterface = () => {
                   <p className="text-muted-foreground mb-8">
                     Ask me anything about your files, documents, or any questions you have. I'm powered by AI and ready to assist!
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
-                    <Button
-                      variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("Analyze my files and provide a summary")}
-                      disabled={isLoading}
-                    >
-                      <div>
-                        <p className="font-medium">File Analysis</p>
-                        <p className="text-sm text-muted-foreground">Analyze and summarize documents</p>
-                      </div>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("Help me organize my workspace")}
-                      disabled={isLoading}
-                    >
-                      <div>
-                        <p className="font-medium">Workspace Organization</p>
-                        <p className="text-sm text-muted-foreground">Get help organizing files</p>
-                      </div>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("What can you help me with?")}
-                      disabled={isLoading}
-                    >
-                      <div>
-                        <p className="font-medium">Capabilities</p>
-                        <p className="text-sm text-muted-foreground">Learn what I can do</p>
-                      </div>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="text-left h-auto p-4 justify-start"
-                      onClick={() => handleSendMessage("Show me my recent activity")}
-                      disabled={isLoading}
-                    >
-                      <div>
-                        <p className="font-medium">Recent Activity</p>
-                        <p className="text-sm text-muted-foreground">View recent actions</p>
-                      </div>
-                    </Button>
-                  </div>
                   
                   <div className="mt-8 pt-6 border-t border-border">
-                    <Dialog open={showConnectServices} onOpenChange={setShowConnectServices}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="lg" className="w-full">
-                          <Settings className="w-4 h-4 mr-2" />
-                          Connect Services
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                        <ConnectivityPanel />
-                      </DialogContent>
-                    </Dialog>
+                    <p className="text-sm text-muted-foreground text-center">
+                      Connect your services using the link icon in the top right to get started with file analysis and workspace organization.
+                    </p>
                   </div>
                 </div>
               </div>

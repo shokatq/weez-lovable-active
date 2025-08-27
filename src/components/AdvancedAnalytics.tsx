@@ -20,29 +20,29 @@ import {
 import { useUserRole } from '@/hooks/useUserRole';
 
 interface AnalyticsData {
-  productivity: {
+  timeMetrics: {
     timeSaved: number;
     efficiencyGain: number;
-    tasksCompleted: number;
-    automationRate: number;
+    workflowOptimization: number;
+    documentProcessingSpeed: number;
   };
-  team: {
-    activeMembers: number;
-    departments: number;
-    collaborationScore: number;
-    satisfactionRate: number;
-  };
-  ai: {
+  fileAnalytics: {
+    documentsProcessed: number;
     queriesProcessed: number;
-    documentsAnalyzed: number;
-    insightsGenerated: number;
-    accuracyRate: number;
+    queryAccuracy: number;
+    fileOrganizationIndex: number;
+    duplicateReductionRate: number;
   };
-  growth: {
-    monthlyGrowth: number;
-    yearlyProjection: number;
+  collaboration: {
+    activeMembers: number;
+    automationRate: number;
+    fileSharingEfficiency: number;
+    collaborationScore: number;
+  };
+  businessImpact: {
     costSavings: number;
     roiPercentage: number;
+    adoptionGrowth: number;
   };
 }
 
@@ -50,108 +50,114 @@ const AdvancedAnalytics = () => {
   const { userRole } = useUserRole();
   const [timeRange, setTimeRange] = useState('30d');
   const [analytics, setAnalytics] = useState<AnalyticsData>({
-    productivity: {
+    timeMetrics: {
       timeSaved: 127.5,
       efficiencyGain: 34,
-      tasksCompleted: 1247,
-      automationRate: 78
+      workflowOptimization: 28,
+      documentProcessingSpeed: 89
     },
-    team: {
-      activeMembers: 24,
-      departments: 6,
-      collaborationScore: 89,
-      satisfactionRate: 94
-    },
-    ai: {
+    fileAnalytics: {
+      documentsProcessed: 2456,
       queriesProcessed: 2347,
-      documentsAnalyzed: 456,
-      insightsGenerated: 89,
-      accuracyRate: 96
+      queryAccuracy: 96,
+      fileOrganizationIndex: 87,
+      duplicateReductionRate: 73
     },
-    growth: {
-      monthlyGrowth: 12.5,
-      yearlyProjection: 145,
+    collaboration: {
+      activeMembers: 24,
+      automationRate: 78,
+      fileSharingEfficiency: 92,
+      collaborationScore: 89
+    },
+    businessImpact: {
       costSavings: 48750,
-      roiPercentage: 340
+      roiPercentage: 340,
+      adoptionGrowth: 12.5
     }
   });
 
-  const productivityMetrics = [
+  const timeMetrics = [
     {
       title: 'Time Saved',
-      value: `${analytics.productivity.timeSaved}h`,
+      value: `${analytics.timeMetrics.timeSaved}h`,
       change: '+12%',
       icon: Clock,
       color: 'text-blue-600'
     },
     {
       title: 'Efficiency Gain',
-      value: `${analytics.productivity.efficiencyGain}%`,
+      value: `${analytics.timeMetrics.efficiencyGain}%`,
       change: '+8%',
       icon: TrendingUp,
       color: 'text-green-600'
     },
     {
-      title: 'Tasks Completed',
-      value: analytics.productivity.tasksCompleted.toLocaleString(),
-      change: '+23%',
-      icon: CheckCircle,
+      title: 'Workflow Optimization',
+      value: `${analytics.timeMetrics.workflowOptimization}%`,
+      change: '+15%',
+      icon: Zap,
       color: 'text-purple-600'
     },
     {
-      title: 'Automation Rate',
-      value: `${analytics.productivity.automationRate}%`,
-      change: '+15%',
-      icon: Zap,
+      title: 'Document Processing Speed',
+      value: `${analytics.timeMetrics.documentProcessingSpeed}%`,
+      change: '+23%',
+      icon: FileText,
       color: 'text-orange-600'
     }
   ];
 
-  const teamMetrics = [
+  const fileMetrics = [
     {
-      title: 'Active Members',
-      value: analytics.team.activeMembers,
-      max: 30,
-      percentage: (analytics.team.activeMembers / 30) * 100
+      title: 'Documents Processed',
+      value: analytics.fileAnalytics.documentsProcessed,
+      max: 3000,
+      percentage: (analytics.fileAnalytics.documentsProcessed / 3000) * 100
     },
     {
-      title: 'Collaboration Score',
-      value: analytics.team.collaborationScore,
+      title: 'Query Accuracy',
+      value: analytics.fileAnalytics.queryAccuracy,
       max: 100,
-      percentage: analytics.team.collaborationScore
+      percentage: analytics.fileAnalytics.queryAccuracy
     },
     {
-      title: 'Satisfaction Rate',
-      value: analytics.team.satisfactionRate,
+      title: 'File Organization Index',
+      value: analytics.fileAnalytics.fileOrganizationIndex,
       max: 100,
-      percentage: analytics.team.satisfactionRate
+      percentage: analytics.fileAnalytics.fileOrganizationIndex
+    },
+    {
+      title: 'Duplicate Reduction Rate',
+      value: analytics.fileAnalytics.duplicateReductionRate,
+      max: 100,
+      percentage: analytics.fileAnalytics.duplicateReductionRate
     }
   ];
 
-  const aiInsights = [
+  const collaborationInsights = [
     {
-      title: 'Document Processing Speed',
-      description: 'AI processes documents 89% faster than manual review',
+      title: 'File Sharing Efficiency',
+      description: 'Average time to share and access files reduced by 92%',
       impact: 'High',
-      metric: '89% faster'
+      metric: '92% faster'
     },
     {
-      title: 'Query Response Accuracy',
-      description: 'AI assistant maintains 96% accuracy across all queries',
+      title: 'Auto-Tagging Accuracy',
+      description: 'AI automatically tags files with 94% accuracy rate',
       impact: 'High',
-      metric: '96% accurate'
+      metric: '94% accurate'
     },
     {
-      title: 'Workflow Optimization',
-      description: 'Automated workflows reduced task completion time by 34%',
+      title: 'Automation Rate',
+      description: '78% of file-related tasks are now automated',
       impact: 'Medium',
-      metric: '34% reduction'
+      metric: '78% automated'
     },
     {
-      title: 'Knowledge Discovery',
-      description: 'AI identified 23 new optimization opportunities this month',
+      title: 'Active User Engagement',
+      description: '24 members actively using file search and organization features',
       impact: 'Medium',
-      metric: '23 opportunities'
+      metric: '24 active users'
     }
   ];
 
@@ -188,16 +194,16 @@ const AdvancedAnalytics = () => {
 
       <Tabs defaultValue="productivity" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="productivity">Productivity</TabsTrigger>
-          <TabsTrigger value="team">Team Performance</TabsTrigger>
-          <TabsTrigger value="ai">AI Insights</TabsTrigger>
-          <TabsTrigger value="growth">Growth & ROI</TabsTrigger>
+          <TabsTrigger value="productivity">Time & Efficiency</TabsTrigger>
+          <TabsTrigger value="team">File Analytics</TabsTrigger>
+          <TabsTrigger value="ai">Collaboration</TabsTrigger>
+          <TabsTrigger value="growth">Business Impact</TabsTrigger>
         </TabsList>
 
         <TabsContent value="productivity" className="space-y-6">
-          {/* Productivity Metrics */}
+          {/* Time & Efficiency Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {productivityMetrics.map((metric, index) => (
+            {timeMetrics.map((metric, index) => (
               <Card key={index} className="bg-card border-border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
@@ -221,7 +227,7 @@ const AdvancedAnalytics = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="w-5 h-5" />
-                  Weekly Productivity Trends
+                  File Processing Trends
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -243,31 +249,31 @@ const AdvancedAnalytics = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="w-5 h-5" />
-                  Goal Progress
+                  File Management Goals
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span>Monthly Tasks</span>
-                      <span>847/1000</span>
+                      <span>Monthly Documents</span>
+                      <span>2456/3000</span>
                     </div>
-                    <Progress value={84.7} />
+                    <Progress value={81.9} />
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span>AI Automation</span>
-                      <span>78/80%</span>
+                      <span>File Organization</span>
+                      <span>87/90%</span>
                     </div>
-                    <Progress value={97.5} />
+                    <Progress value={96.7} />
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span>Team Satisfaction</span>
-                      <span>94/95%</span>
+                      <span>Query Accuracy</span>
+                      <span>96/98%</span>
                     </div>
-                    <Progress value={98.9} />
+                    <Progress value={97.9} />
                   </div>
                 </div>
               </CardContent>
@@ -276,9 +282,9 @@ const AdvancedAnalytics = () => {
         </TabsContent>
 
         <TabsContent value="team" className="space-y-6">
-          {/* Team Performance Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {teamMetrics.map((metric, index) => (
+          {/* File Analytics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {fileMetrics.map((metric, index) => (
               <Card key={index} className="bg-card border-border">
                 <CardContent className="p-4">
                   <div className="space-y-3">
@@ -296,25 +302,25 @@ const AdvancedAnalytics = () => {
             ))}
           </div>
 
-          {/* Department Performance */}
+          {/* File Type Distribution */}
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Department Performance
+                <FileText className="w-5 h-5" />
+                File Type Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {['Marketing', 'Creative', 'Design', 'Content', 'Social Media', 'Client Services'].map((dept, index) => (
-                  <div key={dept} className="p-4 bg-muted/50 rounded-lg">
+                {['Documents', 'Images', 'Videos', 'Spreadsheets', 'Presentations', 'PDFs'].map((type, index) => (
+                  <div key={type} className="p-4 bg-muted/50 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-foreground">{dept}</span>
-                      <Badge variant="outline">{[8, 6, 4, 5, 3, 3][index]} members</Badge>
+                      <span className="font-medium text-foreground">{type}</span>
+                      <Badge variant="outline">{[456, 234, 89, 123, 67, 345][index]} files</Badge>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Productivity</span>
+                        <span className="text-muted-foreground">Processing Rate</span>
                         <span className="font-medium">{[94, 87, 91, 89, 92, 85][index]}%</span>
                       </div>
                       <Progress value={[94, 87, 91, 89, 92, 85][index]} />
@@ -327,17 +333,17 @@ const AdvancedAnalytics = () => {
         </TabsContent>
 
         <TabsContent value="ai" className="space-y-6">
-          {/* AI Performance Metrics */}
+          {/* Collaboration Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="bg-card border-border">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-500/10 rounded-lg">
-                    <MessageSquare className="w-5 h-5 text-blue-600" />
+                    <Users className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">{analytics.ai.queriesProcessed.toLocaleString()}</p>
-                    <p className="text-sm text-muted-foreground">Queries Processed</p>
+                    <p className="text-2xl font-bold text-foreground">{analytics.collaboration.activeMembers}</p>
+                    <p className="text-sm text-muted-foreground">Active Members</p>
                   </div>
                 </div>
               </CardContent>
@@ -346,11 +352,11 @@ const AdvancedAnalytics = () => {
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-purple-500/10 rounded-lg">
-                    <FileText className="w-5 h-5 text-purple-600" />
+                    <Zap className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">{analytics.ai.documentsAnalyzed}</p>
-                    <p className="text-sm text-muted-foreground">Documents Analyzed</p>
+                    <p className="text-2xl font-bold text-foreground">{analytics.collaboration.automationRate}%</p>
+                    <p className="text-sm text-muted-foreground">Automation Rate</p>
                   </div>
                 </div>
               </CardContent>
@@ -359,11 +365,11 @@ const AdvancedAnalytics = () => {
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-green-500/10 rounded-lg">
-                    <Brain className="w-5 h-5 text-green-600" />
+                    <Activity className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">{analytics.ai.insightsGenerated}</p>
-                    <p className="text-sm text-muted-foreground">Insights Generated</p>
+                    <p className="text-2xl font-bold text-foreground">{analytics.collaboration.fileSharingEfficiency}%</p>
+                    <p className="text-sm text-muted-foreground">File Sharing Efficiency</p>
                   </div>
                 </div>
               </CardContent>
@@ -375,25 +381,25 @@ const AdvancedAnalytics = () => {
                     <Target className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">{analytics.ai.accuracyRate}%</p>
-                    <p className="text-sm text-muted-foreground">Accuracy Rate</p>
+                    <p className="text-2xl font-bold text-foreground">{analytics.collaboration.collaborationScore}%</p>
+                    <p className="text-sm text-muted-foreground">Collaboration Score</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* AI Insights */}
+          {/* Collaboration Insights */}
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5" />
-                AI-Generated Insights
+                <Users className="w-5 h-5" />
+                Collaboration Insights
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {aiInsights.map((insight, index) => (
+                {collaborationInsights.map((insight, index) => (
                   <div key={index} className="p-4 bg-muted/50 rounded-lg">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-foreground">{insight.title}</h4>
@@ -415,36 +421,14 @@ const AdvancedAnalytics = () => {
         </TabsContent>
 
         <TabsContent value="growth" className="space-y-6">
-          {/* Growth Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="bg-card border-border">
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Monthly Growth</p>
-                  <p className="text-2xl font-bold text-foreground">{analytics.growth.monthlyGrowth}%</p>
-                  <Badge className="bg-green-500/10 text-green-700 border-green-500/20">
-                    +2.3% from last month
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Yearly Projection</p>
-                  <p className="text-2xl font-bold text-foreground">{analytics.growth.yearlyProjection}%</p>
-                  <Badge className="bg-blue-500/10 text-blue-700 border-blue-500/20">
-                    On track
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Business Impact Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="bg-card border-border">
               <CardContent className="p-4">
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Cost Savings</p>
-                  <p className="text-2xl font-bold text-foreground">${analytics.growth.costSavings.toLocaleString()}</p>
-                  <Badge className="bg-purple-500/10 text-purple-700 border-purple-500/20">
+                  <p className="text-2xl font-bold text-foreground">${analytics.businessImpact.costSavings.toLocaleString()}</p>
+                  <Badge className="bg-green-500/10 text-green-700 border-green-500/20">
                     This month
                   </Badge>
                 </div>
@@ -454,7 +438,18 @@ const AdvancedAnalytics = () => {
               <CardContent className="p-4">
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">ROI</p>
-                  <p className="text-2xl font-bold text-foreground">{analytics.growth.roiPercentage}%</p>
+                  <p className="text-2xl font-bold text-foreground">{analytics.businessImpact.roiPercentage}%</p>
+                  <Badge className="bg-blue-500/10 text-blue-700 border-blue-500/20">
+                    File productivity
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border-border">
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Adoption Growth</p>
+                  <p className="text-2xl font-bold text-foreground">{analytics.businessImpact.adoptionGrowth}%</p>
                   <Badge className="bg-green-500/10 text-green-700 border-green-500/20">
                     Excellent
                   </Badge>
