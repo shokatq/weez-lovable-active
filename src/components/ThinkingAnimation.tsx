@@ -78,7 +78,7 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
   const config = getThinkingConfig();
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 bg-muted rounded-xl border border-border shadow-sm">
+    <div className="flex items-start gap-4 px-4 py-3 bg-white/90 dark:bg-muted/90 rounded-xl border border-border shadow-sm">
       {/* Avatar / context icon */}
       <div className="shrink-0">{config.icon}</div>
 
@@ -102,7 +102,8 @@ const ThinkingAnimation = ({ type = 'general' }: ThinkingAnimationProps) => {
       </div>
 
       {/* Animated dots + label */}
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex flex-col min-w-0">
+        <span className={`text-sm font-medium text-foreground mb-1`}>Here’s a synthesized summary from your sources:</span>
         <div className="flex items-center gap-1">
           <span className={`w-2 h-2 ${config.accentColor} rounded-full`} style={{ animation: 'pulse 1.2s ease-in-out infinite', animationDelay: '0s' }} />
           <span className={`w-2 h-2 ${config.accentColor} rounded-full`} style={{ animation: 'pulse 1.2s ease-in-out infinite', animationDelay: '150ms' }} />

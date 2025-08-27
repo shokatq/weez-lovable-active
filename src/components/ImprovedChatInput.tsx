@@ -79,8 +79,8 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
         {/* Slim input area */}
         <div className="relative">
           <div className={cn(
-            "flex items-center gap-2 p-2 bg-background border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus-within:ring-1 focus-within:ring-primary/50 focus-within:border-primary/50 min-h-[48px]",
-            disabled ? "border-primary/40 animate-pulse-glow" : "border-border"
+            "flex items-center gap-2 p-2 bg-background border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus-within:ring-1 focus-within:ring-primary/30 focus-within:border-primary/40 min-h-[48px]",
+            disabled ? "border-primary/40 ring-1 ring-primary/30 shadow-[0_6px_24px_rgba(99,102,241,0.15)]" : "border-border"
           )}>
             {/* File upload button */}
             <Button
@@ -103,7 +103,7 @@ const ImprovedChatInput = ({ onSendMessage, disabled = false }: ImprovedChatInpu
               disabled={disabled}
               className={cn(
                 "min-h-[32px] max-h-[120px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent placeholder:text-muted-foreground text-sm leading-5 p-1",
-                disabled ? "opacity-80" : "",
+                disabled ? "opacity-90" : "",
                 "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
               )}
               style={{ height: "32px" }}

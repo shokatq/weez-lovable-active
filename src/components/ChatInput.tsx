@@ -40,7 +40,7 @@ const ChatInput = ({ onSendMessage, disabled = false }: ChatInputProps) => {
   return (
     <div className="border-t border-border bg-background/95 backdrop-blur px-4 py-4">
       <div className="max-w-2xl mx-auto">
-        <div className={`relative flex items-center w-full bg-background rounded-xl border ${disabled ? 'border-primary/40 animate-pulse-glow' : 'border-border'} shadow-sm hover:shadow-md transition-all duration-200 focus-within:border-primary/50 focus-within:shadow-md min-h-[44px]`}>
+        <div className={`relative flex items-center w-full bg-background rounded-xl border ${disabled ? 'border-primary/40 ring-1 ring-primary/30 shadow-[0_6px_24px_rgba(99,102,241,0.15)]' : 'border-border'} shadow-sm hover:shadow-md transition-all duration-200 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/30 focus-within:shadow-md min-h-[44px]`}>
           {/* Message input area */}
           <div className="flex-1 min-w-0 px-3 py-2">
             <Textarea
@@ -50,7 +50,7 @@ const ChatInput = ({ onSendMessage, disabled = false }: ChatInputProps) => {
               onKeyPress={handleKeyPress}
               placeholder="Message Weez AI..."
               disabled={disabled}
-              className={`w-full min-h-[32px] max-h-[120px] bg-transparent border-none resize-none text-foreground placeholder:text-muted-foreground focus:ring-0 focus:ring-offset-0 text-sm leading-5 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none ${disabled ? 'opacity-80' : ''}`}
+              className={`w-full min-h-[32px] max-h-[120px] bg-transparent border-none resize-none text-foreground placeholder:text-muted-foreground focus:ring-0 focus:ring-offset-0 text-sm leading-5 px-0 py-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none ${disabled ? 'opacity-90' : ''}`}
               rows={1}
             />
           </div>
@@ -62,8 +62,8 @@ const ChatInput = ({ onSendMessage, disabled = false }: ChatInputProps) => {
               size="icon"
               variant="ghost"
               className={`w-8 h-8 rounded-lg transition-all duration-200 ${message.trim()
-                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                  : 'bg-muted text-muted-foreground cursor-not-allowed hover:bg-muted'
+                ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                : 'bg-muted text-muted-foreground cursor-not-allowed hover:bg-muted'
                 }`}
               disabled={!message.trim() || disabled}
             >
