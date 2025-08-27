@@ -1,4 +1,3 @@
-
 // services/ConversationService.ts
 
 // Backend API types (aligned with ChatAPI.py)
