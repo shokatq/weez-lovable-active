@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Check, AlertCircle, Wifi, WifiOff, ExternalLink, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -31,80 +32,82 @@ const ConnectivityPanel = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const [wsStatus, setWsStatus] = useState<WebSocketStatus>({ connected: false, reconnecting: false });
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [pendingConnection, setPendingConnection] = useState<string | null>(null);
 
   const [integrations, setIntegrations] = useState<Integration[]>([
-        {
-          id: "google-drive",
-          name: "Google Drive",
-          description: "Access your documents and files",
-          icon: "/lovable-uploads/ae039732-12c4-43f6-9bb0-7637273d577c.png",
-          connected: false,
-          color: "bg-black border border-gray-700",
-          isConnecting: false,
-          isSyncing: false
-        },
-        {
-          id: "onedrive",
-          name: "OneDrive",
-          description: "Sync files from Microsoft OneDrive",
-          icon: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Office_OneDrive_%282019%E2%80%93present%29.svg",
-          connected: false,
-          color: "bg-blue-900/50 border border-blue-700",
-          isConnecting: false,
-          isSyncing: false
-        },
-        {
-          id: "dropbox",
-          name: "Dropbox",
-          description: "Connect to your Dropbox storage",
-          icon: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Dropbox_logo_2017.svg",
-          connected: false,
-          color: "bg-blue-800/50 border border-blue-600",
-          isConnecting: false,
-          isSyncing: false
-        },
-        {
-          id: "slack",
-          name: "Slack",
-          description: "Integrate with your team communications",
-          icon: "/lovable-uploads/2b21fecb-5fe6-44fb-8e1a-ac8d0a358617.png",
-          connected: false,
-          color: "bg-black border border-gray-700",
-          isConnecting: false,
-          isSyncing: false
-        },
-        {
-          id: "notion",
-          name: "Notion",
-          description: "Connect your workspace and databases",
-          icon: "/lovable-uploads/ff191e8c-d8df-45af-a5da-a8f49ee636ee.png",
-          connected: false,
-          color: "bg-black border border-gray-700",
-          isConnecting: false,
-          isSyncing: false
-        },
-        {
-          id: "confluence",
-          name: "Confluence",
-          description: "Access team documentation and wikis",
-          icon: "/lovable-uploads/b3623f20-0cca-49eb-bf58-e28d521f52e1.png",
-          connected: false,
-          color: "bg-blue-900/50 border border-blue-700",
-          isConnecting: false,
-          isSyncing: false
-        },
-        {
-          id: "custom-request",
-          name: "Request Custom Connection",
-          description: "Need a specific integration? Let us know!",
-          icon: "",
-          connected: false,
-          color: "bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600",
-          isCustomRequest: true,
-          isConnecting: false,
-          isSyncing: false
-        }
-    ]);
+    {
+      id: "google-drive",
+      name: "Google Drive",
+      description: "Access your documents and files",
+      icon: "/lovable-uploads/ae039732-12c4-43f6-9bb0-7637273d577c.png",
+      connected: false,
+      color: "bg-black border border-gray-700",
+      isConnecting: false,
+      isSyncing: false
+    },
+    {
+      id: "onedrive",
+      name: "OneDrive",
+      description: "Sync files from Microsoft OneDrive",
+      icon: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Microsoft_Office_OneDrive_%282019%E2%80%93present%29.svg",
+      connected: false,
+      color: "bg-blue-900/50 border border-blue-700",
+      isConnecting: false,
+      isSyncing: false
+    },
+    {
+      id: "dropbox",
+      name: "Dropbox",
+      description: "Connect to your Dropbox storage",
+      icon: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Dropbox_logo_2017.svg",
+      connected: false,
+      color: "bg-blue-800/50 border border-blue-600",
+      isConnecting: false,
+      isSyncing: false
+    },
+    {
+      id: "slack",
+      name: "Slack",
+      description: "Integrate with your team communications",
+      icon: "/lovable-uploads/2b21fecb-5fe6-44fb-8e1a-ac8d0a358617.png",
+      connected: false,
+      color: "bg-black border border-gray-700",
+      isConnecting: false,
+      isSyncing: false
+    },
+    {
+      id: "notion",
+      name: "Notion",
+      description: "Connect your workspace and databases",
+      icon: "/lovable-uploads/ff191e8c-d8df-45af-a5da-a8f49ee636ee.png",
+      connected: false,
+      color: "bg-black border border-gray-700",
+      isConnecting: false,
+      isSyncing: false
+    },
+    {
+      id: "confluence",
+      name: "Confluence",
+      description: "Access team documentation and wikis",
+      icon: "/lovable-uploads/b3623f20-0cca-49eb-bf58-e28d521f52e1.png",
+      connected: false,
+      color: "bg-blue-900/50 border border-blue-700",
+      isConnecting: false,
+      isSyncing: false
+    },
+    {
+      id: "custom-request",
+      name: "Request Custom Connection",
+      description: "Need a specific integration? Let us know!",
+      icon: "",
+      connected: false,
+      color: "bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600",
+      isCustomRequest: true,
+      isConnecting: false,
+      isSyncing: false
+    }
+  ]);
 
   // --- Start of Unchanged Logic ---
   // (All the existing hooks, functions like handleConnect, handleWebSocketMessage, etc., remain here without any changes to their logic.)
@@ -341,6 +344,16 @@ const ConnectivityPanel = () => {
       return;
     }
 
+    const integration = integrations.find(i => i.id === id);
+    if (!integration) return;
+
+    // Show disclaimer for platform connections
+    if (!integration.connected && platformMapping[id as keyof typeof platformMapping]) {
+      setPendingConnection(id);
+      setShowDisclaimer(true);
+      return;
+    }
+
     if (id === "custom-request") {
       const subject = "Custom Integration Request - Weez AI";
       const body = `Hello Weez AI Team,\n\nI would like to request a custom integration for my company.\n\nCompany Name: [Your Company Name]\nIntegration Needed: [Describe the platform/service]\nUse Case: [Explain your use case]\n\nBest regards,\n[Your Name]`;
@@ -349,9 +362,6 @@ const ConnectivityPanel = () => {
       toast({ title: "Email Client Opened", description: "Please complete and send the request email." });
       return;
     }
-
-    const integration = integrations.find(i => i.id === id);
-    if (!integration) return;
 
     if (integration.connected) {
       try {
@@ -385,25 +395,55 @@ const ConnectivityPanel = () => {
       return;
     }
 
+    // Proceed with connection after disclaimer agreement
+    if (pendingConnection) {
+      await proceedWithConnection(pendingConnection);
+      setPendingConnection(null);
+    }
+  };
+
+  const proceedWithConnection = async (id: string) => {
+    if (!user?.email) return;
+
+    const integration = integrations.find(i => i.id === id);
+    if (!integration) return;
+
     try {
       setIntegrations(prev => prev.map(i => i.id === id ? { ...i, isConnecting: true } : i));
-      const platformEndpoint = platformMapping[id as keyof typeof platformMapping];
-      const authUrl = `${baseUrl}/auth/${platformEndpoint}?user_email=${encodeURIComponent(user.email)}`;
-      const popup = window.open(authUrl, `${integration.name.replace(/\s+/g, '_')}_auth`, 'width=600,height=700,scrollbars=yes,resizable=yes,status=yes,location=yes,toolbar=no,menubar=no,left=' + (window.screen.width / 2 - 300) + ',top=' + (window.screen.height / 2 - 350));
-      
-      if (!popup) throw new Error('Popup blocked. Please allow popups for this site.');
-      startStatusPolling(id);
-      
-      const checkClosed = setInterval(() => {
-        if (popup && popup.closed) {
-          clearInterval(checkClosed);
-          setTimeout(async () => {
-            await checkPlatformStatuses();
-            setIntegrations(prev => prev.map(i => i.id === id && i.isConnecting ? { ...i, isConnecting: false } : i));
-          }, 2000);
-        }
-      }, 1000);
 
+      // Call the backend API based on platform
+      const platformEndpoint = platformMapping[id as keyof typeof platformMapping];
+      if (platformEndpoint) {
+        const response = await fetch(`https://platform-connection-api-g0b5c3fve2dfb2ag.canadacentral-01.azurewebsites.net/sync/${platformEndpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_email: user.email })
+        });
+
+        if (response.ok) {
+          setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connected: true, isConnecting: false } : i));
+          toast({ title: `${integration.name} Connected!`, description: "Platform connected successfully." });
+        } else {
+          throw new Error('Failed to connect platform');
+        }
+      } else {
+        // Fallback to existing auth flow for platforms not in mapping
+        const authUrl = `${baseUrl}/auth/${platformEndpoint}?user_email=${encodeURIComponent(user.email)}`;
+        const popup = window.open(authUrl, `${integration.name.replace(/\s+/g, '_')}_auth`, 'width=600,height=700,scrollbars=yes,resizable=yes,status=yes,location=yes,toolbar=no,menubar=no,left=' + (window.screen.width / 2 - 300) + ',top=' + (window.screen.height / 2 - 350));
+
+        if (!popup) throw new Error('Popup blocked. Please allow popups for this site.');
+        startStatusPolling(id);
+
+        const checkClosed = setInterval(() => {
+          if (popup && popup.closed) {
+            clearInterval(checkClosed);
+            setTimeout(async () => {
+              await checkPlatformStatuses();
+              setIntegrations(prev => prev.map(i => i.id === id && i.isConnecting ? { ...i, isConnecting: false } : i));
+            }, 2000);
+          }
+        }, 1000);
+      }
     } catch (error) {
       console.error('Connection error:', error);
       setIntegrations(prev => prev.map(i => i.id === id ? { ...i, isConnecting: false } : i));
@@ -480,7 +520,7 @@ const ConnectivityPanel = () => {
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-4 sm:p-6 space-y-3 max-h-[65vh] sm:max-h-[70vh] overflow-y-auto">
         {integrations.map((integration, index) => (
           <div
@@ -507,7 +547,7 @@ const ConnectivityPanel = () => {
                   </>
                 )}
                 {(integration.isConnecting || integration.isSyncing) && (
-                   <div className="absolute inset-0 bg-blue-500/30 rounded-xl animate-pulse"></div>
+                  <div className="absolute inset-0 bg-blue-500/30 rounded-xl animate-pulse"></div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -538,7 +578,7 @@ const ConnectivityPanel = () => {
               >
                 {integration.isConnecting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {integration.isSyncing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                
+
                 {integration.isCustomRequest ? (
                   <div className="flex items-center gap-1.5">
                     <span>Request</span>
@@ -573,6 +613,69 @@ const ConnectivityPanel = () => {
           </div>
         </div>
       </CardContent>
+
+      {/* Disclaimer Dialog */}
+      <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-white">
+              Data Transfer Agreement
+            </DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Before connecting to {pendingConnection ? integrations.find(i => i.id === pendingConnection)?.name : 'this platform'}, please review the following:
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="p-4 bg-blue-950/40 rounded-lg border border-blue-800/50">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-blue-200">
+                  <p className="font-semibold mb-2">Important Disclaimer:</p>
+                  <p className="text-blue-300/90 leading-relaxed">
+                    By clicking "Agree & Connect", you authorize Weez AI to securely transfer and process your files and data from {pendingConnection ? integrations.find(i => i.id === pendingConnection)?.name : 'the selected platform'}.
+                    This includes:
+                  </p>
+                  <ul className="mt-2 space-y-1 text-blue-300/80 text-sm list-disc list-inside">
+                    <li>Secure file access and transfer to Weez AI servers</li>
+                    <li>Data processing for AI-powered search and analysis</li>
+                    <li>Temporary storage for enhanced functionality</li>
+                    <li>Encrypted transmission using industry-standard protocols</li>
+                  </ul>
+                  <p className="mt-3 text-blue-300/90 text-sm">
+                    Your data security and privacy are our top priorities. All transfers are encrypted and processed in accordance with our privacy policy.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDisclaimer(false);
+                setPendingConnection(null);
+              }}
+              className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+            >
+              Disagree
+            </Button>
+            <Button
+              onClick={() => {
+                setShowDisclaimer(false);
+                if (pendingConnection) {
+                  proceedWithConnection(pendingConnection);
+                  setPendingConnection(null);
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Agree & Connect
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
