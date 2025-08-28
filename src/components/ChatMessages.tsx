@@ -73,7 +73,7 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                 {messages.map((message, index) => (
                   <div
                     key={message.id}
-                    className={`group flex gap-4 items-start ${
+                    className={`group flex items-start ${
                       message.isUser ? "justify-end" : "justify-start"
                     } animate-slide-up opacity-0`}
                     style={{ 
@@ -81,16 +81,6 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                       animationFillMode: 'forwards'
                     }}
                   >
-                    {!message.isUser && (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20">
-                        <img 
-                          src="/lovable-uploads/weezy-logo.png" 
-                          alt="Weez AI" 
-                          className="w-6 h-6 object-contain"
-                        />
-                      </div>
-                    )}
-
                     <div className={`max-w-[85%] ${message.isUser ? 'flex flex-col items-end' : ''}`}>
                       <div
                         className={`${message.isUser ? '' : 'py-1'} ${message.isUploading ? 'animate-pulse' : ''}`}
@@ -134,24 +124,11 @@ const ChatMessages = ({ messages, isThinking, thinkingType, onSendMessage }: Cha
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
-
-                    {message.isUser && (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0 mt-1 text-primary-foreground">
-                        <User className="w-5 h-5" />
-                      </div>
-                    )}
                   </div>
                 ))}
       
                 {isThinking && (
-                  <div className="flex gap-4 animate-fade-in">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20">
-                      <img 
-                        src="/lovable-uploads/weezy-logo.png" 
-                        alt="Weez AI" 
-                        className="w-6 h-6 object-contain"
-                      />
-                    </div>
+                  <div className="flex animate-fade-in">
                     <div className="py-1 max-w-[85%]">
                       <ThinkingAnimation type={thinkingType} />
                     </div>
