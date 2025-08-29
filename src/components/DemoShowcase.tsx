@@ -20,7 +20,7 @@ const DemoShowcase = () => {
     },
     {
       icon: FileText,
-      title: "Auto Summarization", 
+      title: "Auto Summarization",
       description: "Get instant summaries of any document",
       color: "bg-green-500",
       demoIndex: 1
@@ -29,7 +29,7 @@ const DemoShowcase = () => {
       icon: MessageSquare,
       title: "RAG Q&A",
       description: "Ask specific questions about your files",
-      color: "bg-purple-500", 
+      color: "bg-purple-500",
       demoIndex: 2
     },
     {
@@ -44,7 +44,7 @@ const DemoShowcase = () => {
   const runDemo = (demoIndex: number) => {
     setIsProcessing(true);
     setActiveDemo(null);
-    
+
     setTimeout(() => {
       setActiveDemo(demoIndex);
       setIsProcessing(false);
@@ -74,7 +74,7 @@ const DemoShowcase = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => runDemo(demo.demoIndex)}
                   className="w-full bg-white text-black hover:bg-gray-200"
                   disabled={isProcessing}
@@ -158,7 +158,7 @@ const DemoShowcase = () => {
           <p className="text-gray-400 mb-4">
             This is a demonstration of Weez's AI capabilities with sample data
           </p>
-          <Button 
+          <Button
             onClick={() => setActiveDemo(null)}
             variant="outline"
             className="border-gray-700 text-gray-300 hover:bg-gray-800"
