@@ -557,52 +557,287 @@ const ConnectivityPanel = () => {
 
   // Function to manually trigger metadata processing
   const triggerMetadataProcessing = async (userEmail: string) => {
-    if (!userEmail) {
+  if (!userEmail) {
+    toast({
+      title: "Error",
+      description: "User email is required",
+      variant: "destructive"
+    });
+    return;
+  }
+
+  try {
+    toast({
+      title: "Checking Service",
+      description: "Checking metadata service availability..."
+    });
+
+    // First check if metadata service is available
+    let metadataServiceAvailable = false;
+    try {
+      const healthCheck = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/health', {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000)
+      });
+      metadataServiceAvailable = healthCheck.ok;
+    } catch (error) {
+      console.warn('Metadata service health check failed:', error);
+      metadataServiceAvailable = false;
+    }
+
+    if (!metadataServiceAvailable) {
       toast({
-        title: "Error",
-        description: "User email is required",
+        title: "Service Unavailable",
+        description: "Metadata processing service is currently unavailable. Please try again later.",
         variant: "destructive"
       });
       return;
     }
 
+    toast({
+      title: "Checking Files",
+      description: "Checking for available files to process..."
+    });
+
+    // Check if there are files available and their processing status
     try {
-      toast({
-        title: "Checking Service",
-        description: "Checking metadata service availability..."
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const statsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
+        signal: controller.signal
       });
 
-      // First check if metadata service is available
-      let metadataServiceAvailable = false;
-      try {
-        const healthCheck = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/health', {
-          method: 'GET',
-          signal: AbortSignal.timeout(5000) // 5 second timeout
-        });
-        metadataServiceAvailable = healthCheck.ok;
-      } catch (error) {
-        console.warn('Metadata service health check failed:', error);
-        metadataServiceAvailable = false;
-      }
+      clearTimeout(timeoutId);
 
-      if (!metadataServiceAvailable) {
+      if (statsResponse.ok) {
+        const responseData = await statsResponse.json();
+        // Handle the nested response format from your Flask API
+        const stats = responseData.stats || responseData;
+
+        if (stats.total_files === 0) {
+          toast({
+            title: "No Files Found",
+            description: "No files are available for processing. Please connect a platform first and wait for files to sync.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        if (stats.processing_percentage >= 100) {
+          toast({
+            title: "Files Already Processed",
+            description: `All ${stats.processed_files} files are already processed and ready for use.`,
+          });
+          return;
+        }
+
+        if (stats.processing_percentage > 0 && stats.processing_percentage < 100) {
+          toast({
+            title: "Processing Already in Progress",
+            description: `Files are currently being processed (${Math.round(stats.processing_percentage)}% complete). Please wait for completion.`,
+          });
+          return;
+        }
+
         toast({
-          title: "Service Unavailable",
-          description: "Metadata processing service is currently unavailable. Please try again later.",
-          variant: "destructive"
+          title: "Starting Processing",
+          description: `Found ${stats.total_files} files. Starting AI-powered metadata generation...`
         });
-        return;
+      } else {
+        throw new Error(`Failed to check files: ${statsResponse.status}`);
       }
+    } catch (error) {
+      console.error('Error checking files:', error);
+      toast({
+        title: "Service Error",
+        description: "Unable to check for files. The metadata service may be experiencing issues.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Start metadata processing using the correct endpoint
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/bulk-update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userEmail,
+        batch_size: 1
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Manual metadata processing started:', result);
+
+      // Start polling for progress updates
+      let attempts = 0;
+      const maxAttempts = 120;
+      const pollInterval = setInterval(async () => {
+        attempts++;
+
+        try {
+          const pollController = new AbortController();
+          const pollTimeoutId = setTimeout(() => pollController.abort(), 8000);
+
+          const statsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
+            signal: pollController.signal
+          });
+
+          clearTimeout(pollTimeoutId);
+
+          if (statsResponse.ok) {
+            const responseData = await statsResponse.json();
+            const stats = responseData.stats || responseData;
+
+            if (stats.processing_percentage >= 100 || attempts >= maxAttempts) {
+              clearInterval(pollInterval);
+
+              if (stats.processed_files > 0) {
+                toast({
+                  title: "Processing Complete!",
+                  description: `Successfully processed ${stats.processed_files} files with AI-powered search capabilities.`
+                });
+              } else {
+                toast({
+                  title: "Processing Complete",
+                  description: "All files have been processed successfully."
+                });
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('Error polling metadata progress:', error);
+          if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+          }
+        }
+      }, 15000);
+
+      setTimeout(() => {
+        clearInterval(pollInterval);
+      }, 1200000);
 
       toast({
-        title: "Checking Files",
-        description: "Checking for available files to process..."
+        title: "Processing Started",
+        description: "Metadata generation has been initiated. This may take several minutes."
+      });
+    } else {
+      const errorText = await response.text();
+      console.error('Manual metadata processing failed:', response.status, errorText);
+      toast({
+        title: "Processing Failed",
+        description: `Failed to start processing: ${response.status}`,
+        variant: "destructive"
+      });
+    }
+  } catch (error) {
+    console.error('Manual metadata processing error:', error);
+    toast({
+      title: "Processing Error",
+      description: error instanceof Error ? error.message : "Unknown error occurred",
+      variant: "destructive"
+    });
+  }
+};
+
+
+  const processMetadataGeneration = async (platformId: string, userEmail: string) => {
+  try {
+    console.log(`Starting file sync and metadata generation for user: ${userEmail}`);
+
+    setIntegrations(prev => prev.map(i => i.id === platformId ? {
+      ...i,
+      transferProgress: 5,
+      filesTransferred: 0,
+      totalFiles: 0
+    } : i));
+
+    toast({
+      title: "Files Syncing",
+      description: "Waiting for files to sync from platform. This may take a few minutes..."
+    });
+
+    // Check if metadata service is available first
+    let metadataServiceAvailable = false;
+    try {
+      const healthCheck = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/health', {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000)
+      });
+      metadataServiceAvailable = healthCheck.ok;
+    } catch (error) {
+      console.warn('Metadata service health check failed:', error);
+      metadataServiceAvailable = false;
+    }
+
+    if (!metadataServiceAvailable) {
+      console.log('Metadata service unavailable, proceeding with platform connection only');
+
+      setIntegrations(prev => prev.map(i => i.id === platformId ? {
+        ...i,
+        transferProgress: 100,
+        filesTransferred: 0,
+        totalFiles: 0
+      } : i));
+
+      toast({
+        title: "Platform Connected",
+        description: "Platform connected successfully. Metadata processing will be available when the service is back online.",
+      });
+      return;
+    }
+
+    // Check if files are already processed to avoid duplicate processing
+    try {
+      const initialStatsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(8000)
       });
 
-      // Check if there are files available and their processing status
+      if (initialStatsResponse.ok) {
+        const responseData = await initialStatsResponse.json();
+        const initialStats = responseData.stats || responseData;
+
+        if (initialStats.total_files > 0 && initialStats.processing_percentage >= 100) {
+          console.log(`Files already processed for user ${userEmail}: ${initialStats.processed_files}/${initialStats.total_files} files`);
+
+          setIntegrations(prev => prev.map(i => i.id === platformId ? {
+            ...i,
+            transferProgress: 100,
+            filesTransferred: initialStats.processed_files || 0,
+            totalFiles: initialStats.total_files || 0
+          } : i));
+
+          toast({
+            title: "Files Already Processed",
+            description: `Found ${initialStats.processed_files} already processed files. No additional processing needed.`
+          });
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn('Could not check initial file status:', error);
+    }
+
+    // Wait for files to be available with proper polling
+    let fileCheckAttempts = 0;
+    const maxFileCheckAttempts = 30;
+    let filesAvailable = false;
+
+    while (fileCheckAttempts < maxFileCheckAttempts && !filesAvailable) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         const statsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
           signal: controller.signal
@@ -611,406 +846,150 @@ const ConnectivityPanel = () => {
         clearTimeout(timeoutId);
 
         if (statsResponse.ok) {
-          const stats = await statsResponse.json();
+          const responseData = await statsResponse.json();
+          const stats = responseData.stats || responseData;
 
-          if (stats.total_files === 0) {
-            toast({
-              title: "No Files Found",
-              description: "No files are available for processing. Please connect a platform first and wait for files to sync.",
-              variant: "destructive"
-            });
-            return;
+          const syncProgress = Math.min(90, (fileCheckAttempts / maxFileCheckAttempts) * 90);
+          setIntegrations(prev => prev.map(i => i.id === platformId ? {
+            ...i,
+            transferProgress: syncProgress,
+            filesTransferred: 0,
+            totalFiles: stats.total_files || 0
+          } : i));
+
+          if (stats.total_files > 0) {
+            filesAvailable = true;
+            console.log(`Found ${stats.total_files} files available for processing`);
+            break;
           }
-
-          // Check if files are already fully processed
-          if (stats.processing_percentage >= 100) {
-            toast({
-              title: "Files Already Processed",
-              description: `All ${stats.processed_files} files are already processed and ready for use.`,
-            });
-            return;
-          }
-
-          // Check if processing is already in progress
-          if (stats.processing_percentage > 0 && stats.processing_percentage < 100) {
-            toast({
-              title: "Processing Already in Progress",
-              description: `Files are currently being processed (${Math.round(stats.processing_percentage)}% complete). Please wait for completion.`,
-            });
-            return;
-          }
-
-          toast({
-            title: "Starting Processing",
-            description: `Found ${stats.total_files} files. Starting AI-powered metadata generation...`
-          });
-        } else {
-          throw new Error(`Failed to check files: ${statsResponse.status}`);
         }
       } catch (error) {
-        console.error('Error checking files:', error);
-        toast({
-          title: "Service Error",
-          description: "Unable to check for files. The metadata service may be experiencing issues.",
-          variant: "destructive"
-        });
-        return;
+        console.warn('Error checking file availability:', error);
+        if (fileCheckAttempts > 5) {
+          console.log('Too many consecutive errors, assuming metadata service is down');
+          break;
+        }
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for processing start
-
-      const response = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/process-metadata', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userEmail,
-          batch_size: 5
-        }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Manual metadata processing started:', result);
-
-        // Start polling for progress updates with timeout handling
-        let attempts = 0;
-        const maxAttempts = 120; // 20 minutes max
-        const pollInterval = setInterval(async () => {
-          attempts++;
-
-          try {
-            const pollController = new AbortController();
-            const pollTimeoutId = setTimeout(() => pollController.abort(), 8000); // 8 second timeout per poll
-
-            const statsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
-              signal: pollController.signal
-            });
-
-            clearTimeout(pollTimeoutId);
-
-            if (statsResponse.ok) {
-              const stats = await statsResponse.json();
-
-              // If processing is complete or max attempts reached
-              if (stats.processing_percentage >= 100 || attempts >= maxAttempts) {
-                clearInterval(pollInterval);
-
-                if (stats.processed_files > 0) {
-                  toast({
-                    title: "Processing Complete!",
-                    description: `Successfully processed ${stats.processed_files} files with AI-powered search capabilities.`
-                  });
-                } else {
-                  toast({
-                    title: "Processing Complete",
-                    description: "All files have been processed successfully."
-                  });
-                }
-              }
-            }
-          } catch (error) {
-            console.warn('Error polling metadata progress:', error);
-            if (attempts >= maxAttempts) {
-              clearInterval(pollInterval);
-            }
-          }
-        }, 15000); // Poll every 15 seconds
-
-        // Set a timeout to clear the interval if it takes too long
-        setTimeout(() => {
-          clearInterval(pollInterval);
-        }, 1200000); // 20 minutes timeout
-
-        toast({
-          title: "Processing Started",
-          description: "Metadata generation has been initiated. This may take several minutes."
-        });
-      } else {
-        const errorText = await response.text();
-        console.error('Manual metadata processing failed:', response.status, errorText);
-        toast({
-          title: "Processing Failed",
-          description: `Failed to start processing: ${response.status}`,
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      console.error('Manual metadata processing error:', error);
-      toast({
-        title: "Processing Error",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive"
-      });
+      fileCheckAttempts++;
+      await new Promise(resolve => setTimeout(resolve, 10000));
     }
-  };
 
-  const processMetadataGeneration = async (platformId: string, userEmail: string) => {
-    try {
-      console.log(`Starting file sync and metadata generation for user: ${userEmail}`);
-
-      // Step 1: Show that we're waiting for files to sync
+    if (!filesAvailable) {
       setIntegrations(prev => prev.map(i => i.id === platformId ? {
         ...i,
-        transferProgress: 5,
+        transferProgress: 0,
         filesTransferred: 0,
         totalFiles: 0
       } : i));
 
       toast({
-        title: "Files Syncing",
-        description: "Waiting for files to sync from platform. This may take a few minutes..."
+        title: "No Files Found",
+        description: "No files were found to process. Please check your platform connection and try again.",
+        variant: "destructive"
       });
+      return;
+    }
 
-      // Step 2: Check if metadata service is available first
-      let metadataServiceAvailable = false;
-      try {
-        const healthCheck = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/health', {
-          method: 'GET',
-          signal: AbortSignal.timeout(5000) // 5 second timeout
-        });
-        metadataServiceAvailable = healthCheck.ok;
-      } catch (error) {
-        console.warn('Metadata service health check failed:', error);
-        metadataServiceAvailable = false;
-      }
+    // Start metadata processing
+    toast({
+      title: "Starting Metadata Processing",
+      description: "Files found! Starting AI-powered metadata generation..."
+    });
 
-      if (!metadataServiceAvailable) {
-        // If metadata service is down, simulate successful connection without metadata processing
-        console.log('Metadata service unavailable, proceeding with platform connection only');
+    setIntegrations(prev => prev.map(i => i.id === platformId ? {
+      ...i,
+      transferProgress: 95,
+      filesTransferred: 0,
+      totalFiles: i.totalFiles || 0
+    } : i));
 
-        setIntegrations(prev => prev.map(i => i.id === platformId ? {
-          ...i,
-          transferProgress: 100,
-          filesTransferred: 0,
-          totalFiles: 0
-        } : i));
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        toast({
-          title: "Platform Connected",
-          description: "Platform connected successfully. Metadata processing will be available when the service is back online.",
-        });
-        return;
-      }
+    const response = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/bulk-update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userEmail,
+        batch_size: 1
+      }),
+      signal: controller.signal
+    });
 
-      // Step 3: Check if files are already processed to avoid duplicate processing
-      try {
-        const initialStatsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
-          method: 'GET',
-          signal: AbortSignal.timeout(8000)
-        });
+    clearTimeout(timeoutId);
 
-        if (initialStatsResponse.ok) {
-          const initialStats = await initialStatsResponse.json();
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Metadata processing started:', result);
 
-          // If files are already fully processed, skip processing
-          if (initialStats.total_files > 0 && initialStats.processing_percentage >= 100) {
-            console.log(`Files already processed for user ${userEmail}: ${initialStats.processed_files}/${initialStats.total_files} files`);
+      // Poll for processing progress
+      let processingAttempts = 0;
+      const maxProcessingAttempts = 120;
+      const pollInterval = setInterval(async () => {
+        processingAttempts++;
 
-            setIntegrations(prev => prev.map(i => i.id === platformId ? {
-              ...i,
-              transferProgress: 100,
-              filesTransferred: initialStats.processed_files || 0,
-              totalFiles: initialStats.total_files || 0
-            } : i));
-
-            toast({
-              title: "Files Already Processed",
-              description: `Found ${initialStats.processed_files} already processed files. No additional processing needed.`
-            });
-            return;
-          }
-        }
-      } catch (error) {
-        console.warn('Could not check initial file status:', error);
-      }
-
-      // Step 4: Wait for files to be available (poll for files) with timeout
-      let fileCheckAttempts = 0;
-      const maxFileCheckAttempts = 30; // 5 minutes max for file sync
-      let filesAvailable = false;
-
-      while (fileCheckAttempts < maxFileCheckAttempts && !filesAvailable) {
         try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout per request
+          const pollController = new AbortController();
+          const pollTimeoutId = setTimeout(() => pollController.abort(), 8000);
 
           const statsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
-            signal: controller.signal
+            signal: pollController.signal
           });
 
-          clearTimeout(timeoutId);
+          clearTimeout(pollTimeoutId);
 
           if (statsResponse.ok) {
-            const stats = await statsResponse.json();
+            const responseData = await statsResponse.json();
+            const stats = responseData.stats || responseData;
 
-            // Update progress based on file sync status
-            const syncProgress = Math.min(90, (fileCheckAttempts / maxFileCheckAttempts) * 90);
             setIntegrations(prev => prev.map(i => i.id === platformId ? {
               ...i,
-              transferProgress: syncProgress,
-              filesTransferred: 0,
-              totalFiles: stats.total_files || 0
+              totalFiles: stats.total_files || 0,
+              filesTransferred: stats.processed_files || 0,
+              transferProgress: Math.min(99, 95 + (stats.processing_percentage || 0) * 0.04)
             } : i));
 
-            // If we have files available, proceed to processing
-            if (stats.total_files > 0) {
-              filesAvailable = true;
-              console.log(`Found ${stats.total_files} files available for processing`);
-              break;
-            }
-          }
-        } catch (error) {
-          console.warn('Error checking file availability:', error);
-          // If we get too many consecutive errors, assume service is down
-          if (fileCheckAttempts > 5) {
-            console.log('Too many consecutive errors, assuming metadata service is down');
-            break;
-          }
-        }
-
-        fileCheckAttempts++;
-        await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds between checks
-      }
-
-      if (!filesAvailable) {
-        setIntegrations(prev => prev.map(i => i.id === platformId ? {
-          ...i,
-          transferProgress: 0,
-          filesTransferred: 0,
-          totalFiles: 0
-        } : i));
-
-        toast({
-          title: "No Files Found",
-          description: "No files were found to process. Please check your platform connection and try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Step 5: Start metadata processing only for unprocessed files
-      toast({
-        title: "Starting Metadata Processing",
-        description: "Files found! Starting AI-powered metadata generation..."
-      });
-
-      setIntegrations(prev => prev.map(i => i.id === platformId ? {
-        ...i,
-        transferProgress: 95,
-        filesTransferred: 0,
-        totalFiles: i.totalFiles || 0
-      } : i));
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for processing start
-
-      const response = await fetch('https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/process-metadata', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userEmail,
-          batch_size: 5
-        }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Metadata processing started:', result);
-
-        // Step 6: Poll for processing progress with timeout handling
-        let processingAttempts = 0;
-        const maxProcessingAttempts = 120; // 20 minutes max for processing
-        const pollInterval = setInterval(async () => {
-          processingAttempts++;
-
-          try {
-            const pollController = new AbortController();
-            const pollTimeoutId = setTimeout(() => pollController.abort(), 8000); // 8 second timeout per poll
-
-            const statsResponse = await fetch(`https://generate-metadata-cffyg9hva0hugyb4.canadacentral-01.azurewebsites.net/processing-stats?user_id=${encodeURIComponent(userEmail)}`, {
-              signal: pollController.signal
-            });
-
-            clearTimeout(pollTimeoutId);
-
-            if (statsResponse.ok) {
-              const stats = await statsResponse.json();
+            if (stats.processing_percentage >= 100 || processingAttempts >= maxProcessingAttempts) {
+              clearInterval(pollInterval);
 
               setIntegrations(prev => prev.map(i => i.id === platformId ? {
                 ...i,
-                totalFiles: stats.total_files || 0,
+                transferProgress: 100,
                 filesTransferred: stats.processed_files || 0,
-                transferProgress: Math.min(99, 95 + (stats.processing_percentage || 0) * 0.04) // Scale remaining 5% for processing
+                totalFiles: stats.total_files || 0
               } : i));
 
-              // If processing is complete or max attempts reached
-              if (stats.processing_percentage >= 100 || processingAttempts >= maxProcessingAttempts) {
-                clearInterval(pollInterval);
-
-                setIntegrations(prev => prev.map(i => i.id === platformId ? {
-                  ...i,
-                  transferProgress: 100,
-                  filesTransferred: stats.processed_files || 0,
-                  totalFiles: stats.total_files || 0
-                } : i));
-
-                if (stats.processed_files > 0) {
-                  toast({
-                    title: "Processing Complete!",
-                    description: `Successfully processed ${stats.processed_files} files with AI-powered search capabilities.`
-                  });
-                } else {
-                  toast({
-                    title: "Processing Complete",
-                    description: "All files have been processed successfully."
-                  });
-                }
+              if (stats.processed_files > 0) {
+                toast({
+                  title: "Processing Complete!",
+                  description: `Successfully processed ${stats.processed_files} files with AI-powered search capabilities.`
+                });
+              } else {
+                toast({
+                  title: "Processing Complete",
+                  description: "All files have been processed successfully."
+                });
               }
             }
-          } catch (error) {
-            console.warn('Error polling processing progress:', error);
-            if (processingAttempts >= maxProcessingAttempts) {
-              clearInterval(pollInterval);
-            }
           }
-        }, 15000); // Poll every 15 seconds
+        } catch (error) {
+          console.warn('Error polling processing progress:', error);
+          if (processingAttempts >= maxProcessingAttempts) {
+            clearInterval(pollInterval);
+          }
+        }
+      }, 15000);
 
-        // Set a timeout to clear the interval if it takes too long
-        setTimeout(() => {
-          clearInterval(pollInterval);
-        }, 1200000); // 20 minutes timeout
+      setTimeout(() => {
+        clearInterval(pollInterval);
+      }, 1200000);
 
-      } else {
-        const errorText = await response.text();
-        console.error('Metadata processing failed:', response.status, errorText);
-
-        setIntegrations(prev => prev.map(i => i.id === platformId ? {
-          ...i,
-          transferProgress: 0,
-          filesTransferred: 0,
-          totalFiles: 0
-        } : i));
-
-        toast({
-          title: "Processing Failed",
-          description: "Could not start metadata generation. Please try again later.",
-          variant: "destructive"
-        });
-      }
-
-    } catch (error) {
-      console.error('Error in metadata generation:', error);
+    } else {
+      const errorText = await response.text();
+      console.error('Metadata processing failed:', response.status, errorText);
 
       setIntegrations(prev => prev.map(i => i.id === platformId ? {
         ...i,
@@ -1020,14 +999,29 @@ const ConnectivityPanel = () => {
       } : i));
 
       toast({
-        title: "Processing Error",
-        description: "An error occurred during file processing. Please try again.",
+        title: "Processing Failed",
+        description: "Could not start metadata generation. Please try again later.",
         variant: "destructive"
       });
     }
-  };
 
+  } catch (error) {
+    console.error('Error in metadata generation:', error);
 
+    setIntegrations(prev => prev.map(i => i.id === platformId ? {
+      ...i,
+      transferProgress: 0,
+      filesTransferred: 0,
+      totalFiles: 0
+    } : i));
+
+    toast({
+      title: "Processing Error",
+      description: "An error occurred during file processing. Please try again.",
+      variant: "destructive"
+    });
+  }
+};
 
 
 
