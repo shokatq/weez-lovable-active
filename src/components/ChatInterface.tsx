@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from '@/hooks/useAuth';
 import { useGlobalAuditLogger } from '@/hooks/useGlobalAuditLogger';
 import { useAuditLogger } from '@/hooks/useAuditLogger';
-import { useAIAgent } from '@/hooks/aiAgent';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Settings, AlertCircle } from "lucide-react";
@@ -36,6 +35,8 @@ const ChatInterface = () => {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [showConnectServices, setShowConnectServices] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   
   // Auth hook to get user information dynamically
@@ -43,9 +44,6 @@ const ChatInterface = () => {
   
   const { logCustomEvent } = useGlobalAuditLogger();
   const { logAuditEvent, logFileAccess } = useAuditLogger();
-
-  // AI Agent hook - this handles the loading state and errors
-  const { askAgent, isLoading, error: aiError, clearError } = useAIAgent();
 
   // Get userId dynamically from authenticated user
   const userId = user?.email || user?.id || null;
@@ -58,57 +56,79 @@ const ChatInterface = () => {
     }
   }, [user, authLoading, navigate]);
 
-  // API helper for saving messages to backend
-  const saveMessageToBackend = async (userMessage: string, aiResponse: string, conversationId: string) => {
-    if (!userId) return;
-    
-    try {
-      const response = await fetch('http://localhost:5000/api/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          conversationId,
-          userQuery: userMessage,
-          agentResponse: aiResponse
-        }),
-      });
-
-      if (!response.ok) {
-        console.error('Failed to save message to backend:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error saving message to backend:', error);
-    }
+  // Clear error function
+  const clearError = () => {
+    setError(null);
   };
 
-  // API helper for creating new conversation
-  const createNewConversationInBackend = async (): Promise<string | null> => {
-    if (!userId) return null;
+  // Load conversation with messages from backend
+  const loadConversationMessages = async (conversationId: string) => {
+    if (!userId || !conversationId) return;
     
     try {
-      const response = await fetch('http://localhost:5000/api/conversations/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId
-        }),
-      });
+      setIsLoading(true);
+      setError(null);
+      
+      console.log('Loading conversation messages for:', conversationId);
+      
+      const response = await fetch(
+        `https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net/api/conversations/${encodeURIComponent(userId)}/${encodeURIComponent(conversationId)}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
 
       if (!response.ok) {
-        console.error('Failed to create conversation in backend:', response.statusText);
-        return null;
+        throw new Error(`Failed to load conversation: ${response.status}`);
       }
 
-      const data = await response.json();
-      return data.conversationId || data.conversation_id;
-    } catch (error) {
-      console.error('Error creating conversation in backend:', error);
-      return null;
+      const conversationHistory = await response.json();
+      console.log('Loaded conversation history:', conversationHistory);
+
+      // Transform backend format to frontend Message format
+      const transformedMessages: Message[] = [];
+      
+      conversationHistory.forEach((item: any) => {
+        // Filter out tool execution messages during transformation
+        const isToolExecution = item.user_query?.includes('[TOOL_EXECUTION]');
+        
+        if (!isToolExecution) {
+          // Add user message
+          if (item.user_query && item.user_query.trim()) {
+            transformedMessages.push({
+              id: `${item.id}_user`,
+              content: item.user_query,
+              isUser: true,
+              timestamp: new Date(item.timestamp)
+            });
+          }
+          
+          // Add AI response
+          if (item.agent_response && item.agent_response.trim()) {
+            transformedMessages.push({
+              id: `${item.id}_agent`,
+              content: item.agent_response,
+              isUser: false,
+              timestamp: new Date(item.timestamp)
+            });
+          }
+        }
+      });
+
+      // Sort messages by timestamp
+      transformedMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+      console.log(`Setting ${transformedMessages.length} messages for conversation ${conversationId}`);
+      setMessages(transformedMessages);
+      
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load conversation';
+      console.error('Error loading conversation messages:', errorMsg);
+      setError(errorMsg);
+      setMessages([]); // Clear messages on error
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -116,25 +136,22 @@ const ChatInterface = () => {
   const handleSendMessage = async (newMessage: string) => {
     if (!newMessage.trim() || isLoading) return;
 
-    // Check if user is authenticated before sending message
     if (!userId) {
       toast.error('Please sign in to send messages');
       navigate('/auth');
       return;
     }
 
-    // If no current conversation, create a new one
+    // Use existing conversation ID or null for new conversation
     let conversationId = currentConversationId;
-    if (!conversationId) {
-      conversationId = await createNewConversationInBackend();
-      if (!conversationId) {
-        toast.error('Failed to create new conversation');
-        return;
-      }
-      setCurrentConversationId(conversationId);
-    }
 
-    // Clear any previous errors
+    console.log('Sending message:', {
+      conversationId: conversationId || 'NEW_CONVERSATION',
+      hasExistingMessages: messages.length > 0,
+      messageCount: messages.length
+    });
+
+    setIsLoading(true);
     clearError();
 
     // Add user message immediately
@@ -148,24 +165,44 @@ const ChatInterface = () => {
     setMessages(prevMessages => [...prevMessages, userMessage]);
 
     try {
-      console.log('🚀 Sending message to AI Agent:', newMessage);
-      console.log('👤 Authenticated User ID:', userId);
-      console.log('💬 Conversation ID:', conversationId);
-      
-      // Call AI agent with authenticated user ID
-      const aiResponse = await askAgent(newMessage.trim(), userId);
+      // Call backend - let it create conversation ID if needed
+      const response = await fetch(`https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net/api/chat/${encodeURIComponent(userId)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: newMessage.trim(),
+          conversation_id: conversationId // null for new conversation, UUID for existing
+        })
+      });
 
-      console.log('📥 AI Agent response:', {
-        responseReceived: !!aiResponse,
-        responseType: typeof aiResponse,
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const aiResponse = result.response;
+      const returnedConversationId = result.conversation_id;
+
+      // Update conversation ID if this was a new conversation
+      if (!currentConversationId && returnedConversationId) {
+        console.log('Setting conversation ID from backend:', returnedConversationId);
+        setCurrentConversationId(returnedConversationId);
+        
+        // Update current conversation object
+        if (currentConversation) {
+          setCurrentConversation(prev => prev ? {...prev, id: returnedConversationId} : null);
+        }
+      }
+
+      console.log('AI response received:', {
         responseLength: aiResponse?.length || 0,
-        responsePreview: aiResponse?.substring(0, 100) || 'No response',
-        hasError: !!aiError,
-        userId: userId
+        conversationId: returnedConversationId,
+        hasContext: messages.length > 0
       });
 
       if (aiResponse && aiResponse.trim()) {
-        // Add AI response message
         const aiMessage: Message = {
           id: (Date.now() + 1).toString(),
           content: aiResponse,
@@ -175,53 +212,44 @@ const ChatInterface = () => {
 
         setMessages(prevMessages => [...prevMessages, aiMessage]);
 
-        // Save both messages to backend
-        await saveMessageToBackend(newMessage.trim(), aiResponse, conversationId);
-
-        console.log('✅ AI Agent response displayed successfully');
+        console.log('Messages updated, total count:', messages.length + 2);
         
-        // Log successful AI interaction
         if (user) {
           logAuditEvent({
             action: 'ai_message_sent',
             resourceType: 'chat',
-            resourceId: conversationId,
+            resourceId: returnedConversationId,
             metadata: { 
               messageLength: newMessage.length,
               responseLength: aiResponse.length,
-              conversationId: conversationId
+              conversationId: returnedConversationId,
+              hasContext: messages.length > 0
             },
             severity: 'low'
           });
         }
       } else {
-        // Handle case where AI agent returns null or empty string
-        console.log('❌ AI Agent returned null/empty response');
-        console.log('🔍 Current aiError:', aiError);
-        
         const errorMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: aiError 
-            ? `AI Agent Error: ${aiError}` 
-            : "I received an empty response from the AI service. Please try rephrasing your message.",
+          content: "I received an empty response. Please try rephrasing your message.",
           isUser: false,
           timestamp: new Date()
         };
-
         setMessages(prevMessages => [...prevMessages, errorMessage]);
       }
     } catch (error) {
-      console.error('💥 Error in handleSendMessage:', error);
+      console.error('Error in handleSendMessage:', error);
       
-      // Add error message
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: `Connection Error: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your connection and try again.`,
         isUser: false,
         timestamp: new Date()
       };
-
       setMessages(prevMessages => [...prevMessages, errorMessage]);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -234,20 +262,32 @@ const ChatInterface = () => {
     }
   };
 
-  // Handle conversation selection from sidebar
-  const handleConversationSelect = (conversation: Conversation) => {
-    console.log('Selecting conversation:', conversation);
+  // Handle conversation selection from sidebar - FIXED VERSION
+  const handleConversationSelect = async (conversation: Conversation) => {
+    console.log('Selecting conversation in ChatInterface:', conversation);
+    console.log('Conversation messages count:', conversation.messages?.length || 0);
+    
+    // CRITICAL FIX: Set conversation state first
     setCurrentConversationId(conversation.id);
     setCurrentConversation(conversation);
-    setMessages(conversation.messages);
+    
+    // Clear any errors when switching conversations
+    clearError();
 
-    // Log conversation selection event using correct API
+    // CRITICAL FIX: Load fresh messages from backend instead of using passed messages
+    // This ensures we get the most up-to-date conversation history
+    await loadConversationMessages(conversation.id);
+
+    // Log conversation selection
     if (user) {
       logAuditEvent({
         action: 'conversation_selected',
         resourceType: 'chat',
         resourceId: conversation.id,
-        metadata: { conversationId: conversation.id },
+        metadata: { 
+          conversationId: conversation.id,
+          messageCount: conversation.messages?.length || 0
+        },
         severity: 'low'
       });
     }
@@ -315,7 +355,7 @@ const ChatInterface = () => {
           onConversationSelect={handleConversationSelect}
           onNewConversation={handleNewConversation}
           onNavigateToWorkspace={handleNavigateToWorkspace}
-          apiBaseUrl="http://localhost:5000" // Make this configurable via environment variable if needed
+          apiBaseUrl="https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net"
         />
         
         <div className="flex-1 flex flex-col min-w-0">
@@ -343,7 +383,7 @@ const ChatInterface = () => {
                     >
                       <div>
                         <p className="font-medium">File Analysis</p>
-                        <p className="text-sm text-muted-foreground">Analyze  documents</p>
+                        <p className="text-sm text-muted-foreground">Analyze documents</p>
                       </div>
                     </Button>
                     <Button
@@ -420,10 +460,10 @@ const ChatInterface = () => {
                   </div>
                 )}
                 
-                {/* Show error if there's an AI error */}
-                {aiError && (
+                {/* Show error if there's an error */}
+                {error && (
                   <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-                    <span>Error: {aiError}</span>
+                    <span>Error: {error}</span>
                     <button 
                       onClick={clearError} 
                       className="ml-2 text-red-500 hover:text-red-700"

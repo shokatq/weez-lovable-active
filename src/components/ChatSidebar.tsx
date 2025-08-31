@@ -5,8 +5,31 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/compone
 import { Plus, MessageSquare, Building2, Clock, Trash2, Loader2 } from "lucide-react";
 import UserProfile from "./UserProfile";
 import { useAuth } from "@/hooks/useAuth";
-import { useConversationManager } from "@/hooks/ConvoManagement";
-import { type Conversation } from "@/services/ConversationService";
+
+interface Message {
+  id: string;
+  content: string;
+  isUser: boolean;
+  timestamp: Date;
+}
+
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  timestamp: Date;
+  lastMessage: string;
+  messageCount?: number;
+}
+
+interface BackendConversationSummary {
+  conversation_id: string;
+  first_message_time: string;
+  last_message_time: string;
+  message_count: number;
+  latest_user_query?: string;
+  latest_agent_response?: string;
+}
 
 interface ChatSidebarProps {
   currentConversationId?: string;
@@ -23,51 +46,152 @@ const ChatSidebar = ({
   onConversationSelect, 
   onNewConversation,
   onNavigateToWorkspace,
-  apiBaseUrl = "http://localhost:5000",
+  apiBaseUrl = "https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net",
   onSendMessage,
   filterToolExecution = true
 }: ChatSidebarProps) => {
   // Get authenticated user from useAuth hook
   const { user, loading: authLoading } = useAuth();
   
-  // Use the conversation manager hook
-  const {
-    currentConversation,
-    conversations,
-    loading,
-    error,
-    createNewConversation,
-    selectConversation,
-    deleteConversation,
-    refreshConversations
-  } = useConversationManager({
-    apiBaseUrl,
-    onSendMessage,
-    filterToolExecution
-  });
+  // Local state for conversation management
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get conversation preview text
+  const getConversationPreviewText = (summary: BackendConversationSummary) => {
+    if (summary.latest_user_query) {
+      return summary.latest_user_query.length > 60 
+        ? summary.latest_user_query.substring(0, 60) + "..."
+        : summary.latest_user_query;
+    }
+    return "New conversation";
+  };
+
+  // Convert backend conversation summary to frontend conversation
+  const convertToFrontendConversation = (summary: BackendConversationSummary): Conversation | null => {
+    if (!summary.conversation_id) {
+      console.warn('Conversation summary missing conversation_id:', summary);
+      return null;
+    }
+
+    const preview = getConversationPreviewText(summary);
+    
+    return {
+      id: summary.conversation_id,
+      title: preview,
+      messages: [], // Messages loaded on demand
+      timestamp: new Date(summary.last_message_time),
+      lastMessage: preview,
+      messageCount: summary.message_count
+    };
+  };
+
+  // Load conversations from backend
+  const loadConversations = async () => {
+    if (!user?.email) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('Loading conversations for user:', user.email);
+
+      const response = await fetch(
+        `${apiBaseUrl}/api/conversations/${encodeURIComponent(user.email)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch conversations: ${response.status}`);
+      }
+
+      const summaries: BackendConversationSummary[] = await response.json();
+      console.log(`Fetched ${summaries.length} conversation summaries`);
+
+      // Convert summaries to frontend format, filtering out invalid ones
+      const frontendConversations = summaries
+        .map(summary => convertToFrontendConversation(summary))
+        .filter((conversation): conversation is Conversation => conversation !== null);
+
+      // Sort by timestamp (newest first)
+      frontendConversations.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+      console.log(`Successfully loaded ${frontendConversations.length} valid conversations`);
+      setConversations(frontendConversations);
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Failed to load conversations:', errorMessage);
+      setError(`Failed to load conversations: ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load conversations when user changes
+  useEffect(() => {
+    if (user?.email && !authLoading) {
+      loadConversations();
+    }
+  }, [user?.email, authLoading]);
 
   // Handle new conversation creation
   const handleNewConversation = () => {
-    createNewConversation();
     onNewConversation();
+    // Don't create a local conversation here - let parent handle it
   };
 
-  // Handle conversation selection
-  const handleConversationSelect = async (conversation: Conversation) => {
-    try {
-      await selectConversation(conversation);
-      onConversationSelect(conversation);
-    } catch (error) {
-      console.error('Failed to select conversation:', error);
-    }
+  // Handle conversation selection - SIMPLIFIED VERSION
+  const handleConversationSelect = (conversation: Conversation) => {
+    console.log('ChatSidebar: Selecting conversation:', conversation.id);
+    
+    // Simply pass the conversation to parent - let parent handle loading messages
+    onConversationSelect(conversation);
   };
 
   // Handle conversation deletion
   const handleDeleteConversation = async (conversationId: string) => {
+    if (!user?.email) return;
+
     try {
-      await deleteConversation(conversationId);
-    } catch (error) {
-      console.error('Failed to delete conversation:', error);
+      setLoading(true);
+      
+      const response = await fetch(
+        `${apiBaseUrl}/api/conversations/${encodeURIComponent(user.email)}/${encodeURIComponent(conversationId)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete conversation: ${response.status}`);
+      }
+
+      // Remove from local state
+      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+      
+      console.log(`Successfully deleted conversation: ${conversationId}`);
+
+      // If the deleted conversation was currently selected, trigger new conversation
+      if (currentConversationId === conversationId) {
+        handleNewConversation();
+      }
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Failed to delete conversation:', errorMessage);
+      setError(`Failed to delete conversation: ${errorMessage}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,19 +210,6 @@ const ChatSidebar = ({
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
   };
-
-  // Get conversation preview text
-  const getConversationPreviewText = (conversation: Conversation) => {
-    if (conversation.lastMessage) {
-      return conversation.lastMessage.length > 60 
-        ? conversation.lastMessage.substring(0, 60) + "..."
-        : conversation.lastMessage;
-    }
-    return conversation.title || "New conversation";
-  };
-
-  // Determine current conversation ID - use prop or hook's current conversation
-  const activeConversationId = currentConversationId || currentConversation?.id;
 
   // Show loading state while auth is loading
   if (authLoading) {
@@ -160,114 +271,120 @@ const ChatSidebar = ({
         </Button>
       </SidebarHeader>
 
-      <SidebarContent className="flex-1 p-3">
-        <ScrollArea className="flex-1">
-          {loading && (
-            <div className="flex items-center justify-center p-4">
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              <span className="text-sm text-muted-foreground">Loading conversations...</span>
-            </div>
-          )}
-          
-          {error && (
-            <div className="p-4">
-              <p className="text-sm text-red-500 mb-2">{error}</p>
-              <Button 
-                onClick={refreshConversations} 
-                variant="outline" 
-                size="sm"
-                className="w-full"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-3 h-3 animate-spin mr-2" />
-                    Retrying...
-                  </>
+      <SidebarContent className="flex-1 p-0">
+        <ScrollArea className="h-full">
+          <div className="p-3">
+            {loading && (
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                <span className="text-sm text-muted-foreground">Loading conversations...</span>
+              </div>
+            )}
+            
+            {error && (
+              <div className="p-4">
+                <p className="text-sm text-red-500 mb-2">{error}</p>
+                <Button 
+                  onClick={loadConversations} 
+                  variant="outline" 
+                  size="sm"
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                      Retrying...
+                    </>
+                  ) : (
+                    "Retry"
+                  )}
+                </Button>
+              </div>
+            )}
+            
+            {!loading && !error && (
+              <div className="space-y-2">
+                {conversations.length === 0 ? (
+                  <div className="p-4 text-center">
+                    <p className="text-sm text-muted-foreground">No conversations yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">Start a new chat to begin</p>
+                  </div>
                 ) : (
-                  "Retry"
-                )}
-              </Button>
-            </div>
-          )}
-          
-          {!loading && !error && (
-            <div className="space-y-1 pb-4">
-              {conversations.length === 0 ? (
-                <div className="p-4 text-center">
-                  <p className="text-sm text-muted-foreground">No conversations yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Start a new chat to begin</p>
-                </div>
-              ) : (
-                conversations.map((conversation) => (
-                  <div key={conversation.id} className="group relative">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleConversationSelect(conversation)}
-                      className={`w-full justify-start text-left p-3 h-auto rounded-lg text-sm transition-all duration-200 ${
-                        activeConversationId === conversation.id 
-                          ? 'bg-muted text-foreground' 
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                      }`}
+                  conversations.map((conversation) => (
+                    <div 
+                      key={conversation.id} 
+                      className="group relative"
                     >
-                      <div className="flex-1 min-w-0 overflow-hidden">
-                        <p className="font-medium line-clamp-1 leading-tight mb-1 text-sm">
-                          {getConversationPreviewText(conversation)}
-                        </p>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                          <span className="text-xs text-muted-foreground">
-                            {formatTime(conversation.timestamp)}
-                          </span>
+                      <div
+                        onClick={() => handleConversationSelect(conversation)}
+                        className={`block w-full p-3 pr-8 cursor-pointer rounded-lg transition-all duration-200 border ${
+                          currentConversationId === conversation.id 
+                            ? 'bg-gray-800/60 border-gray-700 text-white shadow-sm' 
+                            : 'bg-gray-900/40 border-gray-800 text-gray-300 hover:bg-gray-800/40 hover:border-gray-700 hover:text-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h4 className="text-sm font-medium truncate leading-tight">
+                            {conversation.title}
+                          </h4>
+                        </div>
+                        
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <p className="text-xs text-gray-400 truncate leading-relaxed">
+                            {conversation.lastMessage}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                            <Clock className="w-3 h-3" />
+                            <span>{formatTime(conversation.timestamp)}</span>
+                          </div>
+                          
                           {conversation.messageCount && (
-                            <>
-                              <span className="text-xs text-muted-foreground">•</span>
-                              <span className="text-xs text-muted-foreground">
-                                {conversation.messageCount} messages
-                              </span>
-                            </>
+                            <span className="text-xs text-gray-400 bg-gray-700/50 px-2 py-0.5 rounded-full shrink-0 font-medium">
+                              {conversation.messageCount}
+                            </span>
                           )}
                         </div>
                       </div>
-                    </Button>
-                    
-                    {activeConversationId === conversation.id && (
+                      
+                      {/* Delete button */}
                       <Button
                         variant="ghost"
-                        size="icon"
+                        size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteConversation(conversation.id);
                         }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 hover:text-red-600"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 p-0 hover:bg-red-500/20 hover:text-red-400 rounded-md"
                         disabled={loading}
                       >
-                        {loading ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-3 h-3" />
-                        )}
+                        <Trash2 className="w-3 h-3" />
                       </Button>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-sidebar-border space-y-3">
-        <Button
-          onClick={onNavigateToWorkspace}
-          variant="outline"
-          className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
-        >
-          <Building2 className="w-4 h-4 mr-2" />
-          Marketing Workspace
-        </Button>
-        
-        <UserProfile />
+      <SidebarFooter className="p-4 border-t border-sidebar-border">
+        <div className="space-y-2">
+          <Button
+            onClick={onNavigateToWorkspace}
+            variant="outline"
+            className="w-full justify-start text-sidebar-foreground hover:text-sidebar-accent-foreground border-sidebar-border hover:bg-sidebar-accent"
+          >
+            <Building2 className="w-4 h-4 mr-2" />
+            Workspace
+          </Button>
+          
+          <UserProfile />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
