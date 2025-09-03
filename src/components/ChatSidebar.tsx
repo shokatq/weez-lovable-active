@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
-import { Plus, MessageSquare, Building2, Clock, Settings, Trash2 } from "lucide-react";
+import { Plus, MessageSquare, Building2, Clock, Settings, Trash2, FolderOpen, BarChart3, Users, FileText } from "lucide-react";
 import { Conversation } from "@/types/chat";
 import UserProfile from "./UserProfile";
 
@@ -112,13 +112,41 @@ const ChatSidebar = ({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-sidebar-border space-y-3">
+        {/* Individual Component Buttons */}
         <Button
-          onClick={onNavigateToWorkspace}
+          onClick={() => window.location.href = '/spaces'}
           variant="outline"
           className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
         >
-          <Building2 className="w-4 h-4 mr-2" />
-          Marketing Workspace
+          <FolderOpen className="w-4 h-4 mr-2" />
+          Spaces
+        </Button>
+        
+        <Button
+          onClick={() => window.location.href = '/analytics'}
+          variant="outline"
+          className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
+        >
+          <BarChart3 className="w-4 h-4 mr-2" />
+          Analytics
+        </Button>
+        
+        <Button
+          onClick={() => window.location.href = '/team-management'}
+          variant="outline"
+          className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
+        >
+          <Users className="w-4 h-4 mr-2" />
+          Team Management
+        </Button>
+        
+        <Button
+          onClick={() => window.location.href = '/assets'}
+          variant="outline"
+          className="w-full justify-start text-left py-2.5 px-4 rounded-lg text-sm h-auto"
+        >
+          <FileText className="w-4 h-4 mr-2" />
+          Assets
         </Button>
         
         <UserProfile />

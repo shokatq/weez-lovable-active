@@ -22,6 +22,10 @@ import RoleGuard from "./components/auth/RoleGuard";
 import { useGlobalAuditLogger } from "./hooks/useGlobalAuditLogger";
 import { ThemeProvider } from "./components/ThemeProvider";
 import TeamChat from "./pages/TeamChat";
+import SpacesPage from "./pages/SpacesPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import AssetsPage from "./pages/AssetsPage";
+import TeamManagementPage from "./pages/TeamManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +76,26 @@ const AppContent = () => {
         <Route path="/team-chat" element={
           <ProtectedRoute>
             <TeamChat />
+          </ProtectedRoute>
+        } />
+        <Route path="/spaces" element={
+          <ProtectedRoute>
+            <SpacesPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/analytics" element={
+          <ProtectedRoute>
+            <AnalyticsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/assets" element={
+          <ProtectedRoute>
+            <AssetsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/team-management" element={
+          <ProtectedRoute>
+            <TeamManagementPage />
           </ProtectedRoute>
         } />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
