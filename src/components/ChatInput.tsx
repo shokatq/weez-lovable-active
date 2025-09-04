@@ -2,6 +2,9 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
+import { toast } from "sonner";
+import { sanitizeUserInput, checkRateLimit } from "@/lib/security";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -12,13 +15,39 @@ const ChatInput = ({ onSendMessage, disabled = false }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSend = () => {
-    if (message.trim() && !disabled) {
-      onSendMessage(message.trim());
-      setMessage("");
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
+  const handleSend = async () => {
+    if (!message.trim() || disabled) return;
+
+    // Get current user for rate limiting
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('Please sign in to send messages');
+      return;
+    }
+
+    // Rate limiting check
+    const rateLimitKey = `chat_${user.id}`;
+    if (!checkRateLimit(rateLimitKey, 10, 60000)) { // 10 messages per minute
+      toast.error('Please wait before sending another message');
+      return;
+    }
+
+    // Input sanitization and validation
+    const sanitizedMessage = sanitizeUserInput(message);
+    if (sanitizedMessage.length === 0) {
+      toast.error('Message cannot be empty after sanitization');
+      return;
+    }
+
+    if (sanitizedMessage.length > 1000) {
+      toast.error('Message too long. Please keep it under 1000 characters');
+      return;
+    }
+
+    onSendMessage(sanitizedMessage);
+    setMessage("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
     }
   };
 
@@ -30,7 +59,15 @@ const ChatInput = ({ onSendMessage, disabled = false }: ChatInputProps) => {
   };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
+    const value = e.target.value;
+    
+    // Basic input length validation
+    if (value.length > 1000) {
+      toast.warning('Message is getting long. Consider keeping it under 1000 characters.');
+      return;
+    }
+    
+    setMessage(value);
     
     const textarea = e.target;
     textarea.style.height = "auto";

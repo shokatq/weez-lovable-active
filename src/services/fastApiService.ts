@@ -73,20 +73,36 @@ class FastAPIService {
     body?: any
   ): Promise<FastAPIResponse<T>> {
     try {
+      // Add request timeout and enhanced security headers
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(`${FASTAPI_BASE_URL}${endpoint}`, {
         method,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest', // CSRF protection
+          'Cache-Control': 'no-cache', // Prevent response caching
         },
         body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+        credentials: 'omit', // Don't send credentials to external APIs
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      
+      // Basic response validation
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response format');
+      }
+      
       return { success: true, data };
     } catch (error) {
       console.error(`FastAPI ${endpoint} error:`, error);

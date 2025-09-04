@@ -26,11 +26,13 @@ import SpacesPage from "./pages/SpacesPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import AssetsPage from "./pages/AssetsPage";
 import TeamManagementPage from "./pages/TeamManagementPage";
+import { useSecurityHeaders } from "./hooks/useSecurityHeaders";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   useGlobalAuditLogger(); // Global audit logging
+  useSecurityHeaders(); // Initialize security headers
   return (
     <BrowserRouter>
       <Routes>

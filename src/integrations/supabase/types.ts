@@ -733,6 +733,10 @@ export type Database = {
         Args: { team_id: string; user_id: string }
         Returns: boolean
       }
+      validate_email_format: {
+        Args: { email_input: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "team_lead" | "employee" | "viewer"
