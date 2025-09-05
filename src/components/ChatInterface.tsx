@@ -21,7 +21,7 @@ import { useGlobalAuditLogger } from "@/hooks/useGlobalAuditLogger";
 import { useAuditLogger } from "@/hooks/useAuditLogger";
 import { toast } from "@/hooks/use-toast";
 import { ChatService } from "@/services/chatService";
-import DailyUpdater from "./DailyUpdater";
+
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -195,24 +195,14 @@ const ChatInterface = () => {
           
             <div className="flex-1 flex flex-col min-h-0">
               {messages.length === 0 ? (
-                <div className="flex-1 flex flex-col">
-                  {/* Daily Updater Section */}
-                  <div className="p-6 border-b border-border">
-                    <DailyUpdater />
-                  </div>
-                  
-                  <div className="flex-1 flex items-center justify-center p-8">
-                    <div className="text-center max-w-2xl mx-auto">
-                      <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-                        <MessageSquare className="w-8 h-8 text-primary-foreground" />
-                      </div>
-                      <h2 className="text-2xl font-semibold text-foreground mb-3">
-                        How can I help you today?
-                      </h2>
-                      <p className="text-muted-foreground mb-8">
-                        Ask me anything about your files, documents, or any questions you have. I'm powered by AI and ready to assist!
-                      </p>
-                    </div>
+                <div className="flex-1 flex items-center justify-center p-8">
+                  <div className="text-center max-w-2xl mx-auto">
+                    <h2 className="text-2xl font-semibold text-foreground mb-3">
+                      How can I help you today?
+                    </h2>
+                    <p className="text-muted-foreground mb-8">
+                      Ask me anything about your files, documents, or any questions you have. I'm powered by AI and ready to assist!
+                    </p>
                   </div>
                 </div>
               ) : (
