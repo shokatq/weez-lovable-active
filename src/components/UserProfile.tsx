@@ -6,11 +6,12 @@ const UserProfile = () => {
   
   // Use real user data from authentication
   const user = {
-    name: authUser?.user_metadata?.first_name && authUser?.user_metadata?.last_name 
-      ? `${authUser.user_metadata.first_name} ${authUser.user_metadata.last_name}`.trim()
-      : authUser?.email?.split('@')[0] || 'User',
+    name: authUser?.user_metadata?.full_name || 
+          (authUser?.user_metadata?.first_name && authUser?.user_metadata?.last_name 
+            ? `${authUser.user_metadata.first_name} ${authUser.user_metadata.last_name}`.trim()
+            : authUser?.email?.split('@')[0] || 'User'),
     email: authUser?.email || '',
-    avatar: authUser?.user_metadata?.avatar_url || null
+    avatar: authUser?.user_metadata?.avatar_url || authUser?.user_metadata?.picture || null
   };
 
   return (

@@ -114,7 +114,7 @@ const ChatSidebar = ({
         </ScrollArea>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-sidebar-border space-y-2">
+      <SidebarFooter className="p-3 border-t border-sidebar-border space-y-1">
         {/* Collapsible Sections */}
         <DailyUpdatesSection />
         <SpacesSection />

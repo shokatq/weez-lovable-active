@@ -253,23 +253,23 @@ const TeamManagement: React.FC<TeamManagementProps> = ({
           </div>
 
           {/* Team Members Grid */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {filteredEmployees.map((employee) => {
               const RoleIcon = getRoleIcon(employee.role);
               return (
-                <Card key={employee.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="w-10 h-10">
+                <Card key={employee.id} className="hover:shadow-sm transition-shadow">
+                  <CardContent className="p-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="w-8 h-8">
                           <AvatarImage src={employee.avatar} />
-                          <AvatarFallback>
+                          <AvatarFallback className="text-xs">
                             {employee.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <h3 className="font-medium text-sm">{employee.name}</h3>
-                          <p className="text-xs text-muted-foreground">{employee.email}</p>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-medium text-sm truncate">{employee.name}</h3>
+                          <p className="text-xs text-muted-foreground truncate">{employee.email}</p>
                         </div>
                       </div>
                       {canManageEmployee(employee) && (
@@ -277,22 +277,22 @@ const TeamManagement: React.FC<TeamManagementProps> = ({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveEmployee(employee.id)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 h-6 w-6 p-0"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3 h-3" />
                         </Button>
                       )}
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="secondary" className="text-xs">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs flex-shrink-0">
                           <Building2 className="w-3 h-3 mr-1" />
                           {employee.department}
                         </Badge>
                         <Badge 
                           variant={employee.role === 'admin' ? 'default' : 'outline'}
-                          className="text-xs"
+                          className="text-xs flex-shrink-0"
                         >
                           <RoleIcon className="w-3 h-3 mr-1" />
                           {roles.find(r => r.value === employee.role)?.label}
@@ -304,7 +304,7 @@ const TeamManagement: React.FC<TeamManagementProps> = ({
                           value={employee.role}
                           onValueChange={(value) => handleRoleChange(employee.id, value as Employee['role'])}
                         >
-                          <SelectTrigger className="h-8 text-xs">
+                          <SelectTrigger className="h-7 text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -359,20 +359,20 @@ const TeamManagement: React.FC<TeamManagementProps> = ({
         </TabsContent>
 
         <TabsContent value="permissions" className="space-y-4">
-          <div className="grid gap-4">
+          <div className="grid gap-3 md:grid-cols-2">
             {roles.map((role) => (
-              <Card key={role.value}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <role.icon className="w-5 h-5" />
-                    {role.label}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">{role.description}</p>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm">
-                    Members: {employees.filter(emp => emp.role === role.value).length}
+              <Card key={role.value} className="hover:shadow-sm transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <role.icon className="w-4 h-4 text-primary" />
+                      <h3 className="font-medium text-sm">{role.label}</h3>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {employees.filter(emp => emp.role === role.value).length} members
+                    </Badge>
                   </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{role.description}</p>
                 </CardContent>
               </Card>
             ))}

@@ -15,7 +15,7 @@ const AssetsSection = () => {
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger className="w-full">
-        <div className="flex items-center justify-between w-full py-2.5 px-4 rounded-lg text-sm h-auto hover:bg-muted/50 transition-colors">
+        <div className="flex items-center justify-between w-full py-2 px-3 rounded-lg text-sm h-auto hover:bg-muted/50 transition-colors">
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
             <span>Assets</span>
@@ -24,8 +24,8 @@ const AssetsSection = () => {
         </div>
       </CollapsibleTrigger>
       
-      <CollapsibleContent className="px-2 pb-2">
-        <div className="space-y-1 mt-2 ml-4">
+      <CollapsibleContent className="px-1 pb-1">
+        <div className="space-y-0.5 mt-1 ml-3">
           {assetItems.map((item) => (
             <Button
               key={item.name}

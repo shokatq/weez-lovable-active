@@ -1,45 +1,44 @@
-import { useState } from 'react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { FolderOpen, ChevronDown, Eye, Users, FileText } from 'lucide-react';
+import { FolderOpen, Plus } from 'lucide-react';
 
 const SpacesSection = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const spaceItems = [
-    { name: 'Overview', icon: Eye, path: '/spaces' },
-    { name: 'Members', icon: Users, path: '/spaces?tab=members' },
-    { name: 'Files Shared', icon: FileText, path: '/spaces?tab=files' }
+  const spaces = [
+    { name: 'All Tasks', path: '/spaces/all-tasks' },
+    { name: 'Research And Development', path: '/spaces/research' },
+    { name: 'Front-end of Weez AI', path: '/spaces/frontend' },
+    { name: 'Marketing Campaigns', path: '/spaces/marketing' },
+    { name: 'Customer Support', path: '/spaces/support' }
   ];
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="w-full">
-        <div className="flex items-center justify-between w-full py-2.5 px-4 rounded-lg text-sm h-auto hover:bg-muted/50 transition-colors">
-          <div className="flex items-center gap-2">
-            <FolderOpen className="w-4 h-4" />
-            <span>Spaces</span>
-          </div>
-          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-        </div>
-      </CollapsibleTrigger>
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 py-1.5 px-3 text-xs font-medium text-muted-foreground">
+        <FolderOpen className="w-3 h-3" />
+        <span>Spaces</span>
+      </div>
       
-      <CollapsibleContent className="px-2 pb-2">
-        <div className="space-y-1 mt-2 ml-4">
-          {spaceItems.map((item) => (
-            <Button
-              key={item.name}
-              variant="ghost"
-              onClick={() => window.location.href = item.path}
-              className="w-full justify-start text-left py-1.5 px-3 rounded-md text-xs h-auto hover:bg-muted/50"
-            >
-              <item.icon className="w-3 h-3 mr-2" />
-              {item.name}
-            </Button>
-          ))}
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
+      <div className="space-y-0.5">
+        {spaces.map((space) => (
+          <Button
+            key={space.name}
+            variant="ghost"
+            onClick={() => window.location.href = space.path}
+            className="w-full justify-start text-left py-1.5 px-6 rounded-md text-xs h-auto hover:bg-muted/50 font-normal"
+          >
+            {space.name}
+          </Button>
+        ))}
+        
+        <Button
+          variant="ghost"
+          onClick={() => window.location.href = '/spaces/new'}
+          className="w-full justify-start text-left py-1.5 px-6 rounded-md text-xs h-auto hover:bg-muted/50 font-normal text-muted-foreground"
+        >
+          <Plus className="w-3 h-3 mr-2" />
+          New Space
+        </Button>
+      </div>
+    </div>
   );
 };
 

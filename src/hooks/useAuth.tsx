@@ -110,14 +110,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // Keep redirect to app origin (must be in Supabase provider redirect allowlist)
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}/chat`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
 
       if (error) {
         const msg = error.message || 'Google sign-in failed';
-        // Provide clearer guidance when provider is disabled or misconfigured
         if (msg.toLowerCase().includes('unsupported provider') || msg.toLowerCase().includes('not enabled')) {
           toast.error('Google provider is not enabled. Please enable Google in Supabase Auth > Providers and add your Client ID/Secret.');
         } else if (msg.toLowerCase().includes('validation_failed')) {

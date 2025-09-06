@@ -103,49 +103,24 @@ const DailyUpdatesSection = () => {
         </div>
       </CollapsibleTrigger>
       
-      <CollapsibleContent className="px-2 pb-2">
-        <div className="space-y-3 mt-2">
-          <div className="text-xs text-muted-foreground px-2">
-            Last updated: {currentTime}
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2">
-            {updates.slice(0, 4).map((update, index) => (
-              <Card key={index} className="bg-card/50 border-border">
-                <CardContent className="p-2">
-                  <div className="flex items-center gap-1 mb-1">
-                    <update.icon className={`w-3 h-3 ${update.color}`} />
-                    <div className="text-sm font-bold text-foreground">{update.value}</div>
-                  </div>
-                  <div className="text-xs font-medium text-foreground mb-1">{update.label}</div>
-                  {update.change > 0 && (
-                    <Badge variant="outline" className="text-xs px-1 py-0 h-3 bg-green-500/10 text-green-600 border-green-500/20">
-                      <ArrowUp className="w-2 h-2 mr-0.5" />
-                      {update.change}
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          
-          {/* Summary */}
-          <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="p-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-semibold text-foreground mb-1">Today's Summary</h4>
-                  <p className="text-xs text-muted-foreground">
-                    {updates[0]?.value} files, {updates[5]?.value}% efficiency
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 text-green-600">
-                  <TrendingUp className="w-3 h-3" />
-                  <span className="text-xs font-semibold">+{updates.reduce((acc, curr) => acc + curr.change, 0)}</span>
-                </div>
+      <CollapsibleContent className="px-1 pb-1">
+        <div className="space-y-1 mt-1">
+          {updates.slice(0, 6).map((update, index) => (
+            <div key={index} className="flex items-center justify-between py-1.5 px-2 hover:bg-muted/30 rounded-md transition-colors">
+              <div className="flex items-center gap-2">
+                <update.icon className={`w-3 h-3 ${update.color}`} />
+                <span className="text-xs text-foreground">{update.label}</span>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium">{update.value}</span>
+                {update.change > 0 && (
+                  <span className="text-xs font-medium text-green-600">
+                    +{update.change}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </CollapsibleContent>
     </Collapsible>
