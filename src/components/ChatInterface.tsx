@@ -68,10 +68,36 @@ const ChatInterface = () => {
     
     setMessages(prevMessages => [...prevMessages, userMessage]);
 
-    // Update current conversation with user message
+    // Generate smart conversation title if this is the first message
+    const isFirstMessage = messages.length === 0;
+    let conversationTitle = '';
+    
+    if (isFirstMessage) {
+      // Generate smart title based on content
+      const content = newMessage.trim().toLowerCase();
+      if (content.includes('marketing')) conversationTitle = "Marketing Discussion";
+      else if (content.includes('finance') || content.includes('budget')) conversationTitle = "Finance Planning";
+      else if (content.includes('project') || content.includes('task')) conversationTitle = "Project Management";
+      else if (content.includes('report') || content.includes('analysis')) conversationTitle = "Report Analysis";
+      else if (content.includes('design') || content.includes('ui')) conversationTitle = "Design Review";
+      else {
+        // Use first 3 words as fallback
+        const words = newMessage.trim().split(' ');
+        conversationTitle = words.slice(0, 3).join(' ');
+        if (conversationTitle.length > 30) {
+          conversationTitle = conversationTitle.substring(0, 30) + '...';
+        }
+      }
+    }
+
+    // Update current conversation with user message and title
     setConversations(prev => prev.map(conv => 
       conv.id === currentConversationId 
-        ? { ...conv, messages: [...conv.messages, userMessage] }
+        ? { 
+            ...conv, 
+            messages: [...conv.messages, userMessage],
+            title: isFirstMessage ? conversationTitle : conv.title
+          }
         : conv
     ));
 
@@ -124,12 +150,11 @@ const ChatInterface = () => {
         };
 
         setMessages(prevMessages => [...prevMessages, errorMessage]);
-        
-        setConversations(prev => prev.map(conv => 
-          conv.id === currentConversationId 
-            ? { ...conv, messages: [...conv.messages, errorMessage] }
-            : conv
-        ));
+      setConversations(prev => prev.map(conv => 
+        conv.id === currentConversationId 
+          ? { ...conv, messages: [...conv.messages, errorMessage] }
+          : conv
+      ));
       }
     } catch (error) {
       console.error('💥 Error in handleSendMessage:', error);
@@ -143,12 +168,11 @@ const ChatInterface = () => {
       };
 
       setMessages(prevMessages => [...prevMessages, errorMessage]);
-      
-      setConversations(prev => prev.map(conv => 
-        conv.id === currentConversationId 
-          ? { ...conv, messages: [...conv.messages, errorMessage] }
-          : conv
-      ));
+        setConversations(prev => prev.map(conv => 
+          conv.id === currentConversationId 
+            ? { ...conv, messages: [...conv.messages, errorMessage] }
+            : conv
+        ));
     }
   };
 

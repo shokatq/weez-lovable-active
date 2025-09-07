@@ -27,6 +27,7 @@ import AnalyticsPage from "./pages/AnalyticsPage";
 import AssetsPage from "./pages/AssetsPage";
 import TeamManagementPage from "./pages/TeamManagementPage";
 import SpacesNewPage from "./pages/SpacesNewPage";
+import SpaceChatPage from "./pages/SpaceChatPage";
 import { useSecurityHeaders } from "./hooks/useSecurityHeaders";
 
 const queryClient = new QueryClient();
@@ -89,6 +90,11 @@ const AppContent = () => {
         <Route path="/spaces/new" element={
           <ProtectedRoute>
             <SpacesNewPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/spaces/:spaceName" element={
+          <ProtectedRoute>
+            <SpaceChatPage />
           </ProtectedRoute>
         } />
         <Route path="/analytics" element={

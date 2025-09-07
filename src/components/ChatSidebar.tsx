@@ -42,8 +42,37 @@ const ChatSidebar = ({
 
   const getConversationPreview = (conversation: Conversation) => {
     if (conversation.messages.length === 0) return "New conversation";
+    
+    // Use conversation title if available
+    if (conversation.title) {
+      return conversation.title;
+    }
+    
+    // Generate smart title for conversation
+    const firstUserMessage = conversation.messages.find(msg => msg.isUser);
+    if (firstUserMessage) {
+      // Extract topic from first user message
+      const content = firstUserMessage.content;
+      const words = content.split(' ');
+      
+      // Create smart title based on content
+      if (content.toLowerCase().includes('marketing')) return "Marketing Discussion";
+      if (content.toLowerCase().includes('finance') || content.toLowerCase().includes('budget')) return "Finance Planning";
+      if (content.toLowerCase().includes('project') || content.toLowerCase().includes('task')) return "Project Management";
+      if (content.toLowerCase().includes('report') || content.toLowerCase().includes('analysis')) return "Report Analysis";
+      if (content.toLowerCase().includes('design') || content.toLowerCase().includes('ui')) return "Design Review";
+      
+      // Fallback: Use first few words
+      if (words.length > 0) {
+        const title = words.slice(0, 3).join(' ');
+        return title.length > 30 ? title.substring(0, 30) + '...' : title;
+      }
+    }
+    
     const lastMessage = conversation.messages[conversation.messages.length - 1];
-    return lastMessage.isUser ? `You: ${lastMessage.content}` : lastMessage.content;
+    const preview = lastMessage.isUser ? lastMessage.content : lastMessage.content;
+    // Truncate to 50 characters max
+    return preview.length > 50 ? preview.substring(0, 50) + '...' : preview;
   };
 
   return (
