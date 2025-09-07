@@ -1,12 +1,24 @@
 import { SignIn, SignUp, useAuth } from '@clerk/clerk-react';
 import { Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Star, Check, ArrowRight } from 'lucide-react';
+import { MessageSquare, Star, Check, Loader } from 'lucide-react';
 
 const AuthLanding = () => {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+
+  // Show loading while Clerk is initializing
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader className="w-6 h-6 animate-spin" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (isSignedIn) {
     return <Navigate to="/chat" replace />;
@@ -104,9 +116,14 @@ const AuthLanding = () => {
                       elements: {
                         rootBox: "w-full",
                         card: "shadow-none border-0 bg-transparent",
+                        formButtonPrimary: "bg-primary hover:bg-primary/90",
+                        socialButtonsBlockButton: "border border-border hover:bg-muted/50",
+                        socialButtonsBlockButtonText: "text-foreground",
                       }
                     }}
-                    forceRedirectUrl="/chat"
+                    redirectUrl="/chat"
+                    signUpUrl="#"
+                    signUpForceRedirectUrl="/chat"
                   />
                 ) : (
                   <SignUp 
@@ -114,9 +131,14 @@ const AuthLanding = () => {
                       elements: {
                         rootBox: "w-full",
                         card: "shadow-none border-0 bg-transparent",
+                        formButtonPrimary: "bg-primary hover:bg-primary/90",
+                        socialButtonsBlockButton: "border border-border hover:bg-muted/50",
+                        socialButtonsBlockButtonText: "text-foreground",
                       }
                     }}
-                    forceRedirectUrl="/chat"
+                    redirectUrl="/chat"
+                    signInUrl="#"
+                    signInForceRedirectUrl="/chat"
                   />
                 )}
               </div>
