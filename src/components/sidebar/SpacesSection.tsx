@@ -1,23 +1,35 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FolderOpen, Plus } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { FolderOpen, Plus, ChevronDown } from 'lucide-react';
 
 const SpacesSection = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   const spaces = [
-    { name: 'All Tasks', path: '/spaces/all-tasks' },
-    { name: 'Research And Development', path: '/spaces/research' },
-    { name: 'Front-end of Weez AI', path: '/spaces/frontend' },
-    { name: 'Marketing Campaigns', path: '/spaces/marketing' },
-    { name: 'Customer Support', path: '/spaces/support' }
+    { name: 'Marketing', path: '/spaces/marketing' },
+    { name: 'Finance', path: '/spaces/finance' },
+    { name: 'Backend', path: '/spaces/backend' },
+    { name: 'Frontend', path: '/spaces/frontend' },
+    { name: 'Operations', path: '/spaces/operations' }
   ];
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2 py-1.5 px-3 text-xs font-medium text-muted-foreground">
-        <FolderOpen className="w-3 h-3" />
-        <span>Spaces</span>
-      </div>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger asChild>
+        <Button
+          variant="ghost"
+          className="w-full justify-between py-1.5 px-3 text-xs font-medium text-muted-foreground hover:bg-muted/50 h-auto"
+        >
+          <div className="flex items-center gap-2">
+            <FolderOpen className="w-3 h-3" />
+            <span>Spaces</span>
+          </div>
+          <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </Button>
+      </CollapsibleTrigger>
       
-      <div className="space-y-0.5">
+      <CollapsibleContent className="space-y-0.5">
         {spaces.map((space) => (
           <Button
             key={space.name}
@@ -37,8 +49,8 @@ const SpacesSection = () => {
           <Plus className="w-3 h-3 mr-2" />
           New Space
         </Button>
-      </div>
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 
