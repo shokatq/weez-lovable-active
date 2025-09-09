@@ -47,7 +47,6 @@ const CreateSpaceDialog = ({ open, onOpenChange, onSpaceCreated, teamMembers }: 
     try {
       // Create the space
       const spaceId = await SpacesService.createSpace(
-        userRole.teamId,
         name,
         description
       );

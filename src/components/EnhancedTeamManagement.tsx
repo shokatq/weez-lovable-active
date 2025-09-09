@@ -218,7 +218,6 @@ const EnhancedTeamManagement = () => {
 
     try {
       const spaceId = await SpacesService.createSpace(
-        userRole.teamId,
         newSpace.name,
         newSpace.description
       );

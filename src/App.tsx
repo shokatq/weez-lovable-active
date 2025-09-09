@@ -118,6 +118,11 @@ const AppContent = () => {
             <RoleBasedManagementPage />
           </ProtectedRoute>
         } />
+        <Route path="/spaces-management" element={
+          <ProtectedRoute>
+            <SpacesManagementPage />
+          </ProtectedRoute>
+        } />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -231,6 +231,7 @@ export type Database = {
           created_at: string
           file_path: string
           file_size: number | null
+          file_url: string | null
           filename: string
           id: string
           mime_type: string | null
@@ -242,6 +243,7 @@ export type Database = {
           created_at?: string
           file_path: string
           file_size?: number | null
+          file_url?: string | null
           filename: string
           id?: string
           mime_type?: string | null
@@ -253,6 +255,7 @@ export type Database = {
           created_at?: string
           file_path?: string
           file_size?: number | null
+          file_url?: string | null
           filename?: string
           id?: string
           mime_type?: string | null
@@ -418,26 +421,71 @@ export type Database = {
           },
         ]
       }
+      space_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          space_id: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          role?: Database["public"]["Enums"]["app_role"]
+          space_id: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          space_id?: string
+          token?: string
+        }
+        Relationships: []
+      }
       space_members: {
         Row: {
           added_at: string
           added_by: string
+          email: string | null
           id: string
+          role: Database["public"]["Enums"]["app_role"] | null
           space_id: string
+          status: string | null
           user_id: string
         }
         Insert: {
           added_at?: string
           added_by: string
+          email?: string | null
           id?: string
+          role?: Database["public"]["Enums"]["app_role"] | null
           space_id: string
+          status?: string | null
           user_id: string
         }
         Update: {
           added_at?: string
           added_by?: string
+          email?: string | null
           id?: string
+          role?: Database["public"]["Enums"]["app_role"] | null
           space_id?: string
+          status?: string | null
           user_id?: string
         }
         Relationships: []
@@ -718,6 +766,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_space_invitation: {
+        Args: { invitation_token: string }
+        Returns: Json
+      }
       accept_team_invitation: {
         Args: { invitation_id: string }
         Returns: Json

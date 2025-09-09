@@ -79,7 +79,6 @@ export default function SpaceManagement({ teamMembers }: SpaceManagementProps) {
     setLoading(true);
     try {
       const spaceId = await SpacesService.createSpace(
-        userRole.userRole.teamId,
         newSpace.name,
         newSpace.description
       );

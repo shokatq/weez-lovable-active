@@ -14,6 +14,9 @@ export interface SpaceMember {
   id: string;
   space_id: string;
   user_id: string;
+  role?: 'admin' | 'team_lead' | 'viewer' | 'employee';
+  email?: string;
+  status?: string;
   added_by: string;
   added_at: string;
   profile?: {
@@ -24,6 +27,35 @@ export interface SpaceMember {
 }
 
 export class SpacesService {
+  static async getAllSpaces(): Promise<Space[]> {
+    try {
+      const { data, error } = await supabase
+        .from('spaces')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Get member counts separately
+      const spacesWithCounts = await Promise.all(data.map(async space => {
+        const { count } = await supabase
+          .from('space_members')
+          .select('*', { count: 'exact', head: true })
+          .eq('space_id', space.id);
+        
+        return {
+          ...space,
+          member_count: count || 0
+        };
+      }));
+
+      return spacesWithCounts;
+    } catch (error) {
+      console.error('Error fetching spaces:', error);
+      return [];
+    }
+  }
+
   static async getTeamSpaces(teamId: string): Promise<Space[]> {
     try {
       const { data, error } = await supabase
@@ -54,15 +86,16 @@ export class SpacesService {
     }
   }
 
-  static async createSpace(teamId: string, name: string, description?: string): Promise<string | null> {
+  static async createSpace(name: string, description?: string): Promise<string | null> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      // Create space without team_id for now
       const { data, error } = await supabase
         .from('spaces')
         .insert({
-          team_id: teamId,
+          team_id: '00000000-0000-0000-0000-000000000000', // placeholder
           name,
           description: description || null,
           created_by: user.id
@@ -71,6 +104,10 @@ export class SpacesService {
         .single();
 
       if (error) throw error;
+
+      // Add creator as admin
+      await this.addMemberToSpace(data.id, user.id, 'admin', user.email);
+      
       return data.id;
     } catch (error) {
       console.error('Error creating space:', error);
@@ -78,7 +115,7 @@ export class SpacesService {
     }
   }
 
-  static async addMemberToSpace(spaceId: string, userId: string): Promise<boolean> {
+  static async addMemberToSpace(spaceId: string, userId: string, role: 'admin' | 'team_lead' | 'viewer' | 'employee' = 'viewer', email?: string): Promise<boolean> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -88,7 +125,10 @@ export class SpacesService {
         .insert({
           space_id: spaceId,
           user_id: userId,
-          added_by: user.id
+          email: email || '',
+          role,
+          added_by: user.id,
+          status: 'active'
         });
 
       if (error) throw error;
@@ -124,6 +164,7 @@ export class SpacesService {
           profiles!space_members_user_id_fkey(first_name, last_name, email)
         `)
         .eq('space_id', spaceId)
+        .eq('status', 'active')
         .order('added_at', { ascending: false });
 
       if (error) throw error;
@@ -131,6 +172,42 @@ export class SpacesService {
     } catch (error) {
       console.error('Error fetching space members:', error);
       return [];
+    }
+  }
+
+  static async inviteMemberToSpace(spaceId: string, email: string, role: 'admin' | 'team_lead' | 'viewer' | 'employee', spaceName: string): Promise<boolean> {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('User not authenticated');
+
+      const response = await supabase.functions.invoke('send-space-invitation', {
+        body: {
+          spaceId,
+          email,
+          role,
+          spaceName
+        }
+      });
+
+      if (response.error) throw response.error;
+      return true;
+    } catch (error) {
+      console.error('Error inviting member to space:', error);
+      return false;
+    }
+  }
+
+  static async acceptInvitation(token: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('accept_space_invitation', {
+        invitation_token: token
+      });
+
+      if (error) throw error;
+      return (data as any).success === true;
+    } catch (error) {
+      console.error('Error accepting invitation:', error);
+      return false;
     }
   }
 
