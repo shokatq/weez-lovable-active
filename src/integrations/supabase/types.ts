@@ -686,6 +686,15 @@ export type Database = {
         Args: { team_id: string; user_id: string }
         Returns: boolean
       }
+      check_user_invitation_status: {
+        Args: { user_email: string }
+        Returns: {
+          expires_at: string
+          invitation_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          team_name: string
+        }[]
+      }
       create_audit_log: {
         Args: {
           p_action: string
@@ -728,6 +737,16 @@ export type Database = {
           last_name: string
         }[]
       }
+      get_team_member_safe_info: {
+        Args: { target_user_id: string }
+        Returns: {
+          avatar_url: string
+          first_name: string
+          id: string
+          last_name: string
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
       get_team_members: {
         Args: { team_id_param: string }
         Returns: {
@@ -760,6 +779,10 @@ export type Database = {
       is_team_admin: {
         Args: { team_id: string; user_id: string }
         Returns: boolean
+      }
+      log_profile_access: {
+        Args: { access_type: string; accessed_user_id: string }
+        Returns: undefined
       }
       validate_email_format: {
         Args: { email_input: string }

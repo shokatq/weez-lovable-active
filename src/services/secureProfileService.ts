@@ -38,10 +38,10 @@ export async function getTeamMembersSafe(teamId: string): Promise<SafeTeamMember
 }
 
 /**
- * Get basic profile info for a specific team member (name + avatar only)
+ * Get basic profile info for a specific team member (name + avatar + role)
  */
-export async function getTeamMemberProfile(userId: string): Promise<SafeProfile | null> {
-  const { data, error } = await supabase.rpc('get_team_member_info', {
+export async function getTeamMemberProfile(userId: string): Promise<SafeProfile & { role?: string } | null> {
+  const { data, error } = await supabase.rpc('get_team_member_safe_info', {
     target_user_id: userId
   });
 
@@ -51,6 +51,22 @@ export async function getTeamMemberProfile(userId: string): Promise<SafeProfile 
   }
 
   return data?.[0] || null;
+}
+
+/**
+ * Check user's invitation status securely
+ */
+export async function checkInvitationStatus(userEmail: string) {
+  const { data, error } = await supabase.rpc('check_user_invitation_status', {
+    user_email: userEmail
+  });
+
+  if (error) {
+    console.error('Error checking invitation status:', error);
+    return [];
+  }
+
+  return data || [];
 }
 
 /**
