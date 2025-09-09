@@ -72,7 +72,7 @@ const ChatInterface = () => {
       console.log('Loading conversation messages for:', conversationId);
       
       const response = await fetch(
-        `http://localhost:5000/api/conversations/${encodeURIComponent(userId)}/${encodeURIComponent(conversationId)}`,
+        `https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net/api/conversations/${encodeURIComponent(userId)}/${encodeURIComponent(conversationId)}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
@@ -166,7 +166,7 @@ const ChatInterface = () => {
 
     try {
       // Call backend - let it create conversation ID if needed
-      const response = await fetch(`http://localhost:5000/api/chat/${encodeURIComponent(userId)}`, {
+      const response = await fetch(`https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net/api/chat/${encodeURIComponent(userId)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

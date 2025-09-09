@@ -45,7 +45,7 @@ export const useConversationContext = (): ConversationContextHook => {
       console.log('Loading conversation history:', conversationId);
       
       const response = await fetch(
-        `http://localhost:5000/api/conversations/${encodeURIComponent(userId)}/${encodeURIComponent(conversationId)}`,
+        `https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net/api/conversations/${encodeURIComponent(userId)}/${encodeURIComponent(conversationId)}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
