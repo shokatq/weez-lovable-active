@@ -46,7 +46,7 @@ const ChatSidebar = ({
   onConversationSelect, 
   onNewConversation,
   onNavigateToWorkspace,
-  apiBaseUrl = "https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net",
+  apiBaseUrl = "http://localhost:5000",
   onSendMessage,
   filterToolExecution = true
 }: ChatSidebarProps) => {

@@ -28,7 +28,7 @@ interface UseConversationManagerProps {
 }
 
 export const useConversationManager = ({
-  apiBaseUrl = 'https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net',
+  apiBaseUrl = 'http://localhost:5000',
   onSendMessage,
   filterToolExecution = true // Default to true to filter out tool execution messages
 }: UseConversationManagerProps): ConversationManager => {
@@ -45,7 +45,7 @@ export const useConversationManager = ({
 
   // Create service instance with custom API base URL if needed
   const service = useState(() => {
-    if (apiBaseUrl !== 'https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net') {
+    if (apiBaseUrl !== 'http://localhost:5000') {
       return new ConversationService({ apiBaseUrl });
     }
     return conversationService;

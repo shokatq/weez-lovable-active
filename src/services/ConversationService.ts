@@ -92,7 +92,7 @@ class ConversationService {
   private retryDelay: number;
 
   constructor(config: ConversationServiceConfig = {}) {
-    this.apiBaseUrl = config.apiBaseUrl || 'https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net';
+    this.apiBaseUrl = config.apiBaseUrl || 'http://localhost:5000';
     this.defaultTimeout = config.defaultTimeout || 30000; // 30 seconds default
     this.maxRetries = config.maxRetries || 3;
     this.retryDelay = config.retryDelay || 1000; // 1 second
