@@ -226,6 +226,50 @@ export type Database = {
         }
         Relationships: []
       }
+      files: {
+        Row: {
+          created_at: string
+          file_path: string
+          file_size: number | null
+          filename: string
+          id: string
+          mime_type: string | null
+          owner_id: string
+          space_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          file_path: string
+          file_size?: number | null
+          filename: string
+          id?: string
+          mime_type?: string | null
+          owner_id: string
+          space_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string
+          file_size?: number | null
+          filename?: string
+          id?: string
+          mime_type?: string | null
+          owner_id?: string
+          space_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permission_audits: {
         Row: {
           granted_by: string | null
@@ -761,6 +805,10 @@ export type Database = {
       get_user_email_secure: {
         Args: { target_user_id: string }
         Returns: string
+      }
+      get_user_role_for_space: {
+        Args: { space_id_param: string }
+        Returns: Database["public"]["Enums"]["app_role"]
       }
       get_user_role_in_team: {
         Args: { team_id: string; user_id: string }

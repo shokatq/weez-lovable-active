@@ -28,6 +28,7 @@ import AssetsPage from "./pages/AssetsPage";
 import TeamManagementPage from "./pages/TeamManagementPage";
 import SpacesNewPage from "./pages/SpacesNewPage";
 import SpaceChatPage from "./pages/SpaceChatPage";
+import RoleBasedManagementPage from "./pages/RoleBasedManagementPage";
 import { useSecurityHeaders } from "./hooks/useSecurityHeaders";
 
 const queryClient = new QueryClient();
@@ -110,6 +111,11 @@ const AppContent = () => {
         <Route path="/team-management" element={
           <ProtectedRoute>
             <TeamManagementPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/role-management/:spaceId" element={
+          <ProtectedRoute>
+            <RoleBasedManagementPage />
           </ProtectedRoute>
         } />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
