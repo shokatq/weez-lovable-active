@@ -1,4 +1,4 @@
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { ReactNode } from 'react';
 import { Loader } from 'lucide-react';
@@ -8,9 +8,9 @@ interface AuthGuardProps {
 }
 
 const AuthGuard = ({ children }: AuthGuardProps) => {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (!isLoaded) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20">
         <div className="flex flex-col items-center space-y-4">
@@ -21,7 +21,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
-  if (!isSignedIn) {
+  if (!user) {
     return <Navigate to="/auth" replace />;
   }
 

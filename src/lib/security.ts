@@ -76,18 +76,20 @@ export function sanitizeUserInput(input: string): string {
 }
 
 /**
- * Content Security Policy headers
+ * Content Security Policy headers - Improved security
  */
 export const CSP_HEADER = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+  "script-src 'self' https://cdn.jsdelivr.net 'nonce-${nonce}'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https:",
   "connect-src 'self' https://usuthdsminfqguflnzgs.supabase.co wss://usuthdsminfqguflnzgs.supabase.co",
-  "frame-ancestors 'none'",
+  "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'"
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "upgrade-insecure-requests"
 ].join('; ');
 
 /**
