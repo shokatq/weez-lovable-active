@@ -10,6 +10,7 @@ import { AlertCircle, Download, Filter, Search, Shield, Activity, FileText, User
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { toast } from 'sonner';
+import { getTeamMemberProfile } from '@/services/secureProfileService';
 
 interface AuditLog {
   id: string;
@@ -82,12 +83,17 @@ const AuditDashboard = () => {
 
       if (logsError) throw logsError;
       
-      // Fetch user profiles for the logs
+      // Fetch secure profile data for the logs (only names, no emails for regular users)
       const userIds = logs?.map(log => log.user_id).filter(Boolean) || [];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, email')
-        .in('id', userIds);
+      const profilePromises = userIds.map(async (userId) => {
+        try {
+          return await getTeamMemberProfile(userId);
+        } catch {
+          return { id: userId, first_name: 'Unknown', last_name: 'User', avatar_url: null };
+        }
+      });
+      
+      const profiles = await Promise.all(profilePromises);
 
       // Merge profiles with logs
       const logsWithProfiles = logs?.map(log => ({
@@ -107,12 +113,17 @@ const AuditDashboard = () => {
 
       if (alertsError) throw alertsError;
       
-      // Fetch user profiles for alerts
+      // Fetch secure profile data for alerts (only names, no emails for regular users)
       const alertUserIds = alerts?.map(alert => alert.user_id).filter(Boolean) || [];
-      const { data: alertProfiles } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, email')
-        .in('id', alertUserIds);
+      const alertProfilePromises = alertUserIds.map(async (userId) => {
+        try {
+          return await getTeamMemberProfile(userId);
+        } catch {
+          return { id: userId, first_name: 'Unknown', last_name: 'User', avatar_url: null };
+        }
+      });
+      
+      const alertProfiles = await Promise.all(alertProfilePromises);
 
       // Merge profiles with alerts
       const alertsWithProfiles = alerts?.map(alert => ({
@@ -135,7 +146,7 @@ const AuditDashboard = () => {
       const filteredLogs = auditLogs.filter(log => {
       const matchesSearch = searchTerm === '' || 
         log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+        `${log.profiles?.first_name} ${log.profiles?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesAction = filterAction === 'all' || log.action === filterAction;
         const matchesSeverity = filterSeverity === 'all' || log.severity === filterSeverity;
         return matchesSearch && matchesAction && matchesSeverity;
@@ -154,7 +165,7 @@ const AuditDashboard = () => {
         const csvHeaders = ['Timestamp', 'User', 'Action', 'Resource Type', 'Severity', 'Description'];
         const csvRows = filteredLogs.map(log => [
           new Date(log.timestamp).toLocaleString(),
-          log.profiles?.email || 'Unknown',
+          `${log.profiles?.first_name || 'Unknown'} ${log.profiles?.last_name || 'User'}`,
           log.action,
           log.resource_type,
           log.severity,
@@ -210,7 +221,7 @@ const AuditDashboard = () => {
   const filteredLogs = auditLogs.filter(log => {
     const matchesSearch = searchTerm === '' || 
       log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+      `${log.profiles?.first_name} ${log.profiles?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesAction = filterAction === 'all' || log.action === filterAction;
     const matchesSeverity = filterSeverity === 'all' || log.severity === filterSeverity;
     return matchesSearch && matchesAction && matchesSeverity;
@@ -255,7 +266,7 @@ const AuditDashboard = () => {
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">{alert.description}</p>
                     <p className="text-xs text-muted-foreground">
-                      User: {alert.profiles?.email || 'Unknown'} • {new Date(alert.created_at).toLocaleString()}
+                      User: {`${alert.profiles?.first_name || 'Unknown'} ${alert.profiles?.last_name || 'User'}`} • {new Date(alert.created_at).toLocaleString()}
                     </p>
                   </div>
                   <Button
@@ -378,7 +389,7 @@ const AuditDashboard = () => {
                               {log.profiles?.first_name} {log.profiles?.last_name}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                              {log.profiles?.email || 'Unknown'}
+                              Team Member
                             </div>
                           </div>
                         </TableCell>

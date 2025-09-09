@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, User, Crown, Shield, Eye, Mail, Building2 } from 'lucide-react';
+import { Search, User, Crown, Shield, Eye, Building2 } from 'lucide-react';
 
 interface TeamMember {
   id: string;
@@ -17,7 +17,6 @@ interface TeamMember {
   profiles: {
     first_name: string;
     last_name: string;
-    email: string;
     avatar_url?: string;
   };
   departments?: {
@@ -56,11 +55,9 @@ const AllMembersDialog = ({ open, onOpenChange, members }: AllMembersDialogProps
   const filteredMembers = members.filter(member => {
     const searchLower = searchTerm.toLowerCase();
     const fullName = `${member.profiles?.first_name || ''} ${member.profiles?.last_name || ''}`.toLowerCase();
-    const email = member.profiles?.email?.toLowerCase() || '';
     const department = member.departments?.name?.toLowerCase() || member.custom_department?.toLowerCase() || '';
     
     return fullName.includes(searchLower) || 
-           email.includes(searchLower) || 
            department.includes(searchLower) ||
            member.role.toLowerCase().includes(searchLower);
   });
@@ -79,7 +76,7 @@ const AllMembersDialog = ({ open, onOpenChange, members }: AllMembersDialogProps
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
-            placeholder="Search members by name, email, or department..."
+            placeholder="Search members by name, role, or department..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -117,10 +114,6 @@ const AllMembersDialog = ({ open, onOpenChange, members }: AllMembersDialogProps
                   </div>
                   
                   <div className="space-y-1 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4" />
-                      <span>{member.profiles?.email}</span>
-                    </div>
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4" />
                       <span>{member.departments?.name || member.custom_department || 'General'}</span>

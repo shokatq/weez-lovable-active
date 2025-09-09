@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getTeamMemberProfile } from '@/services/secureProfileService';
 
 interface ChatMessage {
   id: string;
@@ -15,10 +16,9 @@ interface ChatMessage {
   user_id: string;
   created_at: string;
   profiles?: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    avatar_url?: string;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
   };
 }
 
@@ -89,7 +89,7 @@ const TeamChatInterface = () => {
     if (!userRole?.teamId) return;
 
     try {
-      // For now, we'll use a simplified approach without joins
+      // Get messages first
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
@@ -98,18 +98,23 @@ const TeamChatInterface = () => {
         .limit(50);
 
       if (error) throw error;
-      
-      // Get profile data separately
-      const userIds = data?.map(msg => msg.user_id).filter(Boolean) || [];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('id', userIds);
 
-      // Combine messages with profiles
+      // Get secure profile data for message authors (names and avatars only, no emails)
+      const userIds = [...new Set(data?.map(msg => msg.user_id).filter(Boolean) || [])];
+      const profilePromises = userIds.map(async (userId) => {
+        try {
+          return await getTeamMemberProfile(userId);
+        } catch {
+          return { id: userId, first_name: 'Unknown', last_name: 'User', avatar_url: null };
+        }
+      });
+      
+      const profiles = await Promise.all(profilePromises);
+
+      // Combine messages with secure profile data
       const messagesWithProfiles = data?.map(msg => ({
         ...msg,
-        profiles: profiles?.find(p => p.id === msg.user_id)
+        profiles: profiles?.find(p => p?.id === msg.user_id) || null
       })) || [];
 
       setMessages(messagesWithProfiles || []);
@@ -190,7 +195,7 @@ const TeamChatInterface = () => {
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={msg.profiles?.avatar_url} />
                   <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                    {msg.profiles?.first_name?.[0] || msg.profiles?.email?.[0]?.toUpperCase()}
+                    {msg.profiles?.first_name?.[0] || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-1">

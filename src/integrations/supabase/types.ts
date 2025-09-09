@@ -678,6 +678,10 @@ export type Database = {
         Args: { invitation_id: string }
         Returns: Json
       }
+      are_team_members: {
+        Args: { user1_id: string; user2_id: string }
+        Returns: boolean
+      }
       can_view_user_roles: {
         Args: { team_id: string; user_id: string }
         Returns: boolean
@@ -713,6 +717,30 @@ export type Database = {
       }
       get_auth_email: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_team_member_info: {
+        Args: { target_user_id: string }
+        Returns: {
+          avatar_url: string
+          first_name: string
+          id: string
+          last_name: string
+        }[]
+      }
+      get_team_members: {
+        Args: { team_id_param: string }
+        Returns: {
+          avatar_url: string
+          first_name: string
+          last_name: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+          user_id: string
+        }[]
+      }
+      get_user_email_secure: {
+        Args: { target_user_id: string }
         Returns: string
       }
       get_user_role_in_team: {
