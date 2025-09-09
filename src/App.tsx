@@ -29,6 +29,7 @@ import TeamManagementPage from "./pages/TeamManagementPage";
 import SpacesNewPage from "./pages/SpacesNewPage";
 import SpaceChatPage from "./pages/SpaceChatPage";
 import RoleBasedManagementPage from "./pages/RoleBasedManagementPage";
+import SpacesManagementPage from "./pages/SpacesManagementPage";
 import { useSecurityHeaders } from "./hooks/useSecurityHeaders";
 
 const queryClient = new QueryClient();
