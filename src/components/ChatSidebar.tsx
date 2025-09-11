@@ -41,9 +41,9 @@ interface ChatSidebarProps {
   filterToolExecution?: boolean;
 }
 
-const ChatSidebar = ({ 
+const ChatSidebar = ({
   currentConversationId,
-  onConversationSelect, 
+  onConversationSelect,
   onNewConversation,
   onNavigateToWorkspace,
   apiBaseUrl = "https://chat-api-weez-cjfzftg4aedgg6h2.canadacentral-01.azurewebsites.net",
@@ -52,7 +52,7 @@ const ChatSidebar = ({
 }: ChatSidebarProps) => {
   // Get authenticated user from useAuth hook
   const { user, loading: authLoading } = useAuth();
-  
+
   // Local state for conversation management
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,7 @@ const ChatSidebar = ({
   // Get conversation preview text
   const getConversationPreviewText = (summary: BackendConversationSummary) => {
     if (summary.latest_user_query) {
-      return summary.latest_user_query.length > 60 
+      return summary.latest_user_query.length > 60
         ? summary.latest_user_query.substring(0, 60) + "..."
         : summary.latest_user_query;
     }
@@ -76,7 +76,7 @@ const ChatSidebar = ({
     }
 
     const preview = getConversationPreviewText(summary);
-    
+
     return {
       id: summary.conversation_id,
       title: preview,
@@ -150,7 +150,7 @@ const ChatSidebar = ({
   // Handle conversation selection - SIMPLIFIED VERSION
   const handleConversationSelect = (conversation: Conversation) => {
     console.log('ChatSidebar: Selecting conversation:', conversation.id);
-    
+
     // Simply pass the conversation to parent - let parent handle loading messages
     onConversationSelect(conversation);
   };
@@ -161,7 +161,7 @@ const ChatSidebar = ({
 
     try {
       setLoading(true);
-      
+
       const response = await fetch(
         `${apiBaseUrl}/api/conversations/${encodeURIComponent(user.email)}/${encodeURIComponent(conversationId)}`,
         {
@@ -178,7 +178,7 @@ const ChatSidebar = ({
 
       // Remove from local state
       setConversations(prev => prev.filter(conv => conv.id !== conversationId));
-      
+
       console.log(`Successfully deleted conversation: ${conversationId}`);
 
       // If the deleted conversation was currently selected, trigger new conversation
@@ -214,8 +214,8 @@ const ChatSidebar = ({
   // Show loading state while auth is loading
   if (authLoading) {
     return (
-      <Sidebar 
-        className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
+      <Sidebar
+        className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300"
         collapsible="offcanvas"
       >
         <SidebarContent className="flex-1 p-3">
@@ -231,8 +231,8 @@ const ChatSidebar = ({
   // Show auth required message if not authenticated
   if (!user) {
     return (
-      <Sidebar 
-        className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
+      <Sidebar
+        className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300"
         collapsible="offcanvas"
       >
         <SidebarContent className="flex-1 p-3">
@@ -245,8 +245,8 @@ const ChatSidebar = ({
   }
 
   return (
-    <Sidebar 
-      className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300" 
+    <Sidebar
+      className="w-64 bg-sidebar-background border-r border-sidebar-border data-[state=collapsed]:w-0 data-[state=collapsed]:overflow-hidden transition-all duration-300"
       collapsible="offcanvas"
     >
       <SidebarHeader className="p-4 border-b border-sidebar-border">
@@ -261,7 +261,7 @@ const ChatSidebar = ({
             </div>
           </div>
         </div>
-        
+
         <Button
           onClick={handleNewConversation}
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-lg text-sm h-auto shadow-sm transition-all duration-200"
@@ -280,13 +280,13 @@ const ChatSidebar = ({
                 <span className="text-sm text-muted-foreground">Loading conversations...</span>
               </div>
             )}
-            
+
             {error && (
               <div className="p-4">
                 <p className="text-sm text-red-500 mb-2">{error}</p>
-                <Button 
-                  onClick={loadConversations} 
-                  variant="outline" 
+                <Button
+                  onClick={loadConversations}
+                  variant="outline"
                   size="sm"
                   className="w-full"
                   disabled={loading}
@@ -302,7 +302,7 @@ const ChatSidebar = ({
                 </Button>
               </div>
             )}
-            
+
             {!loading && !error && (
               <div className="space-y-2">
                 {conversations.length === 0 ? (
@@ -312,36 +312,35 @@ const ChatSidebar = ({
                   </div>
                 ) : (
                   conversations.map((conversation) => (
-                    <div 
-                      key={conversation.id} 
+                    <div
+                      key={conversation.id}
                       className="group relative"
                     >
                       <div
                         onClick={() => handleConversationSelect(conversation)}
-                        className={`block w-full p-3 pr-8 cursor-pointer rounded-lg transition-all duration-200 border ${
-                          currentConversationId === conversation.id 
-                            ? 'bg-gray-800/60 border-gray-700 text-white shadow-sm' 
+                        className={`block w-full p-3 pr-8 cursor-pointer rounded-lg transition-all duration-200 border ${currentConversationId === conversation.id
+                            ? 'bg-gray-800/60 border-gray-700 text-white shadow-sm'
                             : 'bg-gray-900/40 border-gray-800 text-gray-300 hover:bg-gray-800/40 hover:border-gray-700 hover:text-gray-200'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <h4 className="text-sm font-medium truncate leading-tight">
                             {conversation.title}
                           </h4>
                         </div>
-                        
+
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <p className="text-xs text-gray-400 truncate leading-relaxed">
                             {conversation.lastMessage}
                           </p>
                         </div>
-                        
+
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-1.5 text-xs text-gray-500">
                             <Clock className="w-3 h-3" />
                             <span>{formatTime(conversation.timestamp)}</span>
                           </div>
-                          
+
                           {conversation.messageCount && (
                             <span className="text-xs text-gray-400 bg-gray-700/50 px-2 py-0.5 rounded-full shrink-0 font-medium">
                               {conversation.messageCount}
@@ -349,7 +348,7 @@ const ChatSidebar = ({
                           )}
                         </div>
                       </div>
-                      
+
                       {/* Delete button */}
                       <Button
                         variant="ghost"
@@ -374,15 +373,25 @@ const ChatSidebar = ({
 
       <SidebarFooter className="p-4 border-t border-sidebar-border">
         <div className="space-y-2">
-          <Button
-            onClick={onNavigateToWorkspace}
-            variant="outline"
-            className="w-full justify-start text-sidebar-foreground hover:text-sidebar-accent-foreground border-sidebar-border hover:bg-sidebar-accent"
-          >
-            <Building2 className="w-4 h-4 mr-2" />
-            Workspace
-          </Button>
-          
+          <div className="space-y-1">
+            <Button
+              onClick={() => window.location.href = '/workspace-management'}
+              variant="outline"
+              className="w-full justify-start text-sidebar-foreground hover:text-sidebar-accent-foreground border-sidebar-border hover:bg-sidebar-accent"
+            >
+              <Building2 className="w-4 h-4 mr-2" />
+              Manage Workspaces
+            </Button>
+            <Button
+              onClick={onNavigateToWorkspace}
+              variant="outline"
+              className="w-full justify-start text-sidebar-foreground hover:text-sidebar-accent-foreground border-sidebar-border hover:bg-sidebar-accent"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Workspace
+            </Button>
+          </div>
+
           <UserProfile />
         </div>
       </SidebarFooter>

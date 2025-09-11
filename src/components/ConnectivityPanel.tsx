@@ -95,6 +95,7 @@ const ConnectivityPanel = () => {
       color: "bg-blue-900/50 border border-blue-700",
       isConnecting: false,
       isSyncing: false
+      
     },
     {
       id: "custom-request",

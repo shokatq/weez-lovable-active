@@ -9,6 +9,8 @@ import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import WorkspaceNew from "./pages/WorkspaceNew";
+import WorkspaceManagement from "./pages/WorkspaceManagement";
+import WorkspaceDetail from "./pages/WorkspaceDetail";
 import ChatInterface from "./components/ChatInterface";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -62,6 +64,16 @@ const AppContent = () => {
         <Route path="/workspace" element={
           <ProtectedRoute>
             <WorkspaceNew />
+          </ProtectedRoute>
+        } />
+        <Route path="/workspace-management" element={
+          <ProtectedRoute>
+            <WorkspaceManagement />
+          </ProtectedRoute>
+        } />
+        <Route path="/workspace/:workspaceId" element={
+          <ProtectedRoute>
+            <WorkspaceDetail />
           </ProtectedRoute>
         } />
         <Route path="/audit" element={

@@ -38,8 +38,19 @@ export const useUserRole = () => {
           .eq('user_id', user.id)
           .single();
 
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching user role:', error);
+        if (error) {
+          // Handle different error types gracefully
+          if (error.code === 'PGRST116') {
+            // No rows found - user has no team role
+            setHasTeam(false);
+          } else if (error.code === '406' || error.message?.includes('Not Acceptable')) {
+            // Permission denied or table access issue - treat as no team role
+            console.warn('User roles table access denied, treating as no team role:', error.message);
+            setHasTeam(false);
+          } else {
+            console.error('Error fetching user role:', error);
+            setHasTeam(false);
+          }
           setLoading(false);
           return;
         }
@@ -56,12 +67,15 @@ export const useUserRole = () => {
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
+        setHasTeam(false);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserRole();
+    // Add a small delay to prevent rapid calls
+    const timeoutId = setTimeout(fetchUserRole, 100);
+    return () => clearTimeout(timeoutId);
   }, [user]);
 
   const isAdmin = userRole?.role === 'admin';
@@ -94,8 +108,19 @@ export const useUserRole = () => {
               .eq('user_id', user.id)
               .single();
 
-            if (error && error.code !== 'PGRST116') {
-              console.error('Error fetching user role:', error);
+            if (error) {
+              // Handle different error types gracefully
+              if (error.code === 'PGRST116') {
+                // No rows found - user has no team role
+                setHasTeam(false);
+              } else if (error.code === '406' || error.message?.includes('Not Acceptable')) {
+                // Permission denied or table access issue - treat as no team role
+                console.warn('User roles table access denied, treating as no team role:', error.message);
+                setHasTeam(false);
+              } else {
+                console.error('Error fetching user role:', error);
+                setHasTeam(false);
+              }
               setLoading(false);
               return;
             }
@@ -112,6 +137,7 @@ export const useUserRole = () => {
             }
           } catch (error) {
             console.error('Error fetching user role:', error);
+            setHasTeam(false);
           } finally {
             setLoading(false);
           }
