@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { supabase } from '../integrations/supabase/client';
 import { WorkspaceService } from '../services/workspaceService';
 import type {
     WorkspaceWithMembers,
@@ -169,16 +170,22 @@ export function useWorkspaceMembers(workspaceId: string) {
     const [error, setError] = useState<string | null>(null);
     const { toast } = useToast();
 
-    const fetchMembers = async () => {
-        if (!workspaceId) return;
+    const fetchMembers = useCallback(async () => {
+        if (!workspaceId) {
+            console.log('⚠️ No workspace ID provided, skipping member fetch');
+            return;
+        }
 
         try {
+            console.log('🔄 Fetching members for workspace:', workspaceId);
             setLoading(true);
             setError(null);
             const response = await WorkspaceService.getWorkspaceMembers(workspaceId);
+            console.log('📋 Members fetched:', response.members.length, 'members');
             setMembers(response.members);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to fetch members';
+            console.error('❌ Error fetching members:', err);
             setError(errorMessage);
             toast({
                 title: 'Error',
@@ -188,20 +195,30 @@ export function useWorkspaceMembers(workspaceId: string) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [workspaceId, toast]);
 
     const addMember = async (data: AddMemberForm & { userId?: string }) => {
         try {
             setLoading(true);
-            await WorkspaceService.addWorkspaceMember(workspaceId, data);
+            console.log('➕ Adding member:', data);
+            const newMember = await WorkspaceService.addWorkspaceMember(workspaceId, data);
+            console.log('✅ Member added successfully:', newMember);
+            
             // Refresh members immediately
             await fetchMembers();
+            
+            // Also refresh after a short delay to ensure data consistency
+            setTimeout(async () => {
+                await fetchMembers();
+            }, 1000);
+            
             toast({
                 title: 'Success',
                 description: 'Member added successfully'
             });
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to add member';
+            console.error('❌ Error adding member:', err);
             toast({
                 title: 'Error',
                 description: errorMessage,
@@ -261,7 +278,27 @@ export function useWorkspaceMembers(workspaceId: string) {
 
     useEffect(() => {
         fetchMembers();
-    }, [workspaceId]);
+    }, [fetchMembers]);
+
+    // Realtime: keep members list (and thus counts) in sync
+    useEffect(() => {
+        if (!workspaceId) return;
+
+        const channel = supabase
+            .channel(`workspace-members-${workspaceId}`)
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'workspace_members', filter: `workspace_id=eq.${workspaceId}` },
+                () => {
+                    fetchMembers();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [workspaceId, fetchMembers]);
 
     return {
         members,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -24,7 +24,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { useWorkspaces, useWorkspaceMembers, useWorkspaceDocuments } from '../../hooks/useWorkspace';
+import { useWorkspaces, useWorkspaceDocuments } from '../../hooks/useWorkspace';
+import { useMemberContext } from '../../contexts/MemberContext';
+import { usePermissions } from '../../utils/permissions';
+import { MemberList } from './MemberList';
 import { CreateWorkspaceDialog } from './CreateWorkspaceDialog';
 import { AddMemberDialog } from './AddMemberDialog';
 import { DocumentUploadDialog } from './DocumentUploadDialog';
@@ -33,6 +36,7 @@ import { DocumentViewer } from './DocumentViewer';
 import { useAuth } from '../../hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import type { WorkspaceWithMembers, WorkspaceRole, DocumentWithUploader } from '../../types/workspace';
+import { WORKSPACE_ROLES } from '../../types/workspace';
 import { WorkspaceDebug } from '../debug/WorkspaceDebug';
 
 interface WorkspaceManagementProps {
@@ -50,21 +54,54 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [editingMember, setEditingMember] = useState<{ id: string; role: WorkspaceRole } | null>(null);
     const [viewingDocument, setViewingDocument] = useState<DocumentWithUploader | null>(null);
+    
+    // Store member counts for each workspace
+    const [workspaceMemberCounts, setWorkspaceMemberCounts] = useState<Record<string, number>>({});
 
-    const { workspaces, loading: workspacesLoading, createWorkspace } = useWorkspaces();
+    const { workspaces, loading: workspacesLoading, createWorkspace, fetchWorkspaces } = useWorkspaces();
     const {
-        members,
-        loading: membersLoading,
+        getMembers,
+        getMemberCount,
         addMember,
         updateMemberRole,
-        removeMember
-    } = useWorkspaceMembers(selectedWorkspace?.id || '');
+        removeMember,
+        subscribeToMembers,
+        unsubscribeFromMembers
+    } = useMemberContext();
     const {
         documents,
         loading: documentsLoading,
         uploadDocument,
         deleteDocument
     } = useWorkspaceDocuments(selectedWorkspace?.id || '');
+
+    // Update member count when members change for selected workspace
+    useEffect(() => {
+        if (selectedWorkspace) {
+            const memberCount = getMemberCount(selectedWorkspace.id);
+            console.log('Updating member count for workspace:', selectedWorkspace.id, 'Members:', memberCount);
+            setWorkspaceMemberCounts(prev => ({
+                ...prev,
+                [selectedWorkspace.id]: memberCount
+            }));
+        }
+    }, [selectedWorkspace, getMemberCount]);
+
+    // Initialize member counts from workspace data
+    useEffect(() => {
+        if (workspaces.length > 0) {
+            const initialCounts: Record<string, number> = {};
+            workspaces.forEach(workspace => {
+                // Only set if we don't already have a count for this workspace
+                if (!(workspace.id in workspaceMemberCounts)) {
+                    initialCounts[workspace.id] = workspace.members.length;
+                }
+            });
+            if (Object.keys(initialCounts).length > 0) {
+                setWorkspaceMemberCounts(prev => ({ ...prev, ...initialCounts }));
+            }
+        }
+    }, [workspaces, workspaceMemberCounts]);
 
     // Show loading state while user is being fetched
     if (!user) {
@@ -89,28 +126,47 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
 
     const handleAddMember = async (data: { email: string; role: WorkspaceRole; userId?: string }) => {
         try {
-            await addMember(data);
+            console.log('🎯 Adding member to workspace:', selectedWorkspace?.id, data);
+            await addMember(selectedWorkspace.id, data);
             setShowAddMemberDialog(false);
+            
+            // Force refresh workspace list to update member counts in sidebar
+            console.log('🔄 Refreshing workspace list...');
+            await fetchWorkspaces();
+            
+            // Also force refresh members for current workspace
+            if (selectedWorkspace) {
+                console.log('🔄 Force refreshing members for current workspace...');
+                // Subscribe to real-time updates for the workspace
+                subscribeToMembers(selectedWorkspace.id);
+            }
         } catch (error) {
+            console.error('❌ Error in handleAddMember:', error);
             // Error handling is done in the hook
         }
     };
 
     const handleUpdateMemberRole = async (data: { role: WorkspaceRole }) => {
-        if (!editingMember) return;
+        if (!editingMember || !selectedWorkspace) return;
 
         try {
-            await updateMemberRole(editingMember.id, data);
+            await updateMemberRole(selectedWorkspace.id, editingMember.id, data.role);
             setEditingMember(null);
+            // Refresh workspace list to update member counts in sidebar
+            await fetchWorkspaces();
         } catch (error) {
             // Error handling is done in the hook
         }
     };
 
     const handleRemoveMember = async (memberId: string) => {
+        if (!selectedWorkspace) return;
+        
         if (confirm('Are you sure you want to remove this member?')) {
             try {
-                await removeMember(memberId);
+                await removeMember(selectedWorkspace.id, memberId);
+                // Refresh workspace list to update member counts in sidebar
+                await fetchWorkspaces();
             } catch (error) {
                 // Error handling is done in the hook
             }
@@ -142,7 +198,7 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
 
         // Check if current user is a member
         const member = workspace.members.find(m => m.user_id === user?.id);
-        return member?.role as WorkspaceRole || 'none';
+        return (member?.role as WorkspaceRole) || 'viewer';
     };
 
     const canManageWorkspace = (workspace: WorkspaceWithMembers): boolean => {
@@ -168,6 +224,28 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
     const canDeleteDocuments = (workspace: WorkspaceWithMembers): boolean => {
         const role = getUserRole(workspace);
         return role === 'admin';
+    };
+
+    // Helper function to get member count for a workspace
+    const getWorkspaceMemberCount = (workspace: WorkspaceWithMembers): number => {
+        // If this is the selected workspace, use the loaded members count
+        if (selectedWorkspace?.id === workspace.id) {
+            const count = getMemberCount(workspace.id);
+            console.log('Getting member count for selected workspace:', workspace.id, 'Members:', count);
+            return count;
+        }
+        // Otherwise use stored count or fallback to workspace data
+        const count = workspaceMemberCounts[workspace.id] ?? workspace.members.length;
+        console.log('Getting member count for workspace:', workspace.id, 'Count:', count);
+        return count;
+    };
+
+    // Helper function to get members for display
+    const getMembersForDisplay = (workspace: WorkspaceWithMembers) => {
+        if (selectedWorkspace?.id === workspace.id) {
+            return getMembers(workspace.id);
+        }
+        return workspace.members;
     };
 
     if (workspacesLoading) {
@@ -198,7 +276,6 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
 
             {/* Debug Component - Remove this after debugging */}
             <WorkspaceDebug />
-
 
             {workspaces.length === 0 ? (
                 <Card>
@@ -232,58 +309,66 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-2">
-                                {workspaces.map((workspace) => (
-                                    <div
-                                        key={workspace.id}
-                                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedWorkspace?.id === workspace.id
-                                            ? 'border-primary bg-primary/5'
-                                            : 'border-border hover:bg-muted/50'
-                                            }`}
-                                        onClick={() => setSelectedWorkspace(workspace)}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-medium truncate">{workspace.name}</h4>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <Badge variant="secondary" className="text-xs">
-                                                        {getUserRole(workspace)}
-                                                    </Badge>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {workspace.members.length} members
-                                                    </span>
-                                                </div>
-                                                {workspace.members.length > 0 && (
-                                                    <div className="mt-2 text-xs text-muted-foreground">
-                                                        {workspace.members.slice(0, 3).map((member, index) => (
-                                                            <span key={member.id}>
-                                                                {member.user.first_name} {member.user.last_name} ({member.role})
-                                                                {index < Math.min(workspace.members.length, 3) - 1 && ', '}
-                                                            </span>
-                                                        ))}
-                                                        {workspace.members.length > 3 && (
-                                                            <span> +{workspace.members.length - 3} more</span>
-                                                        )}
+                                {workspaces.map((workspace) => {
+                                    const memberCount = getWorkspaceMemberCount(workspace);
+                                    const displayMembers = getMembersForDisplay(workspace);
+                                    
+                                    return (
+                                        <div
+                                            key={workspace.id}
+                                            className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedWorkspace?.id === workspace.id
+                                                ? 'border-primary bg-primary/5'
+                                                : 'border-border hover:bg-muted/50'
+                                                }`}
+                                            onClick={() => {
+                                                console.log('Selecting workspace:', workspace.id, 'with members:', workspace.members.length);
+                                                setSelectedWorkspace(workspace);
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-medium truncate">{workspace.name}</h4>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {getUserRole(workspace)}
+                                                        </Badge>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            {memberCount} members
+                                                        </span>
                                                     </div>
+                                                    {memberCount > 0 && (
+                                                        <div className="mt-2 text-xs text-muted-foreground">
+                                                            {displayMembers.slice(0, 3).map((member, index) => (
+                                                                <span key={member.id}>
+                                                                    {member.user.first_name} {member.user.last_name} ({WORKSPACE_ROLES[member.role as WorkspaceRole]?.label || member.role})
+                                                                    {index < Math.min(memberCount, 3) - 1 && ', '}
+                                                                </span>
+                                                            ))}
+                                                            {memberCount > 3 && (
+                                                                <span> +{memberCount - 3} more</span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {canManageWorkspace(workspace) && (
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="sm">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem>Settings</DropdownMenuItem>
+                                                            <DropdownMenuItem className="text-destructive">
+                                                                Delete Workspace
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 )}
                                             </div>
-                                            {canManageWorkspace(workspace) && (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="sm">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-destructive">
-                                                            Delete Workspace
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            )}
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </CardContent>
                         </Card>
                     </div>
@@ -322,14 +407,23 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                                         <Users className="h-5 w-5 text-muted-foreground" />
                                                         <span className="font-medium">Members</span>
                                                     </div>
-                                                    <p className="text-2xl font-bold mt-2">{selectedWorkspace.members.length}</p>
-                                                    {selectedWorkspace.members.length > 0 && (
+                                                    <p className="text-2xl font-bold mt-2">{getMemberCount(selectedWorkspace.id)}</p>
+                                                    {getMemberCount(selectedWorkspace.id) > 0 ? (
                                                         <div className="mt-3 space-y-1">
-                                                            {selectedWorkspace.members.map((member) => (
+                                                            {getMembers(selectedWorkspace.id).slice(0, 3).map((member) => (
                                                                 <div key={member.id} className="text-sm text-muted-foreground">
-                                                                    {member.user.first_name} {member.user.last_name} ({member.role})
+                                                                    {member.user.first_name} {member.user.last_name} ({WORKSPACE_ROLES[member.role as WorkspaceRole]?.label || member.role})
                                                                 </div>
                                                             ))}
+                                                            {getMemberCount(selectedWorkspace.id) > 3 && (
+                                                                <div className="text-sm text-muted-foreground">
+                                                                    +{getMemberCount(selectedWorkspace.id) - 3} more members
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="mt-3 text-sm text-muted-foreground">
+                                                            No members added yet
                                                         </div>
                                                     )}
                                                 </div>
@@ -339,75 +433,21 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                                         <span className="font-medium">Documents</span>
                                                     </div>
                                                     <p className="text-2xl font-bold mt-2">{selectedWorkspace.document_count}</p>
+                                                    <div className="mt-3 text-sm text-muted-foreground">
+                                                        {selectedWorkspace.document_count === 0 ? 'No documents uploaded' : 'Documents uploaded'}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </TabsContent>
 
                                         <TabsContent value="members" className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <h3 className="text-lg font-semibold">Team Members</h3>
-                                                {canManageWorkspace(selectedWorkspace) && (
-                                                    <Button onClick={() => setShowAddMemberDialog(true)}>
-                                                        <UserPlus className="h-4 w-4 mr-2" />
-                                                        Add Member
-                                                    </Button>
-                                                )}
-                                            </div>
-
-                                            {membersLoading ? (
-                                                <div className="text-center py-8">
-                                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-                                                    <p className="text-sm text-muted-foreground">Loading members...</p>
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-2">
-                                                    {members.map((member) => (
-                                                        <div key={member.id} className="flex items-center justify-between p-3 border rounded-lg">
-                                                            <div className="flex items-center gap-3">
-                                                                <Avatar className="h-8 w-8">
-                                                                    <AvatarImage src={member.user.avatar_url || undefined} />
-                                                                    <AvatarFallback>
-                                                                        {member.user.first_name?.[0]}{member.user.last_name?.[0]}
-                                                                    </AvatarFallback>
-                                                                </Avatar>
-                                                                <div>
-                                                                    <p className="font-medium">
-                                                                        {member.user.first_name} {member.user.last_name}
-                                                                    </p>
-                                                                    <p className="text-sm text-muted-foreground">{member.user.email}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <Badge variant="secondary">{member.role}</Badge>
-                                                                {canManageWorkspace(selectedWorkspace) && (
-                                                                    <DropdownMenu>
-                                                                        <DropdownMenuTrigger asChild>
-                                                                            <Button variant="ghost" size="sm">
-                                                                                <MoreHorizontal className="h-4 w-4" />
-                                                                            </Button>
-                                                                        </DropdownMenuTrigger>
-                                                                        <DropdownMenuContent align="end">
-                                                                            <DropdownMenuItem
-                                                                                onClick={() => setEditingMember({ id: member.id, role: member.role as WorkspaceRole })}
-                                                                            >
-                                                                                <Edit className="h-4 w-4 mr-2" />
-                                                                                Change Role
-                                                                            </DropdownMenuItem>
-                                                                            <DropdownMenuItem
-                                                                                onClick={() => handleRemoveMember(member.id)}
-                                                                                className="text-destructive"
-                                                                            >
-                                                                                <Trash2 className="h-4 w-4 mr-2" />
-                                                                                Remove
-                                                                            </DropdownMenuItem>
-                                                                        </DropdownMenuContent>
-                                                                    </DropdownMenu>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
+                                            <MemberList
+                                                workspaceId={selectedWorkspace.id}
+                                                currentUserRole={getUserRole(selectedWorkspace)}
+                                                isOwner={selectedWorkspace.owner_id === user?.id}
+                                                currentUserId={user?.id || null}
+                                                onAddMember={() => setShowAddMemberDialog(true)}
+                                            />
                                         </TabsContent>
 
                                         <TabsContent value="documents" className="space-y-4">
@@ -541,4 +581,3 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
         </div>
     );
 }
-

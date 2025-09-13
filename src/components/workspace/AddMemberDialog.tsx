@@ -63,9 +63,10 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             if (searchQuery.trim() && !selectedUser) {
+                console.log('🔍 Searching for users with query:', searchQuery);
                 searchUsers(searchQuery);
             }
-        }, 300); // 300ms debounce
+        }, 200); // Reduced debounce for faster search
 
         return () => clearTimeout(timeoutId);
     }, [searchQuery, searchUsers, selectedUser]);
@@ -146,7 +147,7 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
 
                                     {/* User search results */}
                                     {searchQuery && !selectedUser && (
-                                        <div className="border rounded-md max-h-48 overflow-y-auto">
+                                        <div className="border rounded-md max-h-64 overflow-y-auto">
                                             {searchLoading ? (
                                                 <div className="p-3 text-center text-sm text-muted-foreground">
                                                     <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2" />
@@ -154,6 +155,9 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
                                                 </div>
                                             ) : users.length > 0 ? (
                                                 <div className="p-1">
+                                                    <div className="text-xs text-muted-foreground px-2 py-1 border-b">
+                                                        Found {users.length} users
+                                                    </div>
                                                     {users.map((user) => (
                                                         <button
                                                             key={user.id}
@@ -164,7 +168,7 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
                                                             <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
                                                                 <User className="h-4 w-4" />
                                                             </div>
-                                                            <div>
+                                                            <div className="flex-1">
                                                                 <p className="font-medium">
                                                                     {user.first_name} {user.last_name}
                                                                 </p>
@@ -176,6 +180,8 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
                                             ) : (
                                                 <div className="p-3 text-center text-sm text-muted-foreground">
                                                     No users found with that email address
+                                                    <br />
+                                                    <span className="text-xs">Try searching with a different email or name</span>
                                                 </div>
                                             )}
                                         </div>

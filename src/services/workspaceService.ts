@@ -22,6 +22,26 @@ import type {
 } from '../types/workspace';
 
 export class WorkspaceService {
+    // Ensure the workspace owner exists in workspace_members as admin
+    private static async ensureOwnerMembership(workspaceId: string): Promise<void> {
+        const { data: workspace } = await supabase
+            .from('workspaces')
+            .select('owner_id')
+            .eq('id', workspaceId)
+            .single();
+
+        if (!workspace?.owner_id) return;
+
+        await supabase
+            .from('workspace_members')
+            .insert({
+                workspace_id: workspaceId,
+                user_id: workspace.owner_id,
+                role: 'admin'
+            })
+            .onConflict('workspace_id,user_id')
+            .ignoreDuplicates();
+    }
     // Workspace CRUD operations
     static async createWorkspace(data: CreateWorkspaceForm): Promise<Workspace> {
         const { data: { user } } = await supabase.auth.getUser();
@@ -42,7 +62,12 @@ export class WorkspaceService {
                 throw new Error(`Failed to create workspace: ${error.message}`);
             }
 
-            return workspace;
+            // Ensure owner is added as admin member for RLS and counts
+            if (workspace?.id) {
+                await this.ensureOwnerMembership(workspace.id);
+            }
+
+            return workspace as Workspace;
         } catch (error) {
             console.error('Unexpected error creating workspace:', error);
             throw error;
@@ -95,28 +120,40 @@ export class WorkspaceService {
                 index === self.findIndex(w => w.id === workspace.id)
             );
 
-            // For each workspace, get members and document count separately
+            // For each workspace, ensure owner membership and get members and document count separately
             const workspacesWithData = await Promise.all(
                 (uniqueWorkspaces || []).map(async (workspace) => {
                     try {
-                        // Get members for this workspace
-                        const { data: members, error: membersError } = await supabase
+                        await this.ensureOwnerMembership(workspace.id);
+                        // Fetch raw member rows to get accurate count regardless of join RLS
+                        const { data: memberRows, error: membersError } = await supabase
                             .from('workspace_members')
-                            .select(`
-                *,
-                user:profiles(
-                  id,
-                  email,
-                  first_name,
-                  last_name,
-                  avatar_url
-                )
-              `)
+                            .select('*')
                             .eq('workspace_id', workspace.id);
 
-                        if (membersError) {
-                            console.warn(`Error fetching members for workspace ${workspace.id}:`, membersError);
+                        const safeMemberRows = memberRows || [];
+
+                        // Hydrate minimal user info when possible; fall back to placeholders
+                        const userIds = safeMemberRows.map(m => m.user_id);
+                        let profilesById: Record<string, { id: string; email: string; first_name: string | null; last_name: string | null; avatar_url: string | null }> = {};
+                        if (userIds.length > 0) {
+                            const { data: profiles } = await supabase
+                                .from('profiles')
+                                .select('id, email, first_name, last_name, avatar_url')
+                                .in('id', userIds);
+                            profilesById = Object.fromEntries((profiles || []).map(p => [p.id, p]));
                         }
+
+                        const members = safeMemberRows.map(row => ({
+                            ...row,
+                            user: profilesById[row.user_id] || {
+                                id: row.user_id,
+                                email: '',
+                                first_name: null,
+                                last_name: null,
+                                avatar_url: null
+                            }
+                        }));
 
                         // Get document count for this workspace
                         const { count: documentCount, error: countError } = await supabase
@@ -130,7 +167,7 @@ export class WorkspaceService {
 
                         return {
                             ...workspace,
-                            members: members || [],
+                            members,
                             document_count: documentCount || 0
                         };
                     } catch (error) {
@@ -184,56 +221,35 @@ export class WorkspaceService {
                 throw new Error('You do not have access to this workspace');
             }
 
-            // Get members for this workspace
-            const { data: members } = await supabase
+            // Ensure owner membership exists before fetching members
+            await this.ensureOwnerMembership(id);
+
+            // Fetch raw members, then hydrate profiles defensively
+            const { data: memberRows } = await supabase
                 .from('workspace_members')
-                .select(`
-          *,
-          user:profiles(
-            id,
-            email,
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `)
+                .select('*')
                 .eq('workspace_id', id);
 
-            // Ensure workspace owner is included as admin member
-            const ownerMember = members?.find(m => m.user_id === workspace.owner_id);
-            if (!ownerMember) {
-                // Add owner as admin if not already a member
-                await supabase
-                    .from('workspace_members')
-                    .insert({
-                        workspace_id: id,
-                        user_id: workspace.owner_id,
-                        role: 'admin'
-                    })
-                    .onConflict('workspace_id,user_id')
-                    .ignoreDuplicates();
-
-                // Fetch members again to include the owner
-                const { data: updatedMembers } = await supabase
-                    .from('workspace_members')
-                    .select(`
-            *,
-            user:profiles(
-              id,
-              email,
-              first_name,
-              last_name,
-              avatar_url
-            )
-          `)
-                    .eq('workspace_id', id);
-
-                return {
-                    ...workspace,
-                    members: updatedMembers || [],
-                    document_count: documentCount || 0
-                } as WorkspaceWithMembers;
+            const ids = (memberRows || []).map(m => m.user_id);
+            let profilesById: Record<string, { id: string; email: string; first_name: string | null; last_name: string | null; avatar_url: string | null }> = {};
+            if (ids.length > 0) {
+                const { data: profiles } = await supabase
+                    .from('profiles')
+                    .select('id, email, first_name, last_name, avatar_url')
+                    .in('id', ids);
+                profilesById = Object.fromEntries((profiles || []).map(p => [p.id, p]));
             }
+
+            const members = (memberRows || []).map(row => ({
+                ...row,
+                user: profilesById[row.user_id] || {
+                    id: row.user_id,
+                    email: '',
+                    first_name: null,
+                    last_name: null,
+                    avatar_url: null
+                }
+            }));
 
             // Get document count for this workspace
             const { count: documentCount } = await supabase
@@ -276,39 +292,59 @@ export class WorkspaceService {
     // Workspace member operations
     static async getWorkspaceMembers(workspaceId: string): Promise<WorkspaceMembersResponse> {
         try {
-            const { data: members, error } = await supabase
-                .from('workspace_members')
-                .select(`
-            *,
-            user:profiles(
-              id,
-              email,
-              first_name,
-              last_name,
-              avatar_url
-            )
-          `)
-                .eq('workspace_id', workspaceId);
+            console.log('🔍 Fetching members for workspace:', workspaceId);
+            await this.ensureOwnerMembership(workspaceId);
 
-            if (error) {
-                console.error('Error fetching workspace members:', error);
-                // Return empty array instead of throwing
-                return {
-                    members: [],
-                    total: 0
-                };
+            // Fetch raw member rows first (avoid join RLS issues)
+            const { data: memberRows, error: membersError } = await supabase
+                .from('workspace_members')
+                .select('*')
+                .eq('workspace_id', workspaceId)
+                .order('created_at', { ascending: true });
+
+            console.log('📊 Raw member rows:', memberRows, 'Error:', membersError);
+
+            if (membersError) {
+                console.error('Error fetching workspace members:', membersError);
+                return { members: [], total: 0 };
             }
 
-            return {
-                members: members as WorkspaceMemberWithUser[],
-                total: members?.length || 0
-            };
+            const userIds = (memberRows || []).map(m => m.user_id);
+            console.log('👥 User IDs to fetch profiles for:', userIds);
+            
+            let profilesById: Record<string, { id: string; email: string; first_name: string | null; last_name: string | null; avatar_url: string | null }> = {};
+
+            if (userIds.length > 0) {
+                const { data: profiles, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('id, email, first_name, last_name, avatar_url')
+                    .in('id', userIds);
+
+                console.log('👤 Profiles fetched:', profiles, 'Error:', profilesError);
+
+                if (!profilesError && profiles) {
+                    profilesById = Object.fromEntries(profiles.map(p => [p.id, p]));
+                } else if (profilesError) {
+                    console.warn('Profiles fetch blocked by RLS; proceeding without user details');
+                }
+            }
+
+            const membersWithUser: WorkspaceMemberWithUser[] = (memberRows || []).map(row => ({
+                ...row,
+                user: profilesById[row.user_id] || {
+                    id: row.user_id,
+                    email: '',
+                    first_name: null,
+                    last_name: null,
+                    avatar_url: null
+                }
+            }));
+
+            console.log('✅ Final members with user data:', membersWithUser);
+            return { members: membersWithUser, total: membersWithUser.length };
         } catch (error) {
             console.error('Unexpected error fetching workspace members:', error);
-            return {
-                members: [],
-                total: 0
-            };
+            return { members: [], total: 0 };
         }
     }
 
@@ -555,7 +591,7 @@ export class WorkspaceService {
                 return [];
             }
 
-            console.log('Searching for users with query:', query);
+            console.log('🔍 Searching for users with query:', query);
 
             // Try RPC function first
             const { data: users, error } = await supabase
@@ -564,30 +600,44 @@ export class WorkspaceService {
             if (error) {
                 console.error('Error searching users with RPC:', error);
 
-                // Fallback to direct profiles table access
+                // Fallback to direct profiles table access with better search
                 const { data: allUsers, error: allUsersError } = await supabase
                     .from('profiles')
                     .select('id, email, first_name, last_name')
-                    .limit(50);
+                    .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
+                    .limit(100); // Increased limit
 
                 if (allUsersError) {
-                    console.error('Error fetching all users:', allUsersError);
-                    return [];
+                    console.error('Error fetching users with ilike:', allUsersError);
+                    
+                    // Final fallback - get all users and filter client-side
+                    const { data: allUsersFallback, error: allUsersFallbackError } = await supabase
+                        .from('profiles')
+                        .select('id, email, first_name, last_name')
+                        .limit(200);
+
+                    if (allUsersFallbackError) {
+                        console.error('Error fetching all users:', allUsersFallbackError);
+                        return [];
+                    }
+
+                    // Filter users based on query
+                    const filteredUsers = (allUsersFallback || []).filter(user =>
+                        user.email.toLowerCase().includes(query.toLowerCase()) ||
+                        (user.first_name && user.first_name.toLowerCase().includes(query.toLowerCase())) ||
+                        (user.last_name && user.last_name.toLowerCase().includes(query.toLowerCase()))
+                    );
+
+                    console.log('🔍 Filtered users from profiles (fallback):', filteredUsers.length);
+                    return filteredUsers.slice(0, 20); // Increased limit
                 }
 
-                // Filter users based on query
-                const filteredUsers = (allUsers || []).filter(user =>
-                    user.email.toLowerCase().includes(query.toLowerCase()) ||
-                    (user.first_name && user.first_name.toLowerCase().includes(query.toLowerCase())) ||
-                    (user.last_name && user.last_name.toLowerCase().includes(query.toLowerCase()))
-                );
-
-                console.log('Filtered users from profiles:', filteredUsers);
-                return filteredUsers.slice(0, 10);
+                console.log('🔍 Users found via ilike:', allUsers?.length);
+                return (allUsers || []).slice(0, 20); // Increased limit
             }
 
-            console.log('Users found via RPC:', users);
-            return users || [];
+            console.log('🔍 Users found via RPC:', users?.length);
+            return (users || []).slice(0, 20); // Increased limit
         } catch (error) {
             console.error('Error in searchUsers:', error);
             return [];

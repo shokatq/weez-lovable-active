@@ -21,6 +21,7 @@ import EmployeeSignup from "./pages/EmployeeSignup";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import Audit from "./pages/Audit";
 import { AuthProvider } from "./hooks/useAuth";
+import { MemberProvider } from "./contexts/MemberContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleGuard from "./components/auth/RoleGuard";
 import { useGlobalAuditLogger } from "./hooks/useGlobalAuditLogger";
@@ -98,11 +99,13 @@ const App = () => {
         disableTransitionOnChange
       >
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <AppContent />
-          </TooltipProvider>
+          <MemberProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <AppContent />
+            </TooltipProvider>
+          </MemberProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
