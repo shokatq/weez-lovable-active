@@ -32,15 +32,29 @@ export class WorkspaceService {
 
         if (!workspace?.owner_id) return;
 
-        await supabase
+        // Check if owner is already a member
+        const { data: existingMember } = await supabase
             .from('workspace_members')
-            .insert({
-                workspace_id: workspaceId,
-                user_id: workspace.owner_id,
-                role: 'admin'
-            })
-            .onConflict('workspace_id,user_id')
-            .ignoreDuplicates();
+            .select('id')
+            .eq('workspace_id', workspaceId)
+            .eq('user_id', workspace.owner_id)
+            .single();
+
+        // Only insert if not already a member
+        if (!existingMember) {
+            const { error } = await supabase
+                .from('workspace_members')
+                .insert({
+                    workspace_id: workspaceId,
+                    user_id: workspace.owner_id,
+                    role: 'admin'
+                });
+
+            if (error) {
+                console.error('Error adding owner as admin member:', error);
+                // Don't throw here as this is a best-effort operation
+            }
+        }
     }
     // Workspace CRUD operations
     static async createWorkspace(data: CreateWorkspaceForm): Promise<Workspace> {
@@ -85,23 +99,12 @@ export class WorkspaceService {
                 throw new Error('User not authenticated');
             }
 
-            // Get workspaces where user is owner OR member
-            const { data: ownedWorkspaces, error: ownedError } = await supabase
-                .from('workspaces')
-                .select('*')
-                .eq('owner_id', user.id);
+            console.log('🔍 Fetching workspaces for user:', user.id);
 
-            if (ownedError) {
-                console.error('Error fetching owned workspaces:', ownedError);
-                throw new Error(`Failed to fetch owned workspaces: ${ownedError.message}`);
-            }
-
-            // Get workspaces where user is a member
+            // First, get workspace IDs where user is a member
             const { data: memberWorkspaces, error: memberError } = await supabase
                 .from('workspace_members')
-                .select(`
-                    workspace:workspaces(*)
-                `)
+                .select('workspace_id')
                 .eq('user_id', user.id);
 
             if (memberError) {
@@ -109,80 +112,97 @@ export class WorkspaceService {
                 throw new Error(`Failed to fetch member workspaces: ${memberError.message}`);
             }
 
-            // Combine and deduplicate workspaces
-            const allWorkspaces = [
-                ...(ownedWorkspaces || []),
-                ...(memberWorkspaces?.map(m => m.workspace).filter(Boolean) || [])
-            ];
+            const memberWorkspaceIds = memberWorkspaces?.map(m => m.workspace_id) || [];
 
-            // Remove duplicates based on workspace ID
-            const uniqueWorkspaces = allWorkspaces.filter((workspace, index, self) =>
-                index === self.findIndex(w => w.id === workspace.id)
-            );
+            // Get all workspaces where user is owner OR member
+            const { data: workspaces, error: workspacesError } = await supabase
+                .from('workspaces')
+                .select('*')
+                .or(`owner_id.eq.${user.id},id.in.(${memberWorkspaceIds.join(',')})`);
 
-            // For each workspace, ensure owner membership and get members and document count separately
+            if (workspacesError) {
+                console.error('Error fetching workspaces:', workspacesError);
+                throw new Error(`Failed to fetch workspaces: ${workspacesError.message}`);
+            }
+
+            console.log('📊 Raw workspaces data:', workspaces);
+
+            // Process workspaces to get accurate member counts and basic member info
             const workspacesWithData = await Promise.all(
-                (uniqueWorkspaces || []).map(async (workspace) => {
+                (workspaces || []).map(async (workspace) => {
                     try {
                         await this.ensureOwnerMembership(workspace.id);
-                        // Fetch raw member rows to get accurate count regardless of join RLS
-                        const { data: memberRows, error: membersError } = await supabase
+                        
+                        // Get member count efficiently
+                        const { count: memberCount, error: memberCountError } = await supabase
                             .from('workspace_members')
-                            .select('*')
+                            .select('*', { count: 'exact', head: true })
                             .eq('workspace_id', workspace.id);
 
-                        const safeMemberRows = memberRows || [];
-
-                        // Hydrate minimal user info when possible; fall back to placeholders
-                        const userIds = safeMemberRows.map(m => m.user_id);
-                        let profilesById: Record<string, { id: string; email: string; first_name: string | null; last_name: string | null; avatar_url: string | null }> = {};
-                        if (userIds.length > 0) {
-                            const { data: profiles } = await supabase
-                                .from('profiles')
-                                .select('id, email, first_name, last_name, avatar_url')
-                                .in('id', userIds);
-                            profilesById = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+                        if (memberCountError) {
+                            console.warn(`Error fetching member count for workspace ${workspace.id}:`, memberCountError);
                         }
 
-                        const members = safeMemberRows.map(row => ({
-                            ...row,
-                            user: profilesById[row.user_id] || {
-                                id: row.user_id,
-                                email: '',
-                                first_name: null,
-                                last_name: null,
-                                avatar_url: null
-                            }
-                        }));
-
                         // Get document count for this workspace
-                        const { count: documentCount, error: countError } = await supabase
+                        const { count: documentCount, error: documentCountError } = await supabase
                             .from('documents')
                             .select('*', { count: 'exact', head: true })
                             .eq('workspace_id', workspace.id);
 
-                        if (countError) {
-                            console.warn(`Error fetching document count for workspace ${workspace.id}:`, countError);
+                        if (documentCountError) {
+                            console.warn(`Error fetching document count for workspace ${workspace.id}:`, documentCountError);
                         }
+
+                        // Get basic member info for display (limit to 3 for performance)
+                        const { data: memberRows, error: membersError } = await supabase
+                            .from('workspace_members')
+                            .select('id, user_id, role, created_at')
+                            .eq('workspace_id', workspace.id)
+                            .order('created_at', { ascending: true })
+                            .limit(3);
+
+                        if (membersError) {
+                            console.warn(`Error fetching member details for workspace ${workspace.id}:`, membersError);
+                        }
+
+                        const members = (memberRows || []).map(row => ({
+                            id: row.id,
+                            user_id: row.user_id,
+                            role: row.role,
+                            created_at: row.created_at,
+                            user: {
+                                id: row.user_id,
+                                email: 'user@example.com', // Placeholder - will be fetched separately if needed
+                                raw_user_meta_data: null
+                            }
+                        }));
+
+                        console.log(`✅ Workspace ${workspace.id}: ${memberCount || 0} members, ${documentCount || 0} documents`);
 
                         return {
                             ...workspace,
                             members,
-                            document_count: documentCount || 0
+                            member_count: memberCount || 0,
+                            document_count: documentCount || 0,
+                            admin_name: 'Admin' // Simplified for now
                         };
                     } catch (error) {
-                        console.error(`Error fetching data for workspace ${workspace.id}:`, error);
+                        console.error(`Error processing workspace ${workspace.id}:`, error);
                         return {
                             ...workspace,
                             members: [],
-                            document_count: 0
+                            member_count: 0,
+                            document_count: 0,
+                            admin_name: 'Admin' // Simplified for now
                         };
                     }
                 })
             );
 
+            console.log('🎉 Processed workspaces:', workspacesWithData);
+
             return {
-                workspaces: workspacesWithData as WorkspaceWithMembers[],
+                workspaces: workspacesWithData as unknown as WorkspaceWithMembers[],
                 total: workspacesWithData.length
             };
         } catch (error) {
@@ -362,22 +382,43 @@ export class WorkspaceService {
                 .eq('email', data.email)
                 .single();
 
-            if (userError || !user) {
+            if (userError) {
+                if (userError.code === 'PGRST116') {
+                    throw new Error('User not found with this email address');
+                }
+                console.error('Error finding user by email:', userError);
+                throw new Error('Failed to find user');
+            }
+            
+            if (!user) {
                 throw new Error('User not found with this email address');
             }
             userId = user.id;
         }
 
         // Check if user is already a member
-        const { data: existingMember } = await supabase
+        const { data: existingMember, error: checkError } = await supabase
             .from('workspace_members')
-            .select('id')
+            .select('id, role')
             .eq('workspace_id', workspaceId)
             .eq('user_id', userId)
             .single();
 
+        if (checkError && checkError.code !== 'PGRST116') {
+            console.error('Error checking existing member:', checkError);
+            throw new Error('Failed to check existing membership');
+        }
+
         if (existingMember) {
-            throw new Error('User is already a member of this workspace');
+            const error = new Error('The member is already added to the space');
+            error.name = 'MEMBER_ALREADY_EXISTS';
+            throw error;
+        }
+
+        // Validate role
+        const validRoles = ['admin', 'team_lead', 'viewer'];
+        if (!validRoles.includes(data.role)) {
+            throw new Error(`Invalid role. Must be one of: ${validRoles.join(', ')}`);
         }
 
         const { data: member, error } = await supabase
@@ -392,8 +433,23 @@ export class WorkspaceService {
 
         if (error) {
             console.error('Error adding workspace member:', error);
-            throw error;
+            
+            // Provide specific error messages based on error codes
+            if (error.code === '23505') { // Unique constraint violation
+                throw new Error('The member is already added to the space');
+            } else if (error.code === '23503') { // Foreign key violation
+                throw new Error('Invalid workspace or user reference');
+            } else if (error.code === '23514') { // Check constraint violation
+                throw new Error(`Invalid role. Must be one of: ${validRoles.join(', ')}`);
+            }
+            
+            throw new Error(`Failed to add member: ${error.message}`);
         }
+        
+        if (!member) {
+            throw new Error('Failed to add member - no data returned');
+        }
+        
         return member;
     }
 

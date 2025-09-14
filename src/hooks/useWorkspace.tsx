@@ -111,11 +111,18 @@ export function useWorkspaces() {
 
     const fetchWorkspaces = async () => {
         try {
+            console.log('🔄 Fetching workspaces...');
             setLoading(true);
             setError(null);
+            
             const response = await WorkspaceService.getWorkspaces();
-            setWorkspaces(response.workspaces);
+            console.log('📊 Received workspaces:', response.workspaces?.length || 0, 'workspaces');
+            console.log('📋 Workspace details:', response.workspaces);
+            
+            setWorkspaces(response.workspaces || []);
+            console.log('✅ Workspaces state updated');
         } catch (err) {
+            console.error('❌ Error fetching workspaces:', err);
             const errorMessage = err instanceof Error ? err.message : 'Failed to fetch workspaces';
             setError(errorMessage);
             toast({
@@ -130,16 +137,26 @@ export function useWorkspaces() {
 
     const createWorkspace = async (data: CreateWorkspaceForm) => {
         try {
+            console.log('🚀 Creating workspace:', data);
             setLoading(true);
+            setError(null);
+            
             const newWorkspace = await WorkspaceService.createWorkspace(data);
-            await fetchWorkspaces(); // Refresh the list
+            console.log('✅ Workspace created, refreshing list...');
+            
+            // Force refresh the workspace list
+            await fetchWorkspaces();
+            
+            console.log('🎉 Workspace creation completed successfully');
             toast({
                 title: 'Success',
                 description: 'Workspace created successfully'
             });
             return newWorkspace;
         } catch (err) {
+            console.error('❌ Error creating workspace:', err);
             const errorMessage = err instanceof Error ? err.message : 'Failed to create workspace';
+            setError(errorMessage);
             toast({
                 title: 'Error',
                 description: errorMessage,

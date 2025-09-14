@@ -25,7 +25,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
-import { useWorkspace, useWorkspaceMembers, useWorkspaceDocuments } from '../hooks/useWorkspace';
+import { useWorkspace, useWorkspaceDocuments } from '../hooks/useWorkspace';
+import { useMemberContext, MemberProvider } from '../contexts/MemberContext';
 import { AddMemberDialog } from '../components/workspace/AddMemberDialog';
 import { DocumentUploadDialog } from '../components/workspace/DocumentUploadDialog';
 import { UpdateMemberRoleDialog } from '../components/workspace/UpdateMemberRoleDialog';
@@ -53,12 +54,16 @@ function WorkspaceDetailContent() {
     } = useWorkspace();
 
     const {
-        members,
-        loading: membersLoading,
+        getMembers,
+        isLoading,
         addMember,
         updateMemberRole,
-        removeMember
-    } = useWorkspaceMembers(workspaceId || '');
+        removeMember,
+        fetchMembers
+    } = useMemberContext();
+
+    const members = getMembers(workspaceId || '');
+    const membersLoading = isLoading(workspaceId || '');
 
     const {
         documents,
@@ -71,24 +76,28 @@ function WorkspaceDetailContent() {
     useEffect(() => {
         if (workspaceId) {
             loadWorkspace(workspaceId);
+            // Also fetch members for this workspace
+            fetchMembers(workspaceId);
         }
-    }, [workspaceId, loadWorkspace]);
+    }, [workspaceId, loadWorkspace, fetchMembers]);
 
     const handleAddMember = async (data: { email: string; role: WorkspaceRole }) => {
         try {
-            await addMember(data);
-            setShowAddMemberDialog(false);
-            await refreshWorkspace(); // Refresh workspace data
+            if (workspaceId) {
+                await addMember(workspaceId, data);
+                setShowAddMemberDialog(false);
+                await refreshWorkspace(); // Refresh workspace data
+            }
         } catch (error) {
             // Error handling is done in the hook
         }
     };
 
     const handleUpdateMemberRole = async (data: { role: WorkspaceRole }) => {
-        if (!editingMember) return;
+        if (!editingMember || !workspaceId) return;
 
         try {
-            await updateMemberRole(editingMember.id, data);
+            await updateMemberRole(workspaceId, editingMember.id, data.role);
             setEditingMember(null);
             await refreshWorkspace(); // Refresh workspace data
         } catch (error) {
@@ -99,8 +108,10 @@ function WorkspaceDetailContent() {
     const handleRemoveMember = async (memberId: string) => {
         if (confirm('Are you sure you want to remove this member?')) {
             try {
-                await removeMember(memberId);
-                await refreshWorkspace(); // Refresh workspace data
+                if (workspaceId) {
+                    await removeMember(workspaceId, memberId);
+                    await refreshWorkspace(); // Refresh workspace data
+                }
             } catch (error) {
                 // Error handling is done in the hook
             }
@@ -421,7 +432,9 @@ function WorkspaceDetailContent() {
 export default function WorkspaceDetailPage() {
     return (
         <WorkspaceProvider>
-            <WorkspaceDetailContent />
+            <MemberProvider>
+                <WorkspaceDetailContent />
+            </MemberProvider>
         </WorkspaceProvider>
     );
 }

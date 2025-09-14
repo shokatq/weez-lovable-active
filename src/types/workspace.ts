@@ -26,6 +26,7 @@ export interface WorkspaceWithMembers extends Workspace {
       avatar_url: string | null;
     };
   })[];
+  member_count: number;
   document_count: number;
 }
 

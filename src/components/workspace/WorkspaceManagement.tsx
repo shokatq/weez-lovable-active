@@ -16,7 +16,8 @@ import {
     Eye,
     Edit,
     Trash2,
-    Download
+    Download,
+    RefreshCw
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -26,6 +27,7 @@ import {
 } from '../ui/dropdown-menu';
 import { useWorkspaces, useWorkspaceDocuments } from '../../hooks/useWorkspace';
 import { useMemberContext } from '../../contexts/MemberContext';
+import { WorkspaceService } from '../../services/workspaceService';
 import { usePermissions } from '../../utils/permissions';
 import { MemberList } from './MemberList';
 import { CreateWorkspaceDialog } from './CreateWorkspaceDialog';
@@ -37,7 +39,6 @@ import { useAuth } from '../../hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import type { WorkspaceWithMembers, WorkspaceRole, DocumentWithUploader } from '../../types/workspace';
 import { WORKSPACE_ROLES } from '../../types/workspace';
-import { WorkspaceDebug } from '../debug/WorkspaceDebug';
 
 interface WorkspaceManagementProps {
     workspaceId?: string;
@@ -54,6 +55,7 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [editingMember, setEditingMember] = useState<{ id: string; role: WorkspaceRole } | null>(null);
     const [viewingDocument, setViewingDocument] = useState<DocumentWithUploader | null>(null);
+    const [deletingWorkspace, setDeletingWorkspace] = useState<WorkspaceWithMembers | null>(null);
     
     // Store member counts for each workspace
     const [workspaceMemberCounts, setWorkspaceMemberCounts] = useState<Record<string, number>>({});
@@ -66,7 +68,8 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
         updateMemberRole,
         removeMember,
         subscribeToMembers,
-        unsubscribeFromMembers
+        unsubscribeFromMembers,
+        fetchMembers
     } = useMemberContext();
     const {
         documents,
@@ -92,16 +95,13 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
         if (workspaces.length > 0) {
             const initialCounts: Record<string, number> = {};
             workspaces.forEach(workspace => {
-                // Only set if we don't already have a count for this workspace
-                if (!(workspace.id in workspaceMemberCounts)) {
-                    initialCounts[workspace.id] = workspace.members.length;
-                }
+                // Use the actual member count from the workspace data
+                initialCounts[workspace.id] = workspace.members?.length || 0;
+                console.log(`Initializing member count for workspace ${workspace.id}: ${workspace.members?.length || 0} members`);
             });
-            if (Object.keys(initialCounts).length > 0) {
-                setWorkspaceMemberCounts(prev => ({ ...prev, ...initialCounts }));
-            }
+            setWorkspaceMemberCounts(initialCounts);
         }
-    }, [workspaces, workspaceMemberCounts]);
+    }, [workspaces]);
 
     // Show loading state while user is being fetched
     if (!user) {
@@ -117,9 +117,12 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
 
     const handleCreateWorkspace = async (data: { name: string }) => {
         try {
+            console.log('🎯 Creating workspace from WorkspaceManagement:', data);
             await createWorkspace(data);
             setShowCreateDialog(false);
+            console.log('✅ Workspace creation completed in WorkspaceManagement');
         } catch (error) {
+            console.error('❌ Error in handleCreateWorkspace:', error);
             // Error handling is done in the hook
         }
     };
@@ -127,19 +130,36 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
     const handleAddMember = async (data: { email: string; role: WorkspaceRole; userId?: string }) => {
         try {
             console.log('🎯 Adding member to workspace:', selectedWorkspace?.id, data);
-            await addMember(selectedWorkspace.id, data);
-            setShowAddMemberDialog(false);
             
-            // Force refresh workspace list to update member counts in sidebar
+            // Add member using the context
+            await addMember(selectedWorkspace.id, data);
+            
+            // Force refresh the member context to ensure MemberList gets updated data
+            console.log('🔄 Force refreshing members for current workspace...');
+            await fetchMembers(selectedWorkspace.id, true); // Force refresh
+            
+            // Update the selected workspace's member count immediately
+            if (selectedWorkspace) {
+                const updatedMemberCount = getMemberCount(selectedWorkspace.id);
+                setSelectedWorkspace(prev => prev ? {
+                    ...prev,
+                    member_count: updatedMemberCount
+                } : null);
+                
+                // Also update the workspace member counts state
+                setWorkspaceMemberCounts(prev => ({
+                    ...prev,
+                    [selectedWorkspace.id]: updatedMemberCount
+                }));
+            }
+            
+            // Also refresh workspace list to update member counts in sidebar
             console.log('🔄 Refreshing workspace list...');
             await fetchWorkspaces();
             
-            // Also force refresh members for current workspace
-            if (selectedWorkspace) {
-                console.log('🔄 Force refreshing members for current workspace...');
-                // Subscribe to real-time updates for the workspace
-                subscribeToMembers(selectedWorkspace.id);
-            }
+            setShowAddMemberDialog(false);
+            
+            console.log('✅ Member addition completed and data refreshed');
         } catch (error) {
             console.error('❌ Error in handleAddMember:', error);
             // Error handling is done in the hook
@@ -151,7 +171,12 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
 
         try {
             await updateMemberRole(selectedWorkspace.id, editingMember.id, data.role);
+            
+            // Force refresh the member context
+            await fetchMembers(selectedWorkspace.id, true);
+            
             setEditingMember(null);
+            
             // Refresh workspace list to update member counts in sidebar
             await fetchWorkspaces();
         } catch (error) {
@@ -165,6 +190,17 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
         if (confirm('Are you sure you want to remove this member?')) {
             try {
                 await removeMember(selectedWorkspace.id, memberId);
+                
+                // Force refresh the member context
+                await fetchMembers(selectedWorkspace.id, true);
+                
+                // Update the member count for this workspace immediately
+                const updatedMemberCount = getMemberCount(selectedWorkspace.id);
+                setWorkspaceMemberCounts(prev => ({
+                    ...prev,
+                    [selectedWorkspace.id]: updatedMemberCount
+                }));
+                
                 // Refresh workspace list to update member counts in sidebar
                 await fetchWorkspaces();
             } catch (error) {
@@ -179,6 +215,34 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
             setShowUploadDialog(false);
         } catch (error) {
             // Error handling is done in the hook
+        }
+    };
+
+    const handleDeleteWorkspace = async (workspace: WorkspaceWithMembers) => {
+        if (!workspace) return;
+        
+        const confirmed = window.confirm(
+            `Are you sure you want to delete the workspace "${workspace.name}"?\n\nThis will permanently delete:\n- All workspace members\n- All documents\n- All workspace data\n\nThis action cannot be undone.`
+        );
+        
+        if (!confirmed) return;
+
+        try {
+            console.log('🗑️ Deleting workspace:', workspace.id);
+            await WorkspaceService.deleteWorkspace(workspace.id);
+            
+            // Clear selected workspace if it was the deleted one
+            if (selectedWorkspace?.id === workspace.id) {
+                setSelectedWorkspace(null);
+            }
+            
+            // Refresh workspace list
+            await fetchWorkspaces();
+            
+            console.log('✅ Workspace deleted successfully');
+        } catch (error) {
+            console.error('❌ Error deleting workspace:', error);
+            alert('Failed to delete workspace. Please try again.');
         }
     };
 
@@ -228,15 +292,9 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
 
     // Helper function to get member count for a workspace
     const getWorkspaceMemberCount = (workspace: WorkspaceWithMembers): number => {
-        // If this is the selected workspace, use the loaded members count
-        if (selectedWorkspace?.id === workspace.id) {
-            const count = getMemberCount(workspace.id);
-            console.log('Getting member count for selected workspace:', workspace.id, 'Members:', count);
-            return count;
-        }
-        // Otherwise use stored count or fallback to workspace data
-        const count = workspaceMemberCounts[workspace.id] ?? workspace.members.length;
-        console.log('Getting member count for workspace:', workspace.id, 'Count:', count);
+        // Use the member_count from the workspace data (most accurate)
+        const count = workspace.member_count || 0;
+        console.log('Getting member count for workspace:', workspace.id, 'Count:', count, 'From member_count field');
         return count;
     };
 
@@ -248,12 +306,20 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
         return workspace.members;
     };
 
+    // Debug logging for workspace state
+    console.log('🔍 WorkspaceManagement Debug Info:');
+    console.log('- Workspaces count:', workspaces.length);
+    console.log('- Workspaces data:', workspaces);
+    console.log('- Loading state:', workspacesLoading);
+    console.log('- Selected workspace:', selectedWorkspace?.id);
+
     if (workspacesLoading) {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Loading workspaces...</p>
+                    <p className="text-muted-foreground">Loading workspaces and member data...</p>
+                    <p className="text-sm text-muted-foreground mt-2">This may take a moment to sync all workspace information</p>
                 </div>
             </div>
         );
@@ -267,15 +333,29 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                     <p className="text-muted-foreground">
                         Manage your workspaces, team members, and documents
                     </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        {workspaces.length} workspace{workspaces.length !== 1 ? 's' : ''} found
+                    </p>
                 </div>
-                <Button onClick={() => setShowCreateDialog(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Workspace
-                </Button>
+                <div className="flex gap-2">
+                    <Button 
+                        variant="outline" 
+                        onClick={() => {
+                            console.log('🔄 Manual refresh triggered');
+                            fetchWorkspaces();
+                        }}
+                        disabled={workspacesLoading}
+                    >
+                        <RefreshCw className={`h-4 w-4 mr-2 ${workspacesLoading ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </Button>
+                    <Button onClick={() => setShowCreateDialog(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Workspace
+                    </Button>
+                </div>
             </div>
 
-            {/* Debug Component - Remove this after debugging */}
-            <WorkspaceDebug />
 
             {workspaces.length === 0 ? (
                 <Card>
@@ -313,6 +393,15 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                     const memberCount = getWorkspaceMemberCount(workspace);
                                     const displayMembers = getMembersForDisplay(workspace);
                                     
+                                    // Debug information
+                                    console.log(`Workspace ${workspace.name}:`, {
+                                        id: workspace.id,
+                                        member_count: workspace.member_count,
+                                        members_array_length: workspace.members?.length,
+                                        calculated_count: memberCount,
+                                        display_members: displayMembers.length
+                                    });
+                                    
                                     return (
                                         <div
                                             key={workspace.id}
@@ -320,9 +409,16 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                                 ? 'border-primary bg-primary/5'
                                                 : 'border-border hover:bg-muted/50'
                                                 }`}
-                                            onClick={() => {
+                                            onClick={async () => {
                                                 console.log('Selecting workspace:', workspace.id, 'with members:', workspace.members.length);
                                                 setSelectedWorkspace(workspace);
+                                                
+                                                // Load members for the selected workspace
+                                                console.log('🔄 Loading members for selected workspace...');
+                                                await fetchMembers(workspace.id, true);
+                                                
+                                                // Subscribe to real-time updates
+                                                subscribeToMembers(workspace.id);
                                             }}
                                         >
                                             <div className="flex items-center justify-between">
@@ -359,7 +455,10 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem>Settings</DropdownMenuItem>
-                                                            <DropdownMenuItem className="text-destructive">
+                                                            <DropdownMenuItem 
+                                                                className="text-destructive"
+                                                                onClick={() => handleDeleteWorkspace(workspace)}
+                                                            >
                                                                 Delete Workspace
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>

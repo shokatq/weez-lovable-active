@@ -1,285 +1,138 @@
-import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
-import { supabase } from '../integrations/supabase/client';
-import { useAuth } from '../hooks/useAuth';
-import { useToast } from '../hooks/use-toast';
-import type { WorkspaceMemberWithUser, WorkspaceRole } from '../types/workspace';
+// Enhanced MemberContext.tsx
+import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import type { WorkspaceRole, WorkspaceMemberWithUser } from '@/types/workspace';
+import { WorkspaceService } from '@/services/workspaceService';
 
-// Member state management types
 interface MemberState {
-  members: Record<string, WorkspaceMemberWithUser[]>; // workspaceId -> members
-  loading: Record<string, boolean>; // workspaceId -> loading state
-  error: Record<string, string | null>; // workspaceId -> error message
-  optimisticUpdates: Record<string, OptimisticUpdate[]>; // workspaceId -> pending updates
+  [workspaceId: string]: {
+    members: WorkspaceMemberWithUser[];
+    loading: boolean;
+    error: string | null;
+    lastFetched: number | null;
+    initialized: boolean;
+  };
 }
 
-interface OptimisticUpdate {
-  id: string;
-  type: 'add' | 'remove' | 'update';
-  data: any;
-  timestamp: number;
-}
-
-interface MemberContextType {
-  // State
-  members: Record<string, WorkspaceMemberWithUser[]>;
-  loading: Record<string, boolean>;
-  error: Record<string, string | null>;
-  
-  // Actions
-  fetchMembers: (workspaceId: string) => Promise<void>;
-  addMember: (workspaceId: string, memberData: any) => Promise<void>;
-  removeMember: (workspaceId: string, memberId: string) => Promise<void>;
-  updateMemberRole: (workspaceId: string, memberId: string, role: WorkspaceRole) => Promise<void>;
-  
-  // Utilities
+interface MemberContextValue {
   getMembers: (workspaceId: string) => WorkspaceMemberWithUser[];
   getMemberCount: (workspaceId: string) => number;
   isLoading: (workspaceId: string) => boolean;
   getError: (workspaceId: string) => string | null;
-  
-  // Real-time
+  fetchMembers: (workspaceId: string, force?: boolean) => Promise<void>;
+  addMember: (workspaceId: string, memberData: AddMemberData) => Promise<any>;
+  removeMember: (workspaceId: string, memberId: string) => Promise<void>;
+  updateMemberRole: (workspaceId: string, memberId: string, role: WorkspaceRole) => Promise<void>;
   subscribeToMembers: (workspaceId: string) => void;
   unsubscribeFromMembers: (workspaceId: string) => void;
+  clearMemberData: (workspaceId: string) => void;
+  refreshAllWorkspaces: () => Promise<void>;
 }
 
-// Action types
-type MemberAction =
-  | { type: 'FETCH_MEMBERS_START'; workspaceId: string }
-  | { type: 'FETCH_MEMBERS_SUCCESS'; workspaceId: string; members: WorkspaceMemberWithUser[] }
-  | { type: 'FETCH_MEMBERS_ERROR'; workspaceId: string; error: string }
-  | { type: 'ADD_MEMBER_OPTIMISTIC'; workspaceId: string; member: WorkspaceMemberWithUser }
-  | { type: 'ADD_MEMBER_SUCCESS'; workspaceId: string; member: WorkspaceMemberWithUser }
-  | { type: 'ADD_MEMBER_ERROR'; workspaceId: string; error: string; memberId: string }
-  | { type: 'REMOVE_MEMBER_OPTIMISTIC'; workspaceId: string; memberId: string }
-  | { type: 'REMOVE_MEMBER_SUCCESS'; workspaceId: string; memberId: string }
-  | { type: 'REMOVE_MEMBER_ERROR'; workspaceId: string; error: string; memberId: string }
-  | { type: 'UPDATE_MEMBER_OPTIMISTIC'; workspaceId: string; memberId: string; updates: Partial<WorkspaceMemberWithUser> }
-  | { type: 'UPDATE_MEMBER_SUCCESS'; workspaceId: string; memberId: string; updates: Partial<WorkspaceMemberWithUser> }
-  | { type: 'UPDATE_MEMBER_ERROR'; workspaceId: string; error: string; memberId: string; originalData: WorkspaceMemberWithUser }
-  | { type: 'REALTIME_MEMBER_ADDED'; workspaceId: string; member: WorkspaceMemberWithUser }
-  | { type: 'REALTIME_MEMBER_REMOVED'; workspaceId: string; memberId: string }
-  | { type: 'REALTIME_MEMBER_UPDATED'; workspaceId: string; memberId: string; updates: Partial<WorkspaceMemberWithUser> };
+interface AddMemberData {
+  email: string;
+  role: WorkspaceRole;
+  userId?: string;
+  user?: any;
+}
 
-// Initial state
-const initialState: MemberState = {
-  members: {},
-  loading: {},
-  error: {},
-  optimisticUpdates: {}
-};
+type MemberAction = 
+  | { type: 'FETCH_START'; workspaceId: string }
+  | { type: 'FETCH_SUCCESS'; workspaceId: string; members: WorkspaceMemberWithUser[] }
+  | { type: 'FETCH_ERROR'; workspaceId: string; error: string }
+  | { type: 'ADD_MEMBER'; workspaceId: string; member: WorkspaceMemberWithUser }
+  | { type: 'REMOVE_MEMBER'; workspaceId: string; memberId: string }
+  | { type: 'UPDATE_MEMBER_ROLE'; workspaceId: string; memberId: string; role: WorkspaceRole }
+  | { type: 'CLEAR_DATA'; workspaceId: string }
+  | { type: 'SET_INITIALIZED'; workspaceId: string };
 
-// Reducer
+const initialState: MemberState = {};
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 function memberReducer(state: MemberState, action: MemberAction): MemberState {
   switch (action.type) {
-    case 'FETCH_MEMBERS_START':
+    case 'FETCH_START':
       return {
         ...state,
-        loading: { ...state.loading, [action.workspaceId]: true },
-        error: { ...state.error, [action.workspaceId]: null }
-      };
-
-    case 'FETCH_MEMBERS_SUCCESS':
-      return {
-        ...state,
-        members: { ...state.members, [action.workspaceId]: action.members },
-        loading: { ...state.loading, [action.workspaceId]: false },
-        error: { ...state.error, [action.workspaceId]: null }
-      };
-
-    case 'FETCH_MEMBERS_ERROR':
-      return {
-        ...state,
-        loading: { ...state.loading, [action.workspaceId]: false },
-        error: { ...state.error, [action.workspaceId]: action.error }
-      };
-
-    case 'ADD_MEMBER_OPTIMISTIC':
-      return {
-        ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: [...(state.members[action.workspaceId] || []), action.member]
-        },
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: [
-            ...(state.optimisticUpdates[action.workspaceId] || []),
-            {
-              id: action.member.id,
-              type: 'add',
-              data: action.member,
-              timestamp: Date.now()
-            }
-          ]
+        [action.workspaceId]: {
+          ...state[action.workspaceId],
+          loading: true,
+          error: null
         }
       };
 
-    case 'ADD_MEMBER_SUCCESS':
+    case 'FETCH_SUCCESS':
       return {
         ...state,
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: (state.optimisticUpdates[action.workspaceId] || []).filter(
-            update => update.id !== action.member.id
-          )
+        [action.workspaceId]: {
+          members: action.members,
+          loading: false,
+          error: null,
+          lastFetched: Date.now(),
+          initialized: true
         }
       };
 
-    case 'ADD_MEMBER_ERROR':
+    case 'FETCH_ERROR':
       return {
         ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: (state.members[action.workspaceId] || []).filter(
-            member => member.id !== action.memberId
-          )
-        },
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: (state.optimisticUpdates[action.workspaceId] || []).filter(
-            update => update.id !== action.memberId
-          )
-        },
-        error: { ...state.error, [action.workspaceId]: action.error }
-      };
-
-    case 'REMOVE_MEMBER_OPTIMISTIC':
-      return {
-        ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: (state.members[action.workspaceId] || []).filter(
-            member => member.id !== action.memberId
-          )
-        },
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: [
-            ...(state.optimisticUpdates[action.workspaceId] || []),
-            {
-              id: action.memberId,
-              type: 'remove',
-              data: null,
-              timestamp: Date.now()
-            }
-          ]
+        [action.workspaceId]: {
+          ...state[action.workspaceId],
+          loading: false,
+          error: action.error,
+          initialized: true
         }
       };
 
-    case 'REMOVE_MEMBER_SUCCESS':
+    case 'ADD_MEMBER':
+      const currentState = state[action.workspaceId];
+      if (!currentState) return state;
+      
       return {
         ...state,
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: (state.optimisticUpdates[action.workspaceId] || []).filter(
-            update => update.id !== action.memberId
+        [action.workspaceId]: {
+          ...currentState,
+          members: [...currentState.members, action.member]
+        }
+      };
+
+    case 'REMOVE_MEMBER':
+      const removeState = state[action.workspaceId];
+      if (!removeState) return state;
+      
+      return {
+        ...state,
+        [action.workspaceId]: {
+          ...removeState,
+          members: removeState.members.filter(m => m.id !== action.memberId)
+        }
+      };
+
+    case 'UPDATE_MEMBER_ROLE':
+      const updateState = state[action.workspaceId];
+      if (!updateState) return state;
+      
+      return {
+        ...state,
+        [action.workspaceId]: {
+          ...updateState,
+          members: updateState.members.map(m =>
+            m.id === action.memberId ? { ...m, role: action.role } : m
           )
         }
       };
 
-    case 'REMOVE_MEMBER_ERROR':
-      // Rollback: re-add the member
-      const removedMember = state.optimisticUpdates[action.workspaceId]?.find(
-        update => update.id === action.memberId && update.type === 'remove'
-      );
-      return {
-        ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: removedMember?.data 
-            ? [...(state.members[action.workspaceId] || []), removedMember.data]
-            : state.members[action.workspaceId]
-        },
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: (state.optimisticUpdates[action.workspaceId] || []).filter(
-            update => update.id !== action.memberId
-          )
-        },
-        error: { ...state.error, [action.workspaceId]: action.error }
-      };
+    case 'CLEAR_DATA':
+      const { [action.workspaceId]: _, ...rest } = state;
+      return rest;
 
-    case 'UPDATE_MEMBER_OPTIMISTIC':
+    case 'SET_INITIALIZED':
       return {
         ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: (state.members[action.workspaceId] || []).map(member =>
-            member.id === action.memberId ? { ...member, ...action.updates } : member
-          )
-        },
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: [
-            ...(state.optimisticUpdates[action.workspaceId] || []),
-            {
-              id: action.memberId,
-              type: 'update',
-              data: action.updates,
-              timestamp: Date.now()
-            }
-          ]
-        }
-      };
-
-    case 'UPDATE_MEMBER_SUCCESS':
-      return {
-        ...state,
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: (state.optimisticUpdates[action.workspaceId] || []).filter(
-            update => update.id !== action.memberId
-          )
-        }
-      };
-
-    case 'UPDATE_MEMBER_ERROR':
-      // Rollback: restore original data
-      return {
-        ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: (state.members[action.workspaceId] || []).map(member =>
-            member.id === action.memberId ? { ...member, ...action.originalData } : member
-          )
-        },
-        optimisticUpdates: {
-          ...state.optimisticUpdates,
-          [action.workspaceId]: (state.optimisticUpdates[action.workspaceId] || []).filter(
-            update => update.id !== action.memberId
-          )
-        },
-        error: { ...state.error, [action.workspaceId]: action.error }
-      };
-
-    case 'REALTIME_MEMBER_ADDED':
-      return {
-        ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: [...(state.members[action.workspaceId] || []), action.member]
-        }
-      };
-
-    case 'REALTIME_MEMBER_REMOVED':
-      return {
-        ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: (state.members[action.workspaceId] || []).filter(
-            member => member.id !== action.memberId
-          )
-        }
-      };
-
-    case 'REALTIME_MEMBER_UPDATED':
-      return {
-        ...state,
-        members: {
-          ...state.members,
-          [action.workspaceId]: (state.members[action.workspaceId] || []).map(member =>
-            member.id === action.memberId ? { ...member, ...action.updates } : member
-          )
+        [action.workspaceId]: {
+          ...state[action.workspaceId],
+          initialized: true
         }
       };
 
@@ -288,338 +141,345 @@ function memberReducer(state: MemberState, action: MemberAction): MemberState {
   }
 }
 
-// Context
-const MemberContext = createContext<MemberContextType | undefined>(undefined);
+const MemberContext = createContext<MemberContextValue | null>(null);
 
-// Provider component
-interface MemberProviderProps {
-  children: ReactNode;
-}
-
-export function MemberProvider({ children }: MemberProviderProps) {
+export function MemberProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(memberReducer, initialState);
-  const { user } = useAuth();
   const { toast } = useToast();
-  const subscriptions = React.useRef<Record<string, any>>({});
 
-  // Fetch members from API
-  const fetchMembers = useCallback(async (workspaceId: string) => {
-    if (!workspaceId) return;
 
-    dispatch({ type: 'FETCH_MEMBERS_START', workspaceId });
-
-    try {
-      const { data: memberRows, error: membersError } = await supabase
-        .from('workspace_members')
-        .select('*')
-        .eq('workspace_id', workspaceId)
-        .order('created_at', { ascending: true });
-
-      if (membersError) {
-        throw new Error(membersError.message);
-      }
-
-      const userIds = (memberRows || []).map(m => m.user_id);
-      let profilesById: Record<string, any> = {};
-
-      if (userIds.length > 0) {
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, email, first_name, last_name, avatar_url')
-          .in('id', userIds);
-
-        if (!profilesError && profiles) {
-          profilesById = Object.fromEntries(profiles.map(p => [p.id, p]));
-        }
-      }
-
-      const membersWithUser: WorkspaceMemberWithUser[] = (memberRows || []).map(row => ({
-        ...row,
-        user: profilesById[row.user_id] || {
-          id: row.user_id,
-          email: '',
-          first_name: null,
-          last_name: null,
-          avatar_url: null
-        }
-      }));
-
-      dispatch({ type: 'FETCH_MEMBERS_SUCCESS', workspaceId, members: membersWithUser });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch members';
-      dispatch({ type: 'FETCH_MEMBERS_ERROR', workspaceId, error: errorMessage });
-    }
-  }, []);
-
-  // Add member with optimistic update
-  const addMember = useCallback(async (workspaceId: string, memberData: any) => {
-    if (!workspaceId) return;
-
-    // Create optimistic member
-    const optimisticMember: WorkspaceMemberWithUser = {
-      id: `temp-${Date.now()}`,
-      workspace_id: workspaceId,
-      user_id: memberData.userId || memberData.user_id,
-      role: memberData.role,
-      created_at: new Date().toISOString(),
-      user: memberData.user || {
-        id: memberData.userId || memberData.user_id,
-        email: memberData.email || '',
-        first_name: memberData.first_name || null,
-        last_name: memberData.last_name || null,
-        avatar_url: null
-      }
-    };
-
-    // Optimistic update
-    dispatch({ type: 'ADD_MEMBER_OPTIMISTIC', workspaceId, member: optimisticMember });
-
-    try {
-      const { data: newMember, error } = await supabase
-        .from('workspace_members')
-        .insert({
-          workspace_id: workspaceId,
-          user_id: memberData.userId || memberData.user_id,
-          role: memberData.role
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Fetch updated member with user data
-      await fetchMembers(workspaceId);
-      dispatch({ type: 'ADD_MEMBER_SUCCESS', workspaceId, member: newMember });
-
-      toast({
-        title: 'Success',
-        description: 'Member added successfully'
+  // Initialize workspace member data
+  const initializeWorkspace = useCallback((workspaceId: string) => {
+    if (!state[workspaceId]) {
+      dispatch({ 
+        type: 'FETCH_SUCCESS', 
+        workspaceId, 
+        members: [] 
       });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to add member';
-      dispatch({ type: 'ADD_MEMBER_ERROR', workspaceId, error: errorMessage, memberId: optimisticMember.id });
+    }
+  }, [state]);
+
+  // Check if data needs refresh
+  const needsRefresh = useCallback((workspaceId: string, force = false): boolean => {
+    const workspaceState = state[workspaceId];
+    if (!workspaceState || !workspaceState.initialized) return true;
+    if (force) return true;
+    if (!workspaceState.lastFetched) return true;
+    
+    const elapsed = Date.now() - workspaceState.lastFetched;
+    return elapsed > CACHE_DURATION;
+  }, [state]);
+
+  // Fetch members for a workspace
+  const fetchMembers = useCallback(async (workspaceId: string, force = false) => {
+    console.log(`🔍 Fetching members for workspace ${workspaceId}, force: ${force}`);
+    
+    if (!workspaceId) {
+      console.error('❌ No workspace ID provided');
+      return;
+    }
+
+    // Check if we need to fetch
+    if (!needsRefresh(workspaceId, force)) {
+      console.log('📋 Using cached member data');
+      return;
+    }
+
+    dispatch({ type: 'FETCH_START', workspaceId });
+
+    try {
+      // Use WorkspaceService instead of non-existent API endpoints
+      const response = await WorkspaceService.getWorkspaceMembers(workspaceId);
+      const members = response.members || [];
       
+      console.log(`✅ Successfully fetched ${members.length} members`);
+      
+      dispatch({ 
+        type: 'FETCH_SUCCESS', 
+        workspaceId, 
+        members 
+      });
+
+    } catch (error: any) {
+      console.error('❌ Error fetching members:', error);
+      const errorMessage = error.message || 'Failed to fetch workspace members';
+      
+      dispatch({ 
+        type: 'FETCH_ERROR', 
+        workspaceId, 
+        error: errorMessage 
+      });
+
       toast({
-        title: 'Error',
+        title: 'Failed to Load Members',
         description: errorMessage,
         variant: 'destructive'
       });
     }
-  }, [fetchMembers, toast]);
+  }, [needsRefresh, toast]);
 
-  // Remove member with optimistic update
+  // Add member to workspace
+  const addMember = useCallback(async (workspaceId: string, memberData: AddMemberData) => {
+    console.log(`🚀 Adding member to workspace ${workspaceId}:`, memberData);
+
+    if (!workspaceId) {
+      throw new Error('Workspace ID is required');
+    }
+
+    if (!memberData.email?.trim()) {
+      throw new Error('Email is required');
+    }
+
+    // Check if member already exists
+    const currentMembers = state[workspaceId]?.members || [];
+    const existingMember = currentMembers.find(m => 
+      m.user.email.toLowerCase() === memberData.email.toLowerCase()
+    );
+
+    if (existingMember) {
+      const error = new Error('MEMBER_ALREADY_EXISTS');
+      error.name = 'MEMBER_ALREADY_EXISTS';
+      throw error;
+    }
+
+    try {
+      // Use WorkspaceService instead of non-existent API endpoints
+      await WorkspaceService.addWorkspaceMember(workspaceId, {
+        email: memberData.email.trim(),
+        role: memberData.role,
+        ...(memberData.userId && { userId: memberData.userId })
+      });
+
+      // Fetch the updated members list to get the full member data with user info
+      const response = await WorkspaceService.getWorkspaceMembers(workspaceId);
+      const members = response.members || [];
+      
+      // Find the newly added member
+      const newMember = members.find(m => 
+        m.user.email === memberData.email.trim() && m.role === memberData.role
+      );
+
+      if (newMember) {
+        console.log('✅ Successfully added member:', newMember);
+
+        dispatch({ 
+          type: 'ADD_MEMBER', 
+          workspaceId, 
+          member: newMember 
+        });
+      } else {
+        // If we can't find the new member, refresh the entire list
+        dispatch({ 
+          type: 'FETCH_SUCCESS', 
+          workspaceId, 
+          members 
+        });
+      }
+
+      toast({
+        title: 'Member Added',
+        description: `Successfully added ${memberData.email} to the workspace`,
+        variant: 'default'
+      });
+
+      return newMember;
+
+    } catch (error: any) {
+      console.error('❌ Error adding member:', error);
+      
+      // Handle specific error cases with user-friendly messages
+      if (error.message?.includes('already a member') || error.message?.includes('already exists')) {
+        toast({
+          title: 'Member Already Added',
+          description: `The member ${memberData.email} is already added to the space`,
+          variant: 'destructive'
+        });
+        throw error;
+      }
+
+      if (error.message?.includes('User not found')) {
+        toast({
+          title: 'User Not Found',
+          description: `No user found with email ${memberData.email}. Please check the email address.`,
+          variant: 'destructive'
+        });
+        throw error;
+      }
+
+      if (error.message?.includes('permission') || error.message?.includes('Permission')) {
+        toast({
+          title: 'Permission Denied',
+          description: 'You do not have permission to add members to this workspace.',
+          variant: 'destructive'
+        });
+        throw error;
+      }
+
+      // Generic error fallback
+      toast({
+        title: 'Failed to Add Member',
+        description: error.message || 'An unexpected error occurred while adding the member',
+        variant: 'destructive'
+      });
+      
+      throw error;
+    }
+  }, [state, toast]);
+
+  // Remove member from workspace
   const removeMember = useCallback(async (workspaceId: string, memberId: string) => {
-    if (!workspaceId || !memberId) return;
-
-    // Store original member for rollback
-    const originalMember = state.members[workspaceId]?.find(m => m.id === memberId);
-    if (!originalMember) return;
-
-    // Optimistic update
-    dispatch({ type: 'REMOVE_MEMBER_OPTIMISTIC', workspaceId, memberId });
+    console.log(`🗑️ Removing member ${memberId} from workspace ${workspaceId}`);
 
     try {
-      const { error } = await supabase
-        .from('workspace_members')
-        .delete()
-        .eq('id', memberId)
-        .eq('workspace_id', workspaceId);
+      // Use WorkspaceService instead of non-existent API endpoints
+      await WorkspaceService.removeWorkspaceMember(workspaceId, memberId);
 
-      if (error) throw error;
-
-      dispatch({ type: 'REMOVE_MEMBER_SUCCESS', workspaceId, memberId });
+      dispatch({ 
+        type: 'REMOVE_MEMBER', 
+        workspaceId, 
+        memberId 
+      });
 
       toast({
-        title: 'Success',
-        description: 'Member removed successfully'
+        title: 'Member Removed',
+        description: 'Member has been removed from the workspace',
+        variant: 'default'
       });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to remove member';
-      dispatch({ 
-        type: 'REMOVE_MEMBER_ERROR', 
-        workspaceId, 
-        error: errorMessage, 
-        memberId,
-        originalData: originalMember
-      });
+
+    } catch (error: any) {
+      console.error('❌ Error removing member:', error);
       
       toast({
-        title: 'Error',
-        description: errorMessage,
+        title: 'Failed to Remove Member',
+        description: error.message || 'An unexpected error occurred',
         variant: 'destructive'
       });
+      
+      throw error;
     }
-  }, [state.members, toast]);
+  }, [toast]);
 
-  // Update member role with optimistic update
+  // Update member role
   const updateMemberRole = useCallback(async (workspaceId: string, memberId: string, role: WorkspaceRole) => {
-    if (!workspaceId || !memberId) return;
-
-    const originalMember = state.members[workspaceId]?.find(m => m.id === memberId);
-    if (!originalMember) return;
-
-    // Optimistic update
-    dispatch({ 
-      type: 'UPDATE_MEMBER_OPTIMISTIC', 
-      workspaceId, 
-      memberId, 
-      updates: { role } 
-    });
+    console.log(`🔄 Updating member ${memberId} role to ${role} in workspace ${workspaceId}`);
 
     try {
-      const { error } = await supabase
-        .from('workspace_members')
-        .update({ role })
-        .eq('id', memberId)
-        .eq('workspace_id', workspaceId);
+      // Use WorkspaceService instead of non-existent API endpoints
+      await WorkspaceService.updateMemberRole(workspaceId, memberId, { role });
 
-      if (error) throw error;
-
-      dispatch({ type: 'UPDATE_MEMBER_SUCCESS', workspaceId, memberId, updates: { role } });
+      dispatch({ 
+        type: 'UPDATE_MEMBER_ROLE', 
+        workspaceId, 
+        memberId, 
+        role 
+      });
 
       toast({
-        title: 'Success',
-        description: 'Member role updated successfully'
+        title: 'Role Updated',
+        description: `Member role has been updated to ${role}`,
+        variant: 'default'
       });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update member role';
-      dispatch({ 
-        type: 'UPDATE_MEMBER_ERROR', 
-        workspaceId, 
-        error: errorMessage, 
-        memberId,
-        originalData: originalMember
-      });
+
+    } catch (error: any) {
+      console.error('❌ Error updating member role:', error);
       
       toast({
-        title: 'Error',
-        description: errorMessage,
+        title: 'Failed to Update Role',
+        description: error.message || 'An unexpected error occurred',
         variant: 'destructive'
       });
+      
+      throw error;
     }
-  }, [state.members, toast]);
+  }, [toast]);
 
-  // Real-time subscription
+  // Auto-fetch members when workspace is accessed
   const subscribeToMembers = useCallback((workspaceId: string) => {
-    if (subscriptions.current[workspaceId]) return;
+    console.log(`📡 Subscribing to members for workspace ${workspaceId}`);
+    initializeWorkspace(workspaceId);
+    fetchMembers(workspaceId);
+  }, [initializeWorkspace, fetchMembers]);
 
-    const channel = supabase
-      .channel(`workspace-members-${workspaceId}`)
-      .on(
-        'postgres_changes',
-        { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'workspace_members',
-          filter: `workspace_id=eq.${workspaceId}`
-        },
-        async (payload) => {
-          console.log('🔄 Real-time member added:', payload);
-          // Fetch the new member with user data
-          await fetchMembers(workspaceId);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { 
-          event: 'DELETE', 
-          schema: 'public', 
-          table: 'workspace_members',
-          filter: `workspace_id=eq.${workspaceId}`
-        },
-        (payload) => {
-          console.log('🔄 Real-time member removed:', payload);
-          dispatch({ 
-            type: 'REALTIME_MEMBER_REMOVED', 
-            workspaceId, 
-            memberId: payload.old.id 
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { 
-          event: 'UPDATE', 
-          schema: 'public', 
-          table: 'workspace_members',
-          filter: `workspace_id=eq.${workspaceId}`
-        },
-        (payload) => {
-          console.log('🔄 Real-time member updated:', payload);
-          dispatch({ 
-            type: 'REALTIME_MEMBER_UPDATED', 
-            workspaceId, 
-            memberId: payload.new.id,
-            updates: { role: payload.new.role }
-          });
-        }
-      )
-      .subscribe();
-
-    subscriptions.current[workspaceId] = channel;
-  }, [fetchMembers]);
-
-  // Unsubscribe from real-time updates
   const unsubscribeFromMembers = useCallback((workspaceId: string) => {
-    if (subscriptions.current[workspaceId]) {
-      supabase.removeChannel(subscriptions.current[workspaceId]);
-      delete subscriptions.current[workspaceId];
-    }
+    console.log(`📡 Unsubscribing from members for workspace ${workspaceId}`);
+    // Could implement cleanup logic here if needed
   }, []);
 
-  // Utility functions
+  // Clear member data
+  const clearMemberData = useCallback((workspaceId: string) => {
+    dispatch({ type: 'CLEAR_DATA', workspaceId });
+  }, []);
+
+  // Refresh all workspace member counts (for workspace list)
+  const refreshAllWorkspaces = useCallback(async () => {
+    console.log('🔄 Refreshing all workspace member counts');
+    
+    const workspaceIds = Object.keys(state);
+    await Promise.all(
+      workspaceIds.map(workspaceId => fetchMembers(workspaceId, true))
+    );
+  }, [state, fetchMembers]);
+
+  // Auto-initialize workspaces on mount
+  useEffect(() => {
+    // This could fetch a list of user's workspaces and initialize them
+    console.log('🚀 MemberProvider initialized');
+  }, []);
+
+  // Getter functions
   const getMembers = useCallback((workspaceId: string) => {
-    return state.members[workspaceId] || [];
-  }, [state.members]);
+    const workspaceState = state[workspaceId];
+    if (!workspaceState) {
+      // Auto-fetch if not initialized
+      fetchMembers(workspaceId);
+      return [];
+    }
+    return workspaceState.members || [];
+  }, [state, fetchMembers]);
 
   const getMemberCount = useCallback((workspaceId: string) => {
-    return state.members[workspaceId]?.length || 0;
-  }, [state.members]);
+    const workspaceState = state[workspaceId];
+    if (!workspaceState) {
+      // Auto-fetch if not initialized
+      fetchMembers(workspaceId);
+      return 0;
+    }
+    return workspaceState.members?.length || 0;
+  }, [state, fetchMembers]);
 
   const isLoading = useCallback((workspaceId: string) => {
-    return state.loading[workspaceId] || false;
-  }, [state.loading]);
+    return state[workspaceId]?.loading || false;
+  }, [state]);
 
   const getError = useCallback((workspaceId: string) => {
-    return state.error[workspaceId] || null;
-  }, [state.error]);
+    return state[workspaceId]?.error || null;
+  }, [state]);
 
-  // Cleanup subscriptions on unmount
-  useEffect(() => {
-    return () => {
-      Object.values(subscriptions.current).forEach(channel => {
-        supabase.removeChannel(channel);
-      });
-    };
-  }, []);
-
-  const contextValue: MemberContextType = {
-    members: state.members,
-    loading: state.loading,
-    error: state.error,
-    fetchMembers,
-    addMember,
-    removeMember,
-    updateMemberRole,
+  const value: MemberContextValue = {
     getMembers,
     getMemberCount,
     isLoading,
     getError,
+    fetchMembers,
+    addMember,
+    removeMember,
+    updateMemberRole,
     subscribeToMembers,
-    unsubscribeFromMembers
+    unsubscribeFromMembers,
+    clearMemberData,
+    refreshAllWorkspaces
   };
 
   return (
-    <MemberContext.Provider value={contextValue}>
+    <MemberContext.Provider value={value}>
       {children}
     </MemberContext.Provider>
   );
 }
 
-// Hook to use member context
 export function useMemberContext() {
   const context = useContext(MemberContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useMemberContext must be used within a MemberProvider');
   }
   return context;

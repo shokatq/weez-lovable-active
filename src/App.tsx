@@ -22,6 +22,7 @@ import AcceptInvitation from "./pages/AcceptInvitation";
 import Audit from "./pages/Audit";
 import { AuthProvider } from "./hooks/useAuth";
 import { MemberProvider } from "./contexts/MemberContext";
+import { useWorkspaceInitialization } from "./hooks/useWorkspaceInitialization";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleGuard from "./components/auth/RoleGuard";
 import { useGlobalAuditLogger } from "./hooks/useGlobalAuditLogger";
@@ -30,6 +31,7 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   useGlobalAuditLogger(); // Global audit logging
+  useWorkspaceInitialization(); // Initialize workspace data on app load
   return (
     <BrowserRouter>
       <Routes>
