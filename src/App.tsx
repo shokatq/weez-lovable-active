@@ -11,8 +11,10 @@ import NotFound from "./pages/NotFound";
 import WorkspaceNew from "./pages/WorkspaceNew";
 import WorkspaceManagement from "./pages/WorkspaceManagement";
 import WorkspaceDetail from "./pages/WorkspaceDetail";
+import SpacePage from "./pages/Space";
 import ChatInterface from "./components/ChatInterface";
 import Auth from "./pages/Auth";
+import Blank from "./pages/Blank";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
@@ -64,11 +66,22 @@ const AppContent = () => {
             <ChatInterface />
           </ProtectedRoute>
         } />
-        <Route path="/workspace" element={
+        <Route path="/page/:name" element={
           <ProtectedRoute>
-            <WorkspaceNew />
+            <Blank />
           </ProtectedRoute>
         } />
+        <Route path="/space/:spaceName" element={
+          <ProtectedRoute>
+            <Blank />
+          </ProtectedRoute>
+        } />
+        <Route path="/space/id/:spaceId" element={
+          <ProtectedRoute>
+            <SpacePage />
+          </ProtectedRoute>
+        } />
+        {/* Removed direct create workspace page */}
         <Route path="/workspace-management" element={
           <ProtectedRoute>
             <WorkspaceManagement />

@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
-import { Plus, MessageSquare, Building2, Clock, Trash2, Loader2 } from "lucide-react";
+import { Plus, MessageSquare, Building2, Clock, Trash2, Loader2, ChevronDown, ChevronRight, Folder, Upload, FileCheck, Clock3, FolderOpen, MoreHorizontal } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useWorkspaces } from "@/hooks/useWorkspace";
 import UserProfile from "./UserProfile";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -52,11 +55,19 @@ const ChatSidebar = ({
 }: ChatSidebarProps) => {
   // Get authenticated user from useAuth hook
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Local state for conversation management
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // UI collapse state
+  const [openDaily, setOpenDaily] = useState(false);
+  const [openSpaces, setOpenSpaces] = useState(false);
+  const [openAssets, setOpenAssets] = useState(false);
+  const { workspaces, fetchWorkspaces, loading: workspacesLoading } = useWorkspaces();
+  // useWorkspaces already fetches on mount; avoid duplicate call
 
   // Get conversation preview text
   const getConversationPreviewText = (summary: BackendConversationSummary) => {
@@ -273,100 +284,150 @@ const ChatSidebar = ({
 
       <SidebarContent className="flex-1 p-0">
         <ScrollArea className="h-full">
-          <div className="p-3">
-            {loading && (
-              <div className="flex items-center justify-center p-4">
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                <span className="text-sm text-muted-foreground">Loading conversations...</span>
+          <div className="p-3 space-y-4">
+            {/* Conversations (top, primary section, always visible) */}
+            <div className="rounded-lg overflow-hidden">
+              <div className="w-full flex items-center justify-between px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  <span className="text-sm font-medium">Conversations</span>
+                </div>
               </div>
-            )}
-
-            {error && (
-              <div className="p-4">
-                <p className="text-sm text-red-500 mb-2">{error}</p>
-                <Button
-                  onClick={loadConversations}
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-3 h-3 animate-spin mr-2" />
-                      Retrying...
-                    </>
-                  ) : (
-                    "Retry"
-                  )}
-                </Button>
-              </div>
-            )}
-
-            {!loading && !error && (
-              <div className="space-y-2">
-                {conversations.length === 0 ? (
-                  <div className="p-4 text-center">
-                    <p className="text-sm text-muted-foreground">No conversations yet</p>
-                    <p className="text-xs text-muted-foreground mt-1">Start a new chat to begin</p>
-                  </div>
-                ) : (
-                  conversations.map((conversation) => (
-                    <div
-                      key={conversation.id}
-                      className="group relative"
-                    >
-                      <div
-                        onClick={() => handleConversationSelect(conversation)}
-                        className={`block w-full p-3 pr-8 cursor-pointer rounded-lg transition-all duration-200 border ${currentConversationId === conversation.id
-                            ? 'bg-gray-800/60 border-gray-700 text-white shadow-sm'
-                            : 'bg-gray-900/40 border-gray-800 text-gray-300 hover:bg-gray-800/40 hover:border-gray-700 hover:text-gray-200'
-                          }`}
-                      >
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h4 className="text-sm font-medium truncate leading-tight">
-                            {conversation.title}
-                          </h4>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <p className="text-xs text-gray-400 truncate leading-relaxed">
-                            {conversation.lastMessage}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                            <Clock className="w-3 h-3" />
-                            <span>{formatTime(conversation.timestamp)}</span>
-                          </div>
-
-                          {conversation.messageCount && (
-                            <span className="text-xs text-gray-400 bg-gray-700/50 px-2 py-0.5 rounded-full shrink-0 font-medium">
-                              {conversation.messageCount}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Delete button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteConversation(conversation.id);
-                        }}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 p-0 hover:bg-red-500/20 hover:text-red-400 rounded-md"
-                        disabled={loading}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+              <div className="p-2 max-h-[60vh] overflow-y-auto">
+                  {loading && (
+                    <div className="flex items-center justify-center p-4">
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      <span className="text-sm text-muted-foreground">Loading conversations...</span>
                     </div>
-                  ))
-                )}
+                  )}
+                  {error && (
+                    <div className="p-2">
+                      <p className="text-sm text-red-500 mb-2">{error}</p>
+                      <Button onClick={loadConversations} variant="ghost" size="sm" className="w-full" disabled={loading}>Retry</Button>
+                    </div>
+                  )}
+                  {!loading && !error && (
+                    <div className="space-y-1">
+                      {conversations.length === 0 ? (
+                        <div className="p-2 text-center text-sm text-muted-foreground">No conversations yet</div>
+                      ) : (
+                        conversations.map((conversation) => (
+                          <div key={conversation.id} className="group relative">
+                            <div onClick={() => handleConversationSelect(conversation)} className={`block w-full px-2 py-1.5 cursor-pointer rounded-md transition-colors text-xs ${currentConversationId === conversation.id ? 'bg-gray-800/60 text-white' : 'hover:bg-gray-800/40 text-gray-200'}`}>
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="truncate">{conversation.title}</div>
+                                <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                                  <Clock className="w-3 h-3" />
+                                  <span>{formatTime(conversation.timestamp)}</span>
+                                  {conversation.messageCount && (
+                                    <span className="bg-gray-700/50 px-2 py-0.5 rounded-full">{conversation.messageCount}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDeleteConversation(conversation.id); }} className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 p-0 hover:bg-red-500/20 hover:text-red-400 rounded-md" disabled={loading}>
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
               </div>
-            )}
+            </div>
+            {/* Daily Updates - static zeros */}
+            <div className="rounded-lg overflow-hidden">
+              <button onClick={() => setOpenDaily(v => !v)} className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-sidebar-accent">
+                <div className="flex items-center gap-2">
+                  <Clock3 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Daily Updates</span>
+                </div>
+                {openDaily ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+              </button>
+              {openDaily && (
+                <div className="px-3 py-2 text-xs text-muted-foreground space-y-2">
+                  <div className="flex items-center justify-between"><span className="flex items-center gap-2"><FileCheck className="w-3.5 h-3.5" />Files Processed</span><span>0</span></div>
+                  <div className="flex items-center justify-between"><span className="flex items-center gap-2">New Clients</span><span>0</span></div>
+                  <div className="flex items-center justify-between"><span className="flex items-center gap-2"><MessageSquare className="w-3.5 h-3.5" />AI Queries</span><span>0</span></div>
+                  <div className="flex items-center justify-between"><span className="flex items-center gap-2"><FolderOpen className="w-3.5 h-3.5" />Spaces Created</span><span>0</span></div>
+                  <div className="flex items-center justify-between"><span className="flex items-center gap-2"><Folder className="w-3.5 h-3.5" />Files Organized</span><span>0</span></div>
+                </div>
+              )}
+            </div>
+
+            {/* Spaces - dynamic */}
+            <div className="rounded-lg overflow-hidden">
+              <button onClick={() => setOpenSpaces(v => !v)} className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-sidebar-accent">
+                <div className="flex items-center gap-2">
+                  <Folder className="w-4 h-4" />
+                  <span className="text-sm font-medium">Spaces</span>
+                </div>
+                {openSpaces ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+              </button>
+              {openSpaces && (
+                <div className="px-2 py-2 text-sm space-y-1">
+                  {workspacesLoading && (
+                    <div className="px-2 py-1 text-xs text-muted-foreground">Loading spaces...</div>
+                  )}
+                  {!workspacesLoading && workspaces.map(ws => (
+                    <div key={ws.id} className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-sidebar-accent">
+                      <button onClick={() => navigate(`/space/id/${ws.id}`)} className="flex items-center gap-2 min-w-0">
+                        <Folder className="w-3.5 h-3.5" />
+                        <span className="truncate text-sm">{ws.name}</span>
+                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuLabel>Space options</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => navigate(`/space/id/${ws.id}`)}>Open</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(window.location.origin + `/workspace/${ws.id}`)}>Copy link</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>Rename</DropdownMenuItem>
+                          <DropdownMenuItem>Color & Icon</DropdownMenuItem>
+                          <DropdownMenuItem>Space settings</DropdownMenuItem>
+                          <DropdownMenuItem>Duplicate</DropdownMenuItem>
+                          <DropdownMenuItem>Archive</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  ))}
+                  <button onClick={() => navigate('/workspace-management')} className="w-full text-left px-2 py-1.5 rounded hover:bg-sidebar-accent flex items-center gap-2 text-muted-foreground">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>New Space</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+
+            {/* Assets */}
+            <div className="rounded-lg overflow-hidden">
+              <button onClick={() => setOpenAssets(v => !v)} className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-sidebar-accent">
+                <div className="flex items-center gap-2">
+                  <FileCheck className="w-4 h-4" />
+                  <span className="text-sm font-medium">Assets</span>
+                </div>
+                {openAssets ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+              </button>
+              {openAssets && (
+                <div className="px-2 py-2 text-sm space-y-1">
+                  {[{label:'Processed Documents',icon:FileCheck},{label:'Unprocessed Documents',icon:Clock3},{label:'Upload Files',icon:Upload}].map(({label,icon:Icon}) => (
+                    <button key={label} onClick={() => navigate(`/page/${encodeURIComponent(label)}`)} className="w-full text-left px-2 py-1.5 rounded hover:bg-sidebar-accent flex items-center gap-2">
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Bottom conversation duplicate removed */}
           </div>
         </ScrollArea>
       </SidebarContent>
@@ -381,14 +442,6 @@ const ChatSidebar = ({
             >
               <Building2 className="w-4 h-4 mr-2" />
               Manage Workspaces
-            </Button>
-            <Button
-              onClick={onNavigateToWorkspace}
-              variant="outline"
-              className="w-full justify-start text-sidebar-foreground hover:text-sidebar-accent-foreground border-sidebar-border hover:bg-sidebar-accent"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Workspace
             </Button>
           </div>
 

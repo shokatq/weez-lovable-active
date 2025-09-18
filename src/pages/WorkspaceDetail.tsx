@@ -37,7 +37,7 @@ import type { WorkspaceRole } from '../types/workspace';
 function WorkspaceDetailContent() {
     const { workspaceId } = useParams<{ workspaceId: string }>();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('overview');
+    const [activeTab, setActiveTab] = useState('chat');
     const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [editingMember, setEditingMember] = useState<{ id: string; role: WorkspaceRole } | null>(null);
@@ -199,133 +199,25 @@ function WorkspaceDetailContent() {
                 <CardContent className="p-6">
                     <Tabs value={activeTab} onValueChange={setActiveTab}>
                         <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger value="overview">Overview</TabsTrigger>
-                            <TabsTrigger value="members">Members</TabsTrigger>
-                            <TabsTrigger value="documents">Documents</TabsTrigger>
+                            <TabsTrigger value="chat">Chat</TabsTrigger>
+                            <TabsTrigger value="files">Files</TabsTrigger>
+                            <TabsTrigger value="operations">Operations</TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="overview" className="space-y-4 mt-6">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="p-4 border rounded-lg">
-                                    <div className="flex items-center gap-2">
-                                        <Users className="h-5 w-5 text-muted-foreground" />
-                                        <span className="font-medium">Members</span>
-                                    </div>
-                                    <p className="text-2xl font-bold mt-2">{members.length}</p>
-                                </div>
-                                <div className="p-4 border rounded-lg">
-                                    <div className="flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-muted-foreground" />
-                                        <span className="font-medium">Documents</span>
-                                    </div>
-                                    <p className="text-2xl font-bold mt-2">{documents.length}</p>
-                                </div>
-                                <div className="p-4 border rounded-lg">
-                                    <div className="flex items-center gap-2">
-                                        <Calendar className="h-5 w-5 text-muted-foreground" />
-                                        <span className="font-medium">Created</span>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground mt-2">
-                                        {new Date(currentWorkspace.created_at).toLocaleDateString()}
-                                    </p>
-                                </div>
+                        <TabsContent value="chat" className="space-y-4 mt-6">
+                            <div className="rounded-md border p-6 bg-muted/30">
+                                <h3 className="text-lg font-semibold mb-1">{`Chat in ${currentWorkspace.name}`}</h3>
+                                <p className="text-sm text-muted-foreground">Collaborate seamlessly across tasks and conversations. Start chatting with your team or connect tasks to stay on top of your work.</p>
                             </div>
-
-                            {/* Recent Activity */}
-                            <div className="mt-6">
-                                <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-                                <div className="space-y-2">
-                                    <p className="text-sm text-muted-foreground">
-                                        Workspace created by owner
-                                    </p>
-                                    {members.length > 1 && (
-                                        <p className="text-sm text-muted-foreground">
-                                            {members.length - 1} member(s) added to workspace
-                                        </p>
-                                    )}
-                                    {documents.length > 0 && (
-                                        <p className="text-sm text-muted-foreground">
-                                            {documents.length} document(s) uploaded
-                                        </p>
-                                    )}
-                                </div>
+                            <div className="flex items-center gap-2 p-3 border rounded-md text-sm text-muted-foreground">
+                                Chat UI placeholder. Hook this up to your messages list and composer.
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="members" className="space-y-4 mt-6">
+                        <TabsContent value="files" className="space-y-4 mt-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-lg font-semibold">Team Members</h3>
-                                    <p className="text-sm text-muted-foreground">Members ({members.length})</p>
-                                </div>
-                                {canManageUsers && (
-                                    <Button onClick={() => setShowAddMemberDialog(true)}>
-                                        <UserPlus className="h-4 w-4 mr-2" />
-                                        Add Member
-                                    </Button>
-                                )}
-                            </div>
-
-                            {membersLoading ? (
-                                <div className="text-center py-8">
-                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-                                    <p className="text-sm text-muted-foreground">Loading members...</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {members.map((member) => (
-                                        <div key={member.id} className="flex items-center justify-between p-3 border rounded-lg">
-                                            <div className="flex items-center gap-3">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarImage src={member.user.avatar_url || undefined} />
-                                                    <AvatarFallback>
-                                                        {member.user.first_name?.[0]}{member.user.last_name?.[0]}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="font-medium">
-                                                        {member.user.first_name} {member.user.last_name}
-                                                    </p>
-                                                    <p className="text-sm text-muted-foreground">{member.user.email}</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Badge variant="secondary">{member.role}</Badge>
-                                                {canManageUsers && (
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="sm">
-                                                                <MoreHorizontal className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem
-                                                                onClick={() => setEditingMember({ id: member.id, role: member.role as WorkspaceRole })}
-                                                            >
-                                                                <Edit className="h-4 w-4 mr-2" />
-                                                                Change Role
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleRemoveMember(member.id)}
-                                                                className="text-destructive"
-                                                            >
-                                                                <Trash2 className="h-4 w-4 mr-2" />
-                                                                Remove
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </TabsContent>
-
-                        <TabsContent value="documents" className="space-y-4 mt-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-lg font-semibold">Documents</h3>
+                                    <h3 className="text-lg font-semibold">Files</h3>
                                     <p className="text-sm text-muted-foreground">Documents ({documents.length})</p>
                                 </div>
                                 {canEdit && (
@@ -340,22 +232,6 @@ function WorkspaceDetailContent() {
                                 <div className="text-center py-8">
                                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                                     <p className="text-sm text-muted-foreground">Loading documents...</p>
-                                </div>
-                            ) : documents.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <FileText className="h-8 w-8 text-muted-foreground" />
-                                    </div>
-                                    <h3 className="text-lg font-semibold mb-2">No documents yet</h3>
-                                    <p className="text-muted-foreground mb-4">
-                                        Upload your first document to get started
-                                    </p>
-                                    {canEdit && (
-                                        <Button onClick={() => setShowUploadDialog(true)}>
-                                            <Upload className="h-4 w-4 mr-2" />
-                                            Upload Document
-                                        </Button>
-                                    )}
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -401,6 +277,16 @@ function WorkspaceDetailContent() {
                                     ))}
                                 </div>
                             )}
+                        </TabsContent>
+
+                        <TabsContent value="operations" className="space-y-4 mt-6">
+                            <div className="rounded-md border p-6 bg-muted/30">
+                                <h3 className="text-lg font-semibold mb-1">Data & Operations</h3>
+                                <p className="text-sm text-muted-foreground">Chat with files and run data operations for this space.</p>
+                            </div>
+                            <div className="flex items-center gap-2 p-3 border rounded-md text-sm text-muted-foreground">
+                                Operations chat interface placeholder.
+                            </div>
                         </TabsContent>
                     </Tabs>
                 </CardContent>

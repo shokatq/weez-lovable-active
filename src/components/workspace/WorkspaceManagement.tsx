@@ -17,8 +17,10 @@ import {
     Edit,
     Trash2,
     Download,
-    RefreshCw
+    RefreshCw,
+    ArrowLeft
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -45,6 +47,7 @@ interface WorkspaceManagementProps {
 }
 
 export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
+    const navigate = useNavigate();
     // Call useAuth first to avoid initialization issues
     const { user } = useAuth();
 
@@ -326,16 +329,22 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
     }
 
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <div className="container mx-auto p-6 space-y-5">
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold">Workspace Management</h1>
-                    <p className="text-muted-foreground">
-                        Manage your workspaces, team members, and documents
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        {workspaces.length} workspace{workspaces.length !== 1 ? 's' : ''} found
-                    </p>
+                <div className="flex items-center gap-3">
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/chat')}>
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        Back
+                    </Button>
+                    <div>
+                        <h1 className="text-2xl font-bold">Workspace Management</h1>
+                        <p className="text-muted-foreground text-sm">
+                            Manage your spaces, members and files
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {workspaces.length} workspace{workspaces.length !== 1 ? 's' : ''} found
+                        </p>
+                    </div>
                 </div>
                 <div className="flex gap-2">
                     <Button 
@@ -378,7 +387,7 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Workspace List */}
                     <div className="lg:col-span-1">
                         <Card>
@@ -388,7 +397,7 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                     Select a workspace to manage
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-2">
+                            <CardContent className="space-y-1">
                                 {workspaces.map((workspace) => {
                                     const memberCount = getWorkspaceMemberCount(workspace);
                                     const displayMembers = getMembersForDisplay(workspace);
@@ -405,7 +414,7 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                     return (
                                         <div
                                             key={workspace.id}
-                                            className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedWorkspace?.id === workspace.id
+                                            className={`p-2 rounded-lg border cursor-pointer transition-colors ${selectedWorkspace?.id === workspace.id
                                                 ? 'border-primary bg-primary/5'
                                                 : 'border-border hover:bg-muted/50'
                                                 }`}
@@ -423,17 +432,17 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="font-medium truncate">{workspace.name}</h4>
+                                                    <h4 className="font-medium truncate text-sm">{workspace.name}</h4>
                                                     <div className="flex items-center gap-2 mt-1">
-                                                        <Badge variant="secondary" className="text-xs">
+                                                        <Badge variant="secondary" className="text-[10px]">
                                                             {getUserRole(workspace)}
                                                         </Badge>
-                                                        <span className="text-xs text-muted-foreground">
+                                                        <span className="text-[11px] text-muted-foreground">
                                                             {memberCount} members
                                                         </span>
                                                     </div>
                                                     {memberCount > 0 && (
-                                                        <div className="mt-2 text-xs text-muted-foreground">
+                                                        <div className="mt-1 text-[11px] text-muted-foreground">
                                                             {displayMembers.slice(0, 3).map((member, index) => (
                                                                 <span key={member.id}>
                                                                     {member.user.first_name} {member.user.last_name} ({WORKSPACE_ROLES[member.role as WorkspaceRole]?.label || member.role})
@@ -449,7 +458,7 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                                 {canManageWorkspace(workspace) && (
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="sm">
+                                                            <Button variant="ghost" size="icon" className="h-7 w-7">
                                                                 <MoreHorizontal className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
@@ -479,7 +488,7 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <CardTitle>{selectedWorkspace.name}</CardTitle>
+                                            <CardTitle className="text-xl">{selectedWorkspace.name}</CardTitle>
                                             <CardDescription>
                                                 Created {formatDistanceToNow(new Date(selectedWorkspace.created_at))} ago
                                             </CardDescription>
@@ -500,15 +509,15 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                         </TabsList>
 
                                         <TabsContent value="overview" className="space-y-4">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="p-4 border rounded-lg">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="p-3 border rounded-lg">
                                                     <div className="flex items-center gap-2">
                                                         <Users className="h-5 w-5 text-muted-foreground" />
                                                         <span className="font-medium">Members</span>
                                                     </div>
-                                                    <p className="text-2xl font-bold mt-2">{getMemberCount(selectedWorkspace.id)}</p>
+                                                    <p className="text-xl font-bold mt-1">{getMemberCount(selectedWorkspace.id)}</p>
                                                     {getMemberCount(selectedWorkspace.id) > 0 ? (
-                                                        <div className="mt-3 space-y-1">
+                                                        <div className="mt-2 space-y-1">
                                                             {getMembers(selectedWorkspace.id).slice(0, 3).map((member) => (
                                                                 <div key={member.id} className="text-sm text-muted-foreground">
                                                                     {member.user.first_name} {member.user.last_name} ({WORKSPACE_ROLES[member.role as WorkspaceRole]?.label || member.role})
@@ -521,18 +530,18 @@ export function WorkspaceManagement({ workspaceId }: WorkspaceManagementProps) {
                                                             )}
                                                         </div>
                                                     ) : (
-                                                        <div className="mt-3 text-sm text-muted-foreground">
+                                                        <div className="mt-2 text-sm text-muted-foreground">
                                                             No members added yet
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="p-4 border rounded-lg">
+                                                <div className="p-3 border rounded-lg">
                                                     <div className="flex items-center gap-2">
                                                         <FileText className="h-5 w-5 text-muted-foreground" />
                                                         <span className="font-medium">Documents</span>
                                                     </div>
-                                                    <p className="text-2xl font-bold mt-2">{selectedWorkspace.document_count}</p>
-                                                    <div className="mt-3 text-sm text-muted-foreground">
+                                                    <p className="text-xl font-bold mt-1">{selectedWorkspace.document_count}</p>
+                                                    <div className="mt-2 text-sm text-muted-foreground">
                                                         {selectedWorkspace.document_count === 0 ? 'No documents uploaded' : 'Documents uploaded'}
                                                     </div>
                                                 </div>

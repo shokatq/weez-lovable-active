@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Settings, Menu } from "lucide-react";
+import { Settings, Link as LinkIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SettingsPanel from "./SettingsPanel";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import ConnectivityPanel from "./ConnectivityPanel";
 import ThemeToggle from "./ThemeToggle";
 
 const ChatHeader = () => {
@@ -33,6 +35,16 @@ const ChatHeader = () => {
       </div>
 
       <div className="flex items-center gap-1 sm:gap-2">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
+              <LinkIcon className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <ConnectivityPanel />
+          </DialogContent>
+        </Dialog>
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
