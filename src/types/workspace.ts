@@ -156,3 +156,22 @@ export const ALLOWED_FILE_TYPES = [
 ];
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+// Employee types (for backwards compatibility)
+export interface Employee {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+  status: string;
+  custom_role?: string;
+  custom_department?: string;
+}
+
+// File stats types
+export interface FileStats {
+  total_files: number;
+  total_size: number;
+  recent_uploads: number;
+}

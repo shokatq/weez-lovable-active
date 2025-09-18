@@ -5,9 +5,10 @@ import type { User } from '@supabase/supabase-js';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isAuthenticated: boolean;
   signOut: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error?: any }>;
   signInWithGoogle: () => Promise<void>;
 }
 
@@ -51,21 +52,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
       email,
       password,
     });
-    if (error) throw error;
+    return { error };
   };
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: redirectUrl,
         data: {
           first_name: firstName,
           last_name: lastName,
         },
       },
     });
-    if (error) throw error;
+    return { error };
   };
 
   const signInWithGoogle = async () => {
@@ -78,6 +82,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value = {
     user,
     loading,
+    isAuthenticated: !!user,
     signOut,
     signIn,
     signUp,

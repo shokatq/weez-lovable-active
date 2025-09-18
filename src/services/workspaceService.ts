@@ -649,51 +649,20 @@ export class WorkspaceService {
 
             console.log('🔍 Searching for users with query:', query);
 
-            // Try RPC function first
+            // Search profiles directly with secure access
             const { data: users, error } = await supabase
-                .rpc('search_users', { search_query: query });
+                .from('profiles')
+                .select('id, email, first_name, last_name')
+                .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
+                .limit(20);
 
             if (error) {
-                console.error('Error searching users with RPC:', error);
-
-                // Fallback to direct profiles table access with better search
-                const { data: allUsers, error: allUsersError } = await supabase
-                    .from('profiles')
-                    .select('id, email, first_name, last_name')
-                    .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
-                    .limit(100); // Increased limit
-
-                if (allUsersError) {
-                    console.error('Error fetching users with ilike:', allUsersError);
-                    
-                    // Final fallback - get all users and filter client-side
-                    const { data: allUsersFallback, error: allUsersFallbackError } = await supabase
-                        .from('profiles')
-                        .select('id, email, first_name, last_name')
-                        .limit(200);
-
-                    if (allUsersFallbackError) {
-                        console.error('Error fetching all users:', allUsersFallbackError);
-                        return [];
-                    }
-
-                    // Filter users based on query
-                    const filteredUsers = (allUsersFallback || []).filter(user =>
-                        user.email.toLowerCase().includes(query.toLowerCase()) ||
-                        (user.first_name && user.first_name.toLowerCase().includes(query.toLowerCase())) ||
-                        (user.last_name && user.last_name.toLowerCase().includes(query.toLowerCase()))
-                    );
-
-                    console.log('🔍 Filtered users from profiles (fallback):', filteredUsers.length);
-                    return filteredUsers.slice(0, 20); // Increased limit
-                }
-
-                console.log('🔍 Users found via ilike:', allUsers?.length);
-                return (allUsers || []).slice(0, 20); // Increased limit
+                console.error('Error searching users:', error);
+                return [];
             }
 
-            console.log('🔍 Users found via RPC:', users?.length);
-            return (users || []).slice(0, 20); // Increased limit
+            console.log('🔍 Users found:', users?.length);
+            return users || [];
         } catch (error) {
             console.error('Error in searchUsers:', error);
             return [];
