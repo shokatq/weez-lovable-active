@@ -57,28 +57,42 @@ export const SpaceChatInterface: React.FC<SpaceChatInterfaceProps> = ({
 
   const loadMessages = async () => {
     try {
-      const { data, error } = await supabase
+      // Load messages with user profiles using explicit join
+      const { data: messagesData, error: messagesError } = await supabase
         .from('space_messages')
-        .select(`
-          *,
-          profiles (
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('space_id', spaceId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (messagesError) throw messagesError;
+
+      // Get unique user IDs from messages
+      const userIds = [...new Set(messagesData?.map(msg => msg.user_id) || [])];
       
-      const formattedMessages = data?.map(msg => ({
+      // Load profiles for these users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.warn('Error loading profiles:', profilesError);
+      }
+
+      // Create profiles map for quick lookup
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Format messages with user data
+      const formattedMessages = messagesData?.map(msg => ({
         ...msg,
-        user: msg.profiles ? {
-          first_name: msg.profiles.first_name,
-          last_name: msg.profiles.last_name,
-          avatar_url: msg.profiles.avatar_url
-        } : undefined
+        user: profilesMap.get(msg.user_id) || {
+          first_name: 'Unknown',
+          last_name: 'User',
+          avatar_url: null
+        }
       })) || [];
       
       setMessages(formattedMessages);
@@ -128,8 +142,8 @@ export const SpaceChatInterface: React.FC<SpaceChatInterfaceProps> = ({
   useEffect(() => {
     if (!spaceId) return;
 
-    const channel = supabase
-      .channel('space-messages')
+    const messagesChannel = supabase
+      .channel(`space-messages-${spaceId}`)
       .on(
         'postgres_changes',
         {
@@ -142,22 +156,30 @@ export const SpaceChatInterface: React.FC<SpaceChatInterfaceProps> = ({
           const newMsg = payload.new as SpaceMessage;
           
           // Get user profile for the new message
-          const { data: profile } = await supabase
+          const { data: profile, error } = await supabase
             .from('profiles')
             .select('first_name, last_name, avatar_url')
             .eq('id', newMsg.user_id)
             .single();
 
+          if (error) {
+            console.warn('Error loading profile for new message:', error);
+          }
+
           setMessages(prev => [...prev, {
             ...newMsg,
-            user: profile || undefined
+            user: profile || {
+              first_name: 'Unknown',
+              last_name: 'User', 
+              avatar_url: null
+            }
           }]);
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(messagesChannel);
     };
   }, [spaceId]);
 

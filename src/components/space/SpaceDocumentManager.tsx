@@ -45,28 +45,42 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
 
   const loadFiles = async () => {
     try {
-      const { data, error } = await supabase
+      // Load files with owner info using explicit queries
+      const { data: filesData, error: filesError } = await supabase
         .from('files')
-        .select(`
-          *,
-          profiles (
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('space_id', spaceId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (filesError) throw filesError;
+
+      // Get unique owner IDs
+      const ownerIds = [...new Set(filesData?.map(file => file.owner_id) || [])];
       
-      const formattedFiles = data?.map(file => ({
+      // Load profiles for owners
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', ownerIds);
+
+      if (profilesError) {
+        console.warn('Error loading profiles:', profilesError);
+      }
+
+      // Create profiles map for quick lookup
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Format files with owner data
+      const formattedFiles = filesData?.map(file => ({
         ...file,
-        owner: file.profiles ? {
-          first_name: file.profiles.first_name,
-          last_name: file.profiles.last_name,
-          avatar_url: file.profiles.avatar_url
-        } : undefined
+        owner: profilesMap.get(file.owner_id) || {
+          first_name: 'Unknown',
+          last_name: 'User',
+          avatar_url: null
+        }
       })) || [];
       
       setFiles(formattedFiles);
@@ -158,6 +172,32 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
     if (spaceId) {
       loadFiles();
     }
+  }, [spaceId]);
+
+  // Set up real-time subscription for file changes
+  useEffect(() => {
+    if (!spaceId) return;
+
+    const filesChannel = supabase
+      .channel(`space-files-${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'files',
+          filter: `space_id=eq.${spaceId}`
+        },
+        () => {
+          // Reload files when changes occur
+          loadFiles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(filesChannel);
+    };
   }, [spaceId]);
 
   const canUpload = ['admin', 'team_lead', 'employee'].includes(userRole);

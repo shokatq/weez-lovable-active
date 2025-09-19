@@ -81,6 +81,32 @@ export const useSpaceData = (spaceId: string | undefined) => {
     loadSpaceData();
   }, [spaceId, user]);
 
+  // Set up real-time subscription for member changes
+  useEffect(() => {
+    if (!spaceId || !user) return;
+
+    const memberChannel = supabase
+      .channel(`space-members-${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public', 
+          table: 'space_members',
+          filter: `space_id=eq.${spaceId}`
+        },
+        () => {
+          // Reload space data when members change
+          loadSpaceData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(memberChannel);
+    };
+  }, [spaceId, user]);
+
   return {
     space,
     members,
