@@ -160,11 +160,17 @@ export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 // Employee types (for backwards compatibility)
 export interface Employee {
   id: string;
+  name: string;
   email: string;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-  status: string;
+  role: string;
+  department: string;
+  joinDate: Date;
+  lastActive: Date;
+  avatar?: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar_url?: string | null;
+  status?: string;
   custom_role?: string;
   custom_department?: string;
 }
@@ -174,4 +180,7 @@ export interface FileStats {
   total_files: number;
   total_size: number;
   recent_uploads: number;
+  totalFiles?: number; // Backwards compatibility
+  platform?: string; // For platform-specific stats
+  fileTypes?: Record<string, number>; // File type breakdown
 }

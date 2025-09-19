@@ -137,6 +137,9 @@ export const demoFileStats: FileStats[] = [
   {
     platform: "Google Drive",
     totalFiles: 2847,
+    total_files: 2847,
+    total_size: 15000000000,
+    recent_uploads: 45,
     fileTypes: {
       ".pdf": 1240,
       ".docx": 892,
@@ -147,6 +150,9 @@ export const demoFileStats: FileStats[] = [
   {
     platform: "Notion",
     totalFiles: 1534,
+    total_files: 1534,
+    total_size: 8500000000,
+    recent_uploads: 23,
     fileTypes: {
       ".md": 834,
       ".pdf": 445,
@@ -156,6 +162,9 @@ export const demoFileStats: FileStats[] = [
   {
     platform: "OneDrive",
     totalFiles: 1892,
+    total_files: 1892,
+    total_size: 12300000000,
+    recent_uploads: 34,
     fileTypes: {
       ".xlsx": 745,
       ".pptx": 523,
@@ -166,6 +175,9 @@ export const demoFileStats: FileStats[] = [
   {
     platform: "Dropbox",
     totalFiles: 934,
+    total_files: 934,
+    total_size: 6200000000,
+    recent_uploads: 12,
     fileTypes: {
       ".pdf": 445,
       ".jpg": 234,
@@ -176,6 +188,9 @@ export const demoFileStats: FileStats[] = [
   {
     platform: "Slack",
     totalFiles: 567,
+    total_files: 567,
+    total_size: 3800000000,
+    recent_uploads: 8,
     fileTypes: {
       ".pdf": 234,
       ".png": 123,
@@ -260,13 +275,33 @@ export const sampleFiles = [
   }
 ];
 
-export const demoWorkspace: Workspace = {
+// Demo workspace interface extending Workspace
+interface DemoWorkspace extends Workspace {
+  employees: Employee[];
+  stats: {
+    totalEmployees: number;
+    total_files: number;
+    filesByPlatform: FileStats[];
+    recentActivity: Array<{
+      date: Date;
+      action: string;
+      user: string;
+      file?: string;
+      target?: string;
+    }>;
+  };
+}
+
+export const demoWorkspace: DemoWorkspace = {
   id: "workspace-1",
   name: "TechCorp Enterprise",
+  owner_id: "user-1",
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
   employees: demoEmployees,
   stats: {
     totalEmployees: demoEmployees.length,
-    totalFiles: demoFileStats.reduce((sum, platform) => sum + platform.totalFiles, 0),
+    total_files: demoFileStats.reduce((sum, platform) => sum + platform.total_files, 0),
     filesByPlatform: demoFileStats,
     recentActivity: [
       {
@@ -292,6 +327,5 @@ export const demoWorkspace: Workspace = {
         file: "Project_Proposal.docx"
       }
     ]
-  },
-  createdAt: new Date("2024-01-01")
+  }
 };

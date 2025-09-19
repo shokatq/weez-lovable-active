@@ -479,33 +479,62 @@ export class WorkspaceService {
     // Document operations
     static async getWorkspaceDocuments(workspaceId: string): Promise<WorkspaceDocumentsResponse> {
         try {
-            const { data: documents, error } = await supabase
+            // Load documents first
+            const { data: documentsData, error: documentsError } = await supabase
                 .from('documents')
-                .select(`
-            *,
-            uploader:profiles(
-              id,
-              email,
-              first_name,
-              last_name,
-              avatar_url
-            )
-          `)
+                .select('*')
                 .eq('workspace_id', workspaceId)
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Error fetching workspace documents:', error);
-                // Return empty array instead of throwing
+            if (documentsError) {
+                console.error('Error fetching workspace documents:', documentsError);
                 return {
                     documents: [],
                     total: 0
                 };
             }
 
+            if (!documentsData || documentsData.length === 0) {
+                return {
+                    documents: [],
+                    total: 0
+                };
+            }
+
+            // Get unique uploader IDs
+            const uploaderIds = [...new Set(documentsData.map(doc => doc.uploader_id))];
+            
+            // Load profiles for uploaders
+            const { data: profilesData, error: profilesError } = await supabase
+                .from('profiles')
+                .select('id, email, first_name, last_name, avatar_url')
+                .in('id', uploaderIds);
+
+            if (profilesError) {
+                console.warn('Error loading uploader profiles:', profilesError);
+            }
+
+            // Create profiles map for quick lookup
+            const profilesMap = new Map();
+            profilesData?.forEach(profile => {
+                profilesMap.set(profile.id, profile);
+            });
+
+            // Format documents with uploader data
+            const formattedDocuments = documentsData.map(doc => ({
+                ...doc,
+                uploader: profilesMap.get(doc.uploader_id) || {
+                    id: doc.uploader_id,
+                    email: 'unknown@example.com',
+                    first_name: 'Unknown',
+                    last_name: 'User',
+                    avatar_url: null
+                }
+            }));
+
             return {
-                documents: documents as DocumentWithUploader[],
-                total: documents?.length || 0
+                documents: formattedDocuments as DocumentWithUploader[],
+                total: formattedDocuments.length
             };
         } catch (error) {
             console.error('Unexpected error fetching workspace documents:', error);
