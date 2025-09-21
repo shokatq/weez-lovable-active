@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { SpaceSidebar } from '@/components/space/SpaceSidebar';
 import { SpaceChatInterface } from '@/components/space/SpaceChatInterface';
 import { SpaceDocumentManager } from '@/components/space/SpaceDocumentManager';
-import { SpaceAIPrompt } from '@/components/space/SpaceAIPrompt';
+import { FloatingWeezAssistant } from '@/components/space/FloatingWeezAssistant';
 import { useSpaceData } from '@/hooks/useSpaceData';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
@@ -96,10 +96,8 @@ export default function SpacePage() {
           )}
         </div>
         
-        {/* AI Prompt Bar */}
-        <SpaceAIPrompt
-          spaceId={spaceId}
-        />
+        {/* Floating Weez Assistant */}
+        <FloatingWeezAssistant spaceId={spaceId} />
       </div>
     </div>
   );

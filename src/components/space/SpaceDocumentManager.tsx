@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, FileText, Image, Video, Download, Trash2, MoreVertical, Search, Filter } from 'lucide-react';
+import { Eye, FileText, Image, Video, Download, Trash2, MoreVertical, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -7,9 +7,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { DocumentUploadWithProgress } from './DocumentUploadWithProgress';
+import { DocumentViewer } from './DocumentViewer';
 
 interface SpaceFile {
   id: string;
@@ -40,6 +43,8 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [selectedFile, setSelectedFile] = useState<SpaceFile | null>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -96,45 +101,67 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
+  const handleViewFile = (file: SpaceFile) => {
+    setSelectedFile(file);
+    setViewerOpen(true);
+  };
 
+  const handleDeleteFile = async (fileId: string, filePath: string) => {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${spaceId}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
         .from('workspace-documents')
-        .upload(filePath, file);
+        .remove([filePath]);
 
-      if (uploadError) throw uploadError;
+      if (storageError) {
+        console.warn('Storage deletion failed:', storageError);
+      }
 
+      // Delete from database
       const { error: dbError } = await supabase
         .from('files')
-        .insert({
-          space_id: spaceId,
-          filename: file.name,
-          file_path: filePath,
-          mime_type: file.type,
-          file_size: file.size,
-          owner_id: user.id
-        });
+        .delete()
+        .eq('id', fileId);
 
       if (dbError) throw dbError;
 
       toast({
-        title: "Success",
-        description: "File uploaded successfully",
+        title: "File deleted",
+        description: "File has been removed successfully",
       });
 
       loadFiles();
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error deleting file:', error);
       toast({
         title: "Error",
-        description: "Failed to upload file",
+        description: "Failed to delete file",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const downloadFile = async (file: SpaceFile) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('workspace-documents')
+        .download(file.file_path);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download file",
         variant: "destructive",
       });
     }
@@ -204,32 +231,22 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
   const canDelete = userRole === 'admin';
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b bg-background">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="font-semibold text-foreground">Documents & Files</h3>
-            <p className="text-sm text-muted-foreground">{files.length} files</p>
-          </div>
-          
-          {canUpload && (
+    <TooltipProvider>
+      <div className="h-full flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b bg-background">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <input
-                type="file"
-                id="file-upload"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-              <Button asChild>
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload File
-                </label>
-              </Button>
+              <h3 className="font-semibold text-foreground">Documents & Files</h3>
+              <p className="text-sm text-muted-foreground">{files.length} files</p>
             </div>
-          )}
-        </div>
+            
+            <DocumentUploadWithProgress
+              spaceId={spaceId}
+              onUploadComplete={loadFiles}
+              canUpload={canUpload}
+            />
+          </div>
 
         {/* Search and Filter */}
         <div className="flex gap-2">
@@ -284,12 +301,21 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredFiles.map((file) => (
-              <Card key={file.id} className="p-4 hover:shadow-md transition-shadow">
+              <Card key={file.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer group">
                 <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-1 min-w-0" onClick={() => handleViewFile(file)}>
                     {getFileIcon(file.mime_type)}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{file.filename}</p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <p className="font-medium text-sm truncate group-hover:text-blue-600 transition-colors">
+                            {file.filename}
+                          </p>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{file.filename}</p>
+                        </TooltipContent>
+                      </Tooltip>
                       <p className="text-xs text-muted-foreground">
                         {formatFileSize(file.file_size)}
                       </p>
@@ -298,17 +324,24 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleViewFile(file)}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => downloadFile(file)}>
                         <Download className="h-4 w-4 mr-2" />
                         Download
                       </DropdownMenuItem>
                       {canDelete && (
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => handleDeleteFile(file.id, file.file_path)}
+                        >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
                         </DropdownMenuItem>
@@ -338,6 +371,17 @@ export const SpaceDocumentManager: React.FC<SpaceDocumentManagerProps> = ({
           </div>
         )}
       </ScrollArea>
+
+      {/* Document Viewer */}
+      <DocumentViewer
+        file={selectedFile}
+        isOpen={viewerOpen}
+        onClose={() => {
+          setViewerOpen(false);
+          setSelectedFile(null);
+        }}
+      />
     </div>
+    </TooltipProvider>
   );
 };

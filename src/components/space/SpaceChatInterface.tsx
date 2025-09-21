@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { CollapsibleMembersSidebar } from './CollapsibleMembersSidebar';
 
 interface SpaceMember {
   id: string;
@@ -258,35 +259,8 @@ export const SpaceChatInterface: React.FC<SpaceChatInterfaceProps> = ({
         </div>
       </div>
 
-      {/* Members Sidebar */}
-      <Card className="w-64 border-l border-r-0 border-t-0 border-b-0 rounded-none">
-        <div className="p-4 border-b">
-          <h4 className="font-medium text-sm">Members ({members.length})</h4>
-        </div>
-        <ScrollArea className="h-[calc(100%-60px)]">
-          <div className="p-2 space-y-1">
-            {members.map((member) => (
-              <div key={member.user_id} className="flex items-center gap-2 p-2 rounded hover:bg-muted/50">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={member.avatar_url || undefined} />
-                  <AvatarFallback className="text-xs">
-                    {member.first_name?.[0] || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {member.first_name} {member.last_name}
-                  </p>
-                  <Badge variant="secondary" className="text-xs">
-                    {member.role}
-                  </Badge>
-                </div>
-                <div className="h-2 w-2 bg-green-500 rounded-full" />
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </Card>
+      {/* Collapsible Members Sidebar */}
+      <CollapsibleMembersSidebar members={members} />
     </div>
   );
 };
