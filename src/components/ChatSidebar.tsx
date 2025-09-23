@@ -5,7 +5,8 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/compone
 import { Plus, MessageSquare, Building2, Clock, Trash2, Loader2, ChevronDown, ChevronRight, Folder, Upload, FileCheck, Clock3, FolderOpen, MoreHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useWorkspaces } from "@/hooks/useWorkspace";
+import { useSpaces } from "@/hooks/useSpaces";
+import { CreateSpaceDialog } from "@/components/CreateSpaceDialog";
 import UserProfile from "./UserProfile";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -66,8 +67,7 @@ const ChatSidebar = ({
   const [openDaily, setOpenDaily] = useState(false);
   const [openSpaces, setOpenSpaces] = useState(false);
   const [openAssets, setOpenAssets] = useState(false);
-  const { workspaces, fetchWorkspaces, loading: workspacesLoading } = useWorkspaces();
-  // useWorkspaces already fetches on mount; avoid duplicate call
+  const { spaces, loading: spacesLoading } = useSpaces();
 
   // Get conversation preview text
   const getConversationPreviewText = (summary: BackendConversationSummary) => {
@@ -366,14 +366,14 @@ const ChatSidebar = ({
               </button>
               {openSpaces && (
                 <div className="px-2 py-2 text-sm space-y-1">
-                  {workspacesLoading && (
+                  {spacesLoading && (
                     <div className="px-2 py-1 text-xs text-muted-foreground">Loading spaces...</div>
                   )}
-                  {!workspacesLoading && workspaces.map(ws => (
-                    <div key={ws.id} className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-sidebar-accent">
-                      <button onClick={() => navigate(`/space/id/${ws.id}`)} className="flex items-center gap-2 min-w-0">
+                  {!spacesLoading && spaces.map(space => (
+                    <div key={space.id} className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-sidebar-accent">
+                      <button onClick={() => navigate(`/space/id/${space.id}`)} className="flex items-center gap-2 min-w-0">
                         <Folder className="w-3.5 h-3.5" />
-                        <span className="truncate text-sm">{ws.name}</span>
+                        <span className="truncate text-sm">{space.name}</span>
                       </button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -383,8 +383,8 @@ const ChatSidebar = ({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuLabel>Space options</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => navigate(`/space/id/${ws.id}`)}>Open</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(window.location.origin + `/workspace/${ws.id}`)}>Copy link</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/space/id/${space.id}`)}>Open</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(window.location.origin + `/space/id/${space.id}`)}>Copy link</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem>Rename</DropdownMenuItem>
                           <DropdownMenuItem>Color & Icon</DropdownMenuItem>
@@ -397,10 +397,10 @@ const ChatSidebar = ({
                       </DropdownMenu>
                     </div>
                   ))}
-                  <button onClick={() => navigate('/workspace-management')} className="w-full text-left px-2 py-1.5 rounded hover:bg-sidebar-accent flex items-center gap-2 text-muted-foreground">
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>New Space</span>
-                  </button>
+                  {!spacesLoading && spaces.length === 0 && (
+                    <div className="px-2 py-1 text-xs text-muted-foreground">No spaces yet</div>
+                  )}
+                  <CreateSpaceDialog />
                 </div>
               )}
             </div>
