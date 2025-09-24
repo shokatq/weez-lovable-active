@@ -200,7 +200,7 @@ const Index = () => {
       </footer>
 
       {/* Demo Mode Overlay */}
-      <DemoMode isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
+      <ComprehensiveDemo isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
     </div>
   );
 };
