@@ -55,6 +55,86 @@ export const demoFiles: DemoFile[] = [
     platform: "SharePoint", 
     description: "Complete user manual with step-by-step instructions and troubleshooting guide",
     lastModified: "1 week ago"
+  },
+  {
+    id: "6",
+    name: "APIDocumentation.pdf",
+    type: "PDF",
+    platform: "Confluence",
+    description: "REST API documentation with authentication, endpoints, and code examples",
+    lastModified: "2 days ago"
+  },
+  {
+    id: "7",
+    name: "SecurityPolicy.docx",
+    type: "DOCX",
+    platform: "Google Drive",
+    description: "Corporate security policies and data protection guidelines for enterprise systems",
+    lastModified: "1 week ago"
+  },
+  {
+    id: "8",
+    name: "DatabaseDesign.xlsx",
+    type: "XLSX",
+    platform: "OneDrive",
+    description: "Database schema design with entity relationships and normalization strategies",
+    lastModified: "4 days ago"
+  },
+  {
+    id: "9",
+    name: "MeetingMinutes_Q4.pdf",
+    type: "PDF",
+    platform: "Slack",
+    description: "Quarterly review meeting minutes with action items and strategic decisions",
+    lastModified: "6 hours ago"
+  },
+  {
+    id: "10",
+    name: "CloudArchitecture.pptx",
+    type: "PPTX",
+    platform: "SharePoint",
+    description: "Cloud infrastructure architecture presentation with AWS services overview",
+    lastModified: "3 days ago"
+  },
+  {
+    id: "11",
+    name: "ComplianceReport.pdf",
+    type: "PDF",
+    platform: "Google Drive",
+    description: "SOX compliance audit report with findings and remediation recommendations",
+    lastModified: "2 weeks ago"
+  },
+  {
+    id: "12",
+    name: "ProductRoadmap.md",
+    type: "MD",
+    platform: "GitHub",
+    description: "Product development roadmap with feature priorities and release timelines",
+    lastModified: "5 days ago"
+  },
+  {
+    id: "13",
+    name: "VendorContracts.docx",
+    type: "DOCX",
+    platform: "OneDrive",
+    description: "Software vendor contracts and licensing agreements for enterprise tools",
+    lastModified: "1 day ago"
+  },
+  {
+    id: "14",
+    name: "TestingProcedures.txt",
+    type: "TXT",
+    platform: "Jira",
+    description: "Quality assurance testing procedures and automated test case documentation",
+    lastModified: "8 hours ago"
+  },
+  {
+    id: "15",
+    name: "BudgetAnalysis.xlsx",
+    type: "XLSX",
+    platform: "SharePoint",
+    description: "Annual IT budget analysis with cost breakdowns and variance reports",
+    lastModified: "1 week ago"
   }
 ];
 
