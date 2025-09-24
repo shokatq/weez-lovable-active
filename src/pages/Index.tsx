@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,12 +15,15 @@ import {
   Globe, 
   Star,
   Zap,
-  CheckCircle
+  CheckCircle,
+  Play
 } from "lucide-react";
+import DemoMode from "@/components/DemoMode";
 
 
 const Index = () => {
   const navigate = useNavigate();
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
 
   const features = [
     {
@@ -96,6 +100,15 @@ const Index = () => {
               </p>
               
               <div className="flex items-center gap-6 slide-up" style={{ animationDelay: '0.4s' }}>
+                <Button 
+                  onClick={() => setIsDemoOpen(true)}
+                  size="lg"
+                  variant="secondary"
+                  className="font-semibold px-8 py-4 rounded-full text-lg shadow-lg transition-all duration-300 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white border-0"
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Try Demo
+                </Button>
                 <Button 
                   onClick={() => navigate("/auth?mode=signup")}
                   size="lg"
@@ -185,6 +198,9 @@ const Index = () => {
           </p>
         </div>
       </footer>
+
+      {/* Demo Mode Overlay */}
+      <DemoMode isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
     </div>
   );
 };
