@@ -18,7 +18,7 @@ import {
   CheckCircle,
   Play
 } from "lucide-react";
-import DemoMode from "@/components/DemoMode";
+import ComprehensiveDemo from "@/components/ComprehensiveDemo";
 
 
 const Index = () => {
