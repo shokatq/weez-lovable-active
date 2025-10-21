@@ -22,6 +22,8 @@ import EmployeeLogin from "./pages/EmployeeLogin";
 import EmployeeSignup from "./pages/EmployeeSignup";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import Audit from "./pages/Audit";
+import VerificationSuccess from "./pages/VerificationSuccess";
+import VerificationFailed from "./pages/VerificationFailed";
 import { AuthProvider } from "./hooks/useAuth";
 import { MemberProvider } from "./contexts/MemberContext";
 import { useWorkspaceInitialization } from "./hooks/useWorkspaceInitialization";
@@ -32,13 +34,18 @@ import { useGlobalAuditLogger } from "./hooks/useGlobalAuditLogger";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  useGlobalAuditLogger(); // Global audit logging
-  useWorkspaceInitialization(); // Initialize workspace data on app load
+  useGlobalAuditLogger();
+  useWorkspaceInitialization();
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        
+        {/* Email Verification Routes */}
+        <Route path="/verification-success" element={<VerificationSuccess />} />
+        <Route path="/verification-failed" element={<VerificationFailed />} />
+        
         <Route path="/accept-invitation" element={<AcceptInvitation />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
@@ -81,7 +88,6 @@ const AppContent = () => {
             <SpacePage />
           </ProtectedRoute>
         } />
-        {/* Removed direct create workspace page */}
         <Route path="/workspace-management" element={
           <ProtectedRoute>
             <WorkspaceManagement />
@@ -97,7 +103,6 @@ const AppContent = () => {
             <Audit />
           </ProtectedRoute>
         } />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
